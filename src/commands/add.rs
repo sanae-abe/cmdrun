@@ -325,8 +325,8 @@ mod tests {
         let mut doc = content.parse::<DocumentMut>().unwrap();
 
         let mut command_table = InlineTable::new();
-        command_table.insert("description", Value::from("Test command"));
-        command_table.insert("cmd", Value::from("echo test"));
+        command_table.insert("description", value("Test command").into_value().unwrap());
+        command_table.insert("cmd", value("echo test").into_value().unwrap());
 
         if let Some(commands_table) = doc["commands"].as_table_mut() {
             commands_table.insert("test", Item::Value(command_table.into()));
