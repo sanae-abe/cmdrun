@@ -1,131 +1,172 @@
-# CLI Reference
+# CLIリファレンス
 
-[English](CLI.md) | [日本語](CLI.ja.md)
+cmdrunコマンドラインインターフェースの完全なリファレンスです。
 
-Complete reference for all cmdrun command-line interface commands and options.
+## 目次
 
-## Table of Contents
-
-- [Global Options](#global-options)
-- [Commands](#commands)
-  - [run](#run)
-  - [list](#list)
-  - [add](#add)
-  - [remove](#remove)
-  - [edit](#edit)
-  - [info](#info)
-  - [search](#search)
-  - [open](#open)
-  - [init](#init)
-  - [validate](#validate)
-  - [graph](#graph)
-  - [completion](#completion)
-  - [completion-list](#completion-list)
-- [Exit Codes](#exit-codes)
-- [Configuration](#configuration)
+- [グローバルオプション](#グローバルオプション)
+- [コマンド](#コマンド)
+  - [add](#add) - コマンドを追加
+  - [run](#run) - コマンドを実行
+  - [list](#list) - コマンド一覧
+  - [remove](#remove) - コマンドを削除
+  - [edit](#edit) - コマンドを編集
+  - [info](#info) - コマンド情報を表示
+  - [search](#search) - コマンドを検索
+  - [open](#open) - 設定ファイルを開く
+  - [validate](#validate) - 設定を検証
+  - [config](#config) - 設定管理
+  - [completion](#completion) - シェル補完スクリプト生成
+- [終了コード](#終了コード)
+- [設定ファイル](#設定ファイル)
 
 ---
 
-## Global Options
+## グローバルオプション
 
-These options are available for all commands:
+すべてのコマンドで使用可能なオプション:
 
 ### `-h, --help`
 
-Display help information for cmdrun or a specific command.
+cmdrunまたは特定のコマンドのヘルプを表示します。
 
-**Examples:**
+**使用例:**
 
 ```bash
-# Show general help
+# 一般的なヘルプを表示
 cmdrun --help
 
-# Show help for a specific command
+# 特定のコマンドのヘルプを表示
 cmdrun run --help
 cmdrun add --help
 ```
 
 ### `--version`
 
-Display the version of cmdrun.
+cmdrunのバージョンを表示します。
 
-**Example:**
+**使用例:**
 
 ```bash
 cmdrun --version
-# Output: cmdrun 1.0.0
+# 出力: cmdrun 1.0.0
 ```
 
 ### `-v, --verbose`
 
-Enable verbose output for debugging and detailed information.
+詳細な出力を有効にします。
 
-- `-v`: Debug level logging
-- `-vv`: Trace level logging
+- `-v`: デバッグレベルのログ
+- `-vv`: トレースレベルのログ
 
-**Example:**
+**使用例:**
 
 ```bash
-# Standard output
+# 標準出力
 cmdrun run build
 
-# Verbose output
+# 詳細出力
 cmdrun -v run build
 
-# Very verbose output
+# 非常に詳細な出力
 cmdrun -vv run build
 ```
 
 ---
 
-## Commands
+## コマンド
+
+### add
+
+新しいコマンドを設定ファイルに追加します。
+
+#### 構文
+
+```bash
+cmdrun add [ID] [COMMAND] [DESCRIPTION]
+```
+
+#### 説明
+
+グローバル設定ファイル（`~/.config/cmdrun/commands.toml`）に新しいコマンドを追加します。
+引数を省略すると対話モードで入力できます。
+
+#### 引数
+
+- `[ID]` - コマンドの一意な識別子（省略可、対話モードで入力）
+- `[COMMAND]` - 実行するコマンド（省略可、対話モードで入力）
+- `[DESCRIPTION]` - コマンドの説明（省略可、対話モードで入力）
+
+#### 使用例
+
+```bash
+# 対話モードで追加
+cmdrun add
+
+# 全ての引数を指定して追加
+cmdrun add dev "npm run dev" "開発サーバーを起動"
+
+# よく使うコマンドの例
+cmdrun add push "git add . && git commit && git push" "変更をコミット＆プッシュ"
+cmdrun add prod-ssh "ssh user@production-server.com" "本番サーバーに接続"
+cmdrun add docker-clean "docker system prune -af" "未使用のDockerリソースを削除"
+```
+
+#### 対話モード例
+
+```
+=== コマンドを追加 ===
+
+コマンドID: build
+コマンド: cargo build --release
+説明: リリースビルド
+
+プレビュー
+  ID: build
+  コマンド: cargo build --release
+  説明: リリースビルド
+
+どうしますか？
+❯ はい、このコマンドを追加します
+  いいえ、再編集します
+  キャンセル
+
+📝 コマンドを追加中 'build' ...
+✓ コマンドを追加しました 'build'
+  説明: リリースビルド
+  コマンド: cargo build --release
+```
+
+---
 
 ### run
 
-Execute a command defined in your configuration.
+登録されたコマンドを実行します。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun run [OPTIONS] <NAME> [-- ARGS...]
 ```
 
-#### Description
+#### 説明
 
-Runs the specified command from your `commands.toml` configuration file. If the command has dependencies, they will be executed first in the correct order. Supports both sequential and parallel execution modes.
+設定ファイルに登録されたコマンドを実行します。依存関係があれば正しい順序で実行されます。
 
-#### Arguments
+#### 引数
 
-- `<NAME>` - The name/ID of the command to execute (required)
-- `[ARGS...]` - Additional arguments to pass to the command (optional)
+- `<NAME>` - 実行するコマンドのID（必須）
+- `[ARGS...]` - コマンドに渡す追加引数（省略可）
 
-#### Options
+#### オプション
 
-- `-p, --parallel` - Execute dependencies in parallel when possible
+- `-p, --parallel` - 依存関係を並列実行
 
-#### Examples
-
-**English:**
-
-```bash
-# Run a simple command
-cmdrun run test
-
-# Run command with parallel dependency execution
-cmdrun run build --parallel
-
-# Pass additional arguments to the command
-cmdrun run dev -- --port 8080
-
-# Run with verbose output
-cmdrun -v run build
-```
-
-**Japanese (日本語):**
+#### 使用例
 
 ```bash
 # シンプルなコマンド実行
-cmdrun run test
+cmdrun run dev
 
 # 並列実行で依存関係を解決
 cmdrun run build --parallel
@@ -137,54 +178,32 @@ cmdrun run dev -- --port 8080
 cmdrun -v run build
 ```
 
-#### Output Example
-
-```
-Running: Build the project (with parallel dependencies)
-📋 Execution plan: 3 groups
-▶ Group 1/3 (2 commands)
-  ✓ lint completed in 1.23s
-  ✓ test completed in 2.45s
-▶ Group 2/3 (1 commands)
-  ✓ compile completed in 5.67s
-▶ Group 3/3 (1 commands)
-  ✓ package completed in 1.89s
-✓ All commands completed in 11.24s
-```
-
 ---
 
 ### list
 
-List all available commands from the configuration.
+登録されている全コマンドを一覧表示します。
 
-#### Synopsis
-
-```bash
-cmdrun list [OPTIONS]
-```
-
-#### Description
-
-Displays all commands defined in your `commands.toml` file with their descriptions. Use the verbose flag to see detailed information including command specifications and dependencies.
-
-#### Options
-
-- `-v, --verbose` - Show detailed information for each command
-
-#### Examples
-
-**English:**
+#### 構文
 
 ```bash
-# List all commands
-cmdrun list
-
-# List with detailed information
-cmdrun list --verbose
+cmdrun list [OPTIONS] [KEYWORD]
 ```
 
-**Japanese (日本語):**
+#### 説明
+
+設定ファイルに登録されている全コマンドを表示します。
+キーワードを指定すると、そのキーワードを含むコマンドのみ表示します。
+
+#### 引数
+
+- `[KEYWORD]` - 検索キーワード（省略可）
+
+#### オプション
+
+- `-v, --verbose` - 各コマンドの詳細情報を表示
+
+#### 使用例
 
 ```bash
 # コマンド一覧を表示
@@ -192,174 +211,66 @@ cmdrun list
 
 # 詳細情報付きで表示
 cmdrun list --verbose
+
+# 特定のキーワードで検索
+cmdrun list docker
+cmdrun list dev
 ```
 
-#### Output Example
+#### 出力例
 
-**Standard output:**
-
-```
-Available commands:
-
-  build - Build the project
-  clean - Clean build artifacts
-  dev - Start development server
-  test - Run all tests
-```
-
-**Verbose output:**
+**標準出力:**
 
 ```
-Available commands:
+利用可能なコマンド:
 
-  build - Build the project
-    Command:
-      cargo build --release
-    Dependencies: ["lint", "test"]
-
-  dev - Start development server
-    Command:
-      cargo watch -x run
-    [...]
+  dev - 開発サーバーを起動
+  push - 変更をコミット＆プッシュ
+  prod-ssh - 本番サーバーに接続
+  docker-clean - 未使用のDockerリソースを削除
 ```
 
----
-
-### add
-
-Add a new command to the configuration file.
-
-#### Synopsis
-
-```bash
-cmdrun add [OPTIONS] [ID] [COMMAND] [DESCRIPTION]
-```
-
-#### Description
-
-Adds a new command entry to your `commands.toml` configuration file. Can be used in interactive mode (when arguments are omitted) or with all arguments provided for scripting.
-
-Interactive mode provides a guided experience with:
-- Input validation
-- Preview before saving
-- Back navigation support
-- Multi-language prompts
-
-#### Arguments
-
-- `[ID]` - Unique command identifier (optional, will prompt if omitted)
-- `[COMMAND]` - Command to execute (optional, will prompt if omitted)
-- `[DESCRIPTION]` - Command description (optional, will prompt if omitted)
-
-#### Options
-
-- `-c, --category <CATEGORY>` - Category for the command
-- `-t, --tags <TAGS>` - Comma-separated tags for the command
-
-#### Examples
-
-**English:**
-
-```bash
-# Interactive mode
-cmdrun add
-
-# Add with all arguments
-cmdrun add build "cargo build --release" "Build release binary"
-
-# Add with category and tags
-cmdrun add test "cargo test" "Run tests" \
-  --category testing \
-  --tags rust,ci
-
-# Quick one-liner
-cmdrun add lint "cargo clippy" "Lint code"
-```
-
-**Japanese (日本語):**
-
-```bash
-# 対話モードで追加
-cmdrun add
-
-# 全ての引数を指定して追加
-cmdrun add build "cargo build --release" "リリースビルド"
-
-# カテゴリとタグを指定
-cmdrun add test "cargo test" "テスト実行" \
-  --category testing \
-  --tags rust,ci
-
-# ワンライナーで追加
-cmdrun add lint "cargo clippy" "リンター実行"
-```
-
-#### Interactive Mode Example
+**詳細出力:**
 
 ```
-=== Add New Command ===
+利用可能なコマンド:
 
-Command ID: build
-Command: cargo build --release
-Description: Build release binary
+  dev - 開発サーバーを起動
+    コマンド:
+      npm run dev
+    依存関係: なし
 
-Preview
-  ID: build
-  Command: cargo build --release
-  Description: Build release binary
-
-What would you like to do?
-❯ Yes, add this command
-  No, edit again
-  Cancel
-
-📝 Adding command 'build' to commands.toml
-✓ Command added successfully 'build'
-  Description: Build release binary
-  Command: cargo build --release
+  push - 変更をコミット＆プッシュ
+    コマンド:
+      git add . && git commit && git push
+    依存関係: なし
 ```
 
 ---
 
 ### remove
 
-Remove a command from the configuration file.
+コマンドを設定ファイルから削除します。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun remove [OPTIONS] <ID>
 ```
 
-#### Description
+#### 説明
 
-Removes a command entry from your `commands.toml` configuration file. Creates a backup before modification for safety. Requires confirmation unless the `--force` flag is used.
+グローバル設定ファイルからコマンドを削除します。削除前にバックアップが作成されます。
 
-#### Arguments
+#### 引数
 
-- `<ID>` - Command ID to remove (required)
+- `<ID>` - 削除するコマンドのID（必須）
 
-#### Options
+#### オプション
 
-- `-f, --force` - Skip confirmation prompt
-- `-c, --config <PATH>` - Path to configuration file (default: auto-detect)
+- `-f, --force` - 確認プロンプトをスキップ
 
-#### Examples
-
-**English:**
-
-```bash
-# Remove with confirmation
-cmdrun remove old-command
-
-# Remove without confirmation
-cmdrun remove old-command --force
-
-# Remove from specific config file
-cmdrun remove build --config ./custom-commands.toml
-```
-
-**Japanese (日本語):**
+#### 使用例
 
 ```bash
 # 確認プロンプト付きで削除
@@ -367,417 +278,193 @@ cmdrun remove old-command
 
 # 確認なしで削除
 cmdrun remove old-command --force
-
-# 指定した設定ファイルから削除
-cmdrun remove build --config ./custom-commands.toml
 ```
 
-#### Output Example
+#### 出力例
 
 ```
-Removal target:
+削除対象:
   ID: old-command
-  Description: Obsolete build script
-  Command: make old-build
+  説明: 古いビルドスクリプト
+  コマンド: make old-build
 
-Are you sure? (y/N): y
+本当に削除しますか？ (y/N): y
 
-✓ Backup created: commands.toml.backup.20231105_143022
-✓ Command removed successfully 'old-command'
+✓ バックアップを作成しました: commands.toml.backup.20231105_143022
+✓ コマンドを削除しました 'old-command'
 ```
 
 ---
 
 ### edit
 
-Edit an existing command interactively.
+既存のコマンドを対話的に編集します。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun edit [ID]
 ```
 
-#### Description
+#### 説明
 
-Opens an interactive editor to modify an existing command's properties including description, command string, tags, and execution settings. If no command ID is provided, displays a selection menu.
+登録されているコマンドの内容を対話的に編集します。IDを省略すると選択メニューが表示されます。
 
-#### Arguments
+#### 引数
 
-- `[ID]` - Command ID to edit (optional, will prompt if omitted)
+- `[ID]` - 編集するコマンドのID（省略可）
 
-#### Examples
-
-**English:**
-
-```bash
-# Edit specific command
-cmdrun edit build
-
-# Interactive command selection
-cmdrun edit
-```
-
-**Japanese (日本語):**
+#### 使用例
 
 ```bash
 # 特定のコマンドを編集
-cmdrun edit build
+cmdrun edit dev
 
 # 対話的にコマンド選択
 cmdrun edit
-```
-
-#### Output Example
-
-```
-Current settings
-  ID: build
-  Description: Build the project
-  Command: cargo build
-  Tags: []
-  Parallel: false
-  Confirm: false
-
-Description (Build the project): Build release binary
-Command (cargo build): cargo build --release
-Tags (comma-separated) (): rust,build
-Parallel execution (false): false
-Confirm before execution (false): false
-
-✓ Command updated successfully 'build'
 ```
 
 ---
 
 ### info
 
-Show detailed information about a command.
+コマンドの詳細情報を表示します。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun info [ID]
 ```
 
-#### Description
+#### 説明
 
-Displays comprehensive information about a specific command including:
-- Description
-- Command specification (single, multiple, or platform-specific)
-- Dependencies
-- Tags
-- Working directory
-- Environment variables
-- Execution settings
-- Platform support
+登録されているコマンドの詳細情報を表示します。
 
-#### Arguments
+#### 引数
 
-- `[ID]` - Command ID to display info for (optional, will prompt if omitted)
+- `[ID]` - 情報を表示するコマンドのID（省略可）
 
-#### Examples
-
-**English:**
-
-```bash
-# Show info for specific command
-cmdrun info build
-
-# Interactive selection
-cmdrun info
-```
-
-**Japanese (日本語):**
+#### 使用例
 
 ```bash
 # 特定のコマンドの情報表示
-cmdrun info build
+cmdrun info dev
 
 # 対話的に選択
 cmdrun info
-```
-
-#### Output Example
-
-```
-Command details: build
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Description: Build the project
-
-Command:
-  cargo build --release
-
-Dependencies:
-  → lint
-  → test
-
-Tags: rust, build, ci
-
-Execution settings:
-  Parallel: yes
-  Confirm: no
-  Timeout: 300s
-
-Platforms: Unix, Linux, macOS
 ```
 
 ---
 
 ### search
 
-Search commands by keyword.
+キーワードでコマンドを検索します。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun search <KEYWORD>
 ```
 
-#### Description
+#### 説明
 
-Searches through all commands for the specified keyword (case-insensitive). Searches in:
-- Command IDs
-- Descriptions
-- Command text
-- Tags
+コマンドID、説明、コマンド本体、タグから指定したキーワードを検索します（大文字小文字を区別しません）。
 
-Results show where the keyword was matched (id, description, command, or tags).
+#### 引数
 
-#### Arguments
+- `<KEYWORD>` - 検索キーワード（必須）
 
-- `<KEYWORD>` - Keyword to search for (required)
-
-#### Examples
-
-**English:**
+#### 使用例
 
 ```bash
-# Search for test-related commands
-cmdrun search test
+# docker関連のコマンドを検索
+cmdrun search docker
 
-# Search for build commands
-cmdrun search build
+# dev関連のコマンドを検索
+cmdrun search dev
 
-# Search by tag
-cmdrun search rust
+# gitコマンドを検索
+cmdrun search git
 ```
 
-**Japanese (日本語):**
-
-```bash
-# テスト関連のコマンドを検索
-cmdrun search test
-
-# ビルド系コマンドを検索
-cmdrun search build
-
-# タグで検索
-cmdrun search rust
-```
-
-#### Output Example
+#### 出力例
 
 ```
-Searching for: 'test'
+検索キーワード: 'docker'
 
-✓ Found 3 matching command(s):
+✓ 2件のコマンドが見つかりました:
 
-  • integration-test - Run integration tests
-    Matched in: id, description
+  • docker-clean - 未使用のDockerリソースを削除
+    一致箇所: id, description
 
-  • test - Run all tests
-    Matched in: id, description, tags
+  • docker-logs - Dockerコンテナのログを表示
+    一致箇所: id, command
 
-  • test-watch - Run tests in watch mode
-    Matched in: id, command
-
-💡 Use cmdrun info <command> to see details
+💡 詳細は cmdrun info <コマンド> で確認できます
 ```
 
 ---
 
 ### open
 
-Open the configuration file in the default editor.
+設定ファイルをエディタで開きます。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun open
 ```
 
-#### Description
+#### 説明
 
-Opens your `commands.toml` configuration file in the system's default editor or a suitable text editor. Searches for the configuration file in:
-1. Current directory (`./commands.toml`)
-2. Parent directories (searching upward)
-3. Global directory (`~/.cmdrun/commands.toml`)
+グローバル設定ファイル（`~/.config/cmdrun/commands.toml`）をデフォルトエディタで開きます。
 
-Attempts to use editors in the following order:
+設定ファイルが存在しない場合は、自動的に作成されます。
+
+#### 使用するエディタ
+
+以下の順序でエディタを試行します:
+
 - **macOS**: `open`, `code`, `vim`
 - **Linux**: `xdg-open`, `code`, `vim`, `nano`
 - **Windows**: `code`, `notepad`
 
-#### Examples
-
-**English:**
-
-```bash
-# Open configuration file
-cmdrun open
-```
-
-**Japanese (日本語):**
+#### 使用例
 
 ```bash
 # 設定ファイルを開く
 cmdrun open
 ```
 
-#### Output Example
+#### 出力例
 
 ```
-Opening: /path/to/project/commands.toml
+Opening: ~/.config/cmdrun/commands.toml
 ✓ Opened in code
-```
-
----
-
-### init
-
-Initialize a new commands.toml configuration file.
-
-#### Synopsis
-
-```bash
-cmdrun init [OPTIONS]
-```
-
-#### Description
-
-Creates a new `commands.toml` configuration file from a template. Provides several project-specific templates optimized for different development environments.
-
-Available templates:
-- **default** - Generic command runner configuration
-- **web** - Web development (HTML/CSS/JS)
-- **rust** - Rust project with cargo commands
-- **node** - Node.js project with npm/yarn commands
-- **python** - Python project with common tools
-
-#### Options
-
-- `-t, --template <TEMPLATE>` - Template to use (web, rust, node, python)
-- `-i, --interactive` - Use interactive mode to select template
-- `-o, --output <PATH>` - Output path (default: `commands.toml`)
-
-#### Examples
-
-**English:**
-
-```bash
-# Create with default template
-cmdrun init
-
-# Create with specific template
-cmdrun init --template rust
-
-# Create with interactive selection
-cmdrun init --interactive
-
-# Create at custom location
-cmdrun init --output ./custom/path/commands.toml
-
-# Create for Node.js project
-cmdrun init -t node
-```
-
-**Japanese (日本語):**
-
-```bash
-# デフォルトテンプレートで作成
-cmdrun init
-
-# 特定のテンプレートで作成
-cmdrun init --template rust
-
-# 対話モードで選択
-cmdrun init --interactive
-
-# カスタムパスに作成
-cmdrun init --output ./custom/path/commands.toml
-
-# Node.jsプロジェクト用に作成
-cmdrun init -t node
-```
-
-#### Output Example
-
-```
-✓ Created commands.toml using rust template
-
-Next steps:
-  1. Edit commands.toml to define your commands
-  2. Run cmdrun list to list available commands
-  3. Run cmdrun run <name> to execute a command
-
-Example commands:
-  $ cmdrun list --verbose
-  $ cmdrun run dev
-  $ cmdrun run build
 ```
 
 ---
 
 ### validate
 
-Validate the configuration file.
+設定ファイルを検証します。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun validate [OPTIONS]
 ```
 
-#### Description
+#### 説明
 
-Validates your `commands.toml` configuration file for:
-- Syntax errors
-- Missing required fields
-- Invalid command references
-- Circular dependencies (when `--check-cycles` is enabled)
-- Broken alias references
-- Platform-specific command validity
+設定ファイルの構文、必須フィールド、依存関係などを検証します。
 
-#### Options
+#### オプション
 
-- `-p, --path <PATH>` - Path to configuration file (default: auto-detect)
-- `-v, --verbose` - Show detailed validation report
-- `--check-cycles` - Check for circular dependencies
+- `-v, --verbose` - 詳細な検証レポートを表示
+- `--check-cycles` - 循環依存をチェック
 
-#### Examples
-
-**English:**
-
-```bash
-# Validate configuration
-cmdrun validate
-
-# Validate with detailed output
-cmdrun validate --verbose
-
-# Check for circular dependencies
-cmdrun validate --check-cycles
-
-# Validate specific file
-cmdrun validate --path ./custom-commands.toml
-
-# Full validation
-cmdrun validate --verbose --check-cycles
-```
-
-**Japanese (日本語):**
+#### 使用例
 
 ```bash
 # 設定ファイルを検証
@@ -789,249 +476,107 @@ cmdrun validate --verbose
 # 循環依存をチェック
 cmdrun validate --check-cycles
 
-# 特定のファイルを検証
-cmdrun validate --path ./custom-commands.toml
-
 # 完全な検証
 cmdrun validate --verbose --check-cycles
 ```
 
-#### Output Example
+#### 出力例
 
-**Success:**
-
-```
-Validating configuration...
-
-✓ Loaded configuration from commands.toml
-
-Information:
-  ℹ 15 commands defined
-  ℹ 3 aliases defined
-  ℹ Dependency graph built successfully
-
-✓ Configuration is valid (15 commands, 3 aliases)
-```
-
-**With Errors:**
+**成功時:**
 
 ```
-Validating configuration...
+設定を検証中...
 
-✓ Loaded configuration from commands.toml
+✓ 設定を読み込みました: commands.toml
 
-Errors:
-  ✗ Alias 'quick-test' points to non-existent command 'test-fast'
-  ✗ Circular dependency in 'build': build → compile → build
+情報:
+  ℹ 15個のコマンドが定義されています
+  ℹ 依存関係グラフを構築しました
 
-Warnings:
-  ⚠ Command 'old-script' has no description
+✓ 設定は有効です (15個のコマンド)
+```
 
-✗ Configuration validation failed with 2 error(s)
+**エラーがある場合:**
+
+```
+設定を検証中...
+
+✓ 設定を読み込みました: commands.toml
+
+エラー:
+  ✗ 循環依存: build → compile → build
+
+警告:
+  ⚠ コマンド 'old-script' に説明がありません
+
+✗ 設定の検証に失敗しました (1個のエラー)
 ```
 
 ---
 
-### graph
+### config
 
-Display the dependency graph.
+cmdrunの設定を管理します。
 
-#### Synopsis
-
-```bash
-cmdrun graph [OPTIONS] [COMMAND]
-```
-
-#### Description
-
-Visualizes command dependencies in various formats. Shows which commands depend on which, helping understand execution order and parallel execution opportunities.
-
-Supported output formats:
-- **tree** (default) - Colorful tree-like text output with Unicode box drawing
-- **dot** - Graphviz DOT format (can be converted to PNG/SVG)
-- **mermaid** - Mermaid diagram format (embeddable in Markdown)
-
-#### Arguments
-
-- `[COMMAND]` - Specific command to show dependencies for (optional, shows all if omitted)
-
-#### Options
-
-- `-f, --format <FORMAT>` - Output format: tree, dot, mermaid (default: tree)
-- `-o, --output <PATH>` - Output file path (prints to stdout if not specified)
-- `-g, --show-groups` - Show execution groups (parallel execution plan)
-
-#### Examples
-
-**English:**
+#### 構文
 
 ```bash
-# Show all dependencies in tree format
-cmdrun graph
-
-# Show dependencies for specific command
-cmdrun graph build
-
-# Show with execution groups
-cmdrun graph build --show-groups
-
-# Export as Graphviz DOT format
-cmdrun graph build --format dot --output deps.dot
-dot -Tpng deps.dot -o deps.png
-
-# Export as Mermaid diagram
-cmdrun graph build --format mermaid --output deps.mmd
-
-# Show all commands in Mermaid format
-cmdrun graph --format mermaid
+cmdrun config <SUBCOMMAND>
 ```
 
-**Japanese (日本語):**
+#### サブコマンド
+
+- `show` - 現在の設定を表示
+- `set <KEY> <VALUE>` - 設定値を変更
+- `get <KEY>` - 特定の設定値を取得
+
+#### 使用例
 
 ```bash
-# すべての依存関係をツリー形式で表示
-cmdrun graph
+# 設定を表示
+cmdrun config show
 
-# 特定のコマンドの依存関係を表示
-cmdrun graph build
+# 言語設定を変更
+cmdrun config set language japanese
 
-# 実行グループ付きで表示
-cmdrun graph build --show-groups
-
-# Graphviz DOT形式でエクスポート
-cmdrun graph build --format dot --output deps.dot
-dot -Tpng deps.dot -o deps.png
-
-# Mermaid図でエクスポート
-cmdrun graph build --format mermaid --output deps.mmd
-
-# すべてのコマンドをMermaid形式で表示
-cmdrun graph --format mermaid
+# 設定値を取得
+cmdrun config get language
 ```
 
-#### Output Examples
-
-**Tree format (default):**
+#### 出力例
 
 ```
-Dependencies for: build
-  🔗 build (2 dependencies)
-    └─► 📦 lint
-    └─► 📦 test
+現在の設定:
+
+  language: japanese
+  config_path: ~/.config/cmdrun/commands.toml
 ```
-
-**With execution groups:**
-
-```
-Dependencies for: build
-
-Execution Plan: 3 groups
-
-▶ Group 1 / 3
-  • lint Run linter
-  • test Run tests
-  ⚡ Can run in parallel
-
-▶ Group 2 / 3
-  • compile Compile sources
-
-▶ Group 3 / 3
-  • build Build the project
-```
-
-**DOT format (Graphviz):**
-
-```dot
-digraph dependencies {
-  rankdir=TB;
-  node [shape=box, style=rounded, fontname="Arial"];
-
-  // Node styles
-  "build" [label="build\nBuild the project", fillcolor=lightgreen, style=filled];
-  "lint" [label="lint\nRun linter", fillcolor=lightblue, style=filled];
-  "test" [label="test\nRun tests", fillcolor=lightblue, style=filled];
-
-  // Dependencies
-  "lint" -> "build";
-  "test" -> "build";
-}
-```
-
-**Mermaid format:**
-
-```mermaid
-graph TD
-  %% Node definitions
-  build("build<br/>Build the project")
-  lint["lint<br/>Run linter"]
-  test["test<br/>Run tests"]
-
-  %% Dependencies
-  lint --> build
-  test --> build
-
-  %% Styling
-  classDef default fill:#e1f5ff,stroke:#01579b,stroke-width:2px
-```
-
-#### Use Cases
-
-1. **Understanding dependencies**: Visualize complex dependency chains
-2. **Documentation**: Export graphs for project documentation
-3. **Optimization**: Identify parallel execution opportunities
-4. **Debugging**: Find circular dependencies and bottlenecks
-5. **CI/CD planning**: Understand execution order for pipeline optimization
 
 ---
 
 ### completion
 
-Generate shell completion scripts.
+シェル補完スクリプトを生成します。
 
-#### Synopsis
+#### 構文
 
 ```bash
 cmdrun completion <SHELL>
 ```
 
-#### Description
+#### 説明
 
-Generates shell completion scripts for cmdrun commands. Supports major shells including bash, zsh, fish, PowerShell, and elvish.
+cmdrunコマンドのシェル補完スクリプトを生成します。
 
-#### Arguments
+#### 引数
 
-- `<SHELL>` - Shell to generate completion for (required)
+- `<SHELL>` - シェルの種類（必須）
   - `bash`
   - `zsh`
   - `fish`
   - `powershell`
-  - `elvish`
 
-#### Examples
-
-**English:**
-
-```bash
-# Generate bash completion
-cmdrun completion bash
-
-# Generate zsh completion
-cmdrun completion zsh
-
-# Generate fish completion
-cmdrun completion fish
-
-# Install bash completion (Linux)
-cmdrun completion bash | sudo tee /etc/bash_completion.d/cmdrun
-
-# Install zsh completion
-cmdrun completion zsh > "${fpath[1]}/_cmdrun"
-
-# Install fish completion
-cmdrun completion fish > ~/.config/fish/completions/cmdrun.fish
-```
-
-**Japanese (日本語):**
+#### 使用例
 
 ```bash
 # Bash補完スクリプト生成
@@ -1053,88 +598,20 @@ cmdrun completion zsh > "${fpath[1]}/_cmdrun"
 cmdrun completion fish > ~/.config/fish/completions/cmdrun.fish
 ```
 
-#### Output Example
-
-```
-→ Generating bash completion script...
-
-# Bash completion script output...
-
-Installation instructions:
-
-  Add to your ~/.bashrc:
-    eval "$(cmdrun completion bash)"
-
-  Or save to completion directory:
-    cmdrun completion bash > /etc/bash_completion.d/cmdrun
-
-Note: After installation, restart your shell or source the config file.
-```
-
 ---
 
-### completion-list
+## 終了コード
 
-List command names for completion (internal use).
+cmdrunは以下の終了コードを使用します:
 
-#### Synopsis
+| 終了コード | 意味 | 説明 |
+|-----------|------|------|
+| `0` | 成功 | コマンドが正常に実行されました |
+| `1` | 一般エラー | コマンド実行失敗、設定エラー、検証エラー |
+| `2` | 使用方法エラー | 無効なコマンドライン引数またはオプション |
+| `130` | 中断 | コマンドが中断されました (Ctrl+C) |
 
-```bash
-cmdrun completion-list
-```
-
-#### Description
-
-Internal command used by shell completion scripts to list available command names from the current configuration. This command is hidden from general help and is primarily used by the completion system.
-
-**Note:** This command is for internal use and should not be called directly by users.
-
-#### Output Example
-
-```
-build
-clean
-dev
-lint
-test
-```
-
----
-
-## Exit Codes
-
-cmdrun uses standard exit codes to indicate execution status:
-
-| Exit Code | Meaning | Description |
-|-----------|---------|-------------|
-| `0` | Success | Command executed successfully |
-| `1` | General error | Command failed, configuration error, or validation error |
-| `2` | Invalid usage | Invalid command-line arguments or options |
-| `130` | Interrupted | Command was interrupted (Ctrl+C) |
-
-### Examples
-
-**English:**
-
-```bash
-# Check exit code
-cmdrun run test
-echo $?  # Prints: 0 (success) or 1 (failure)
-
-# Use in scripts
-if cmdrun validate; then
-    echo "Configuration is valid"
-    cmdrun run build
-else
-    echo "Configuration has errors"
-    exit 1
-fi
-
-# Chain commands
-cmdrun run lint && cmdrun run test && cmdrun run build
-```
-
-**Japanese (日本語):**
+### 使用例
 
 ```bash
 # 終了コードを確認
@@ -1156,162 +633,142 @@ cmdrun run lint && cmdrun run test && cmdrun run build
 
 ---
 
-## Configuration
+## 設定ファイル
 
-cmdrun searches for configuration files in the following order:
+### 設定ファイルの場所
 
-1. **Project-local**: Current directory and parent directories
-   - `./commands.toml`
-   - `./.cmdrun.toml`
-   - `./cmdrun.toml`
+cmdrunはグローバル設定ファイルを使用します:
 
-2. **Global**: User's home directory
-   - `~/.cmdrun/commands.toml`
-   - `~/.cmdrun/.cmdrun.toml`
-   - `~/.cmdrun/cmdrun.toml`
+- **Linux/macOS**: `~/.config/cmdrun/commands.toml`
+- **Windows**: `%APPDATA%\cmdrun\commands.toml`
 
-### Language Configuration
+### 言語設定
 
-cmdrun supports internationalization (i18n) with English and Japanese languages. Set the language in your configuration file:
+cmdrunは日本語と英語をサポートしています。設定ファイルで言語を指定できます:
 
 ```toml
 [config]
-language = "Japanese"  # or "English" (default)
+language = "japanese"  # または "english" (デフォルト)
 ```
 
-### Environment Variables
+### 環境変数
 
-cmdrun respects the following environment variables:
+cmdrunは以下の環境変数を認識します:
 
-- `CMDRUN_CONFIG` - Override config file path
-- `CMDRUN_SHELL` - Override shell for command execution
-- `NO_COLOR` - Disable colored output
-- `CMDRUN_LOG` - Set log level (error, warn, info, debug, trace)
+- `CMDRUN_CONFIG` - 設定ファイルのパスを上書き
+- `CMDRUN_SHELL` - コマンド実行時のシェルを上書き
+- `NO_COLOR` - カラー出力を無効化
+- `CMDRUN_LOG` - ログレベルを設定 (error, warn, info, debug, trace)
 
-**Examples:**
+**使用例:**
 
 ```bash
-# Use custom config file
+# カスタム設定ファイルを使用
 export CMDRUN_CONFIG=/path/to/custom/commands.toml
 cmdrun list
 
-# Use specific shell
+# 特定のシェルを使用
 export CMDRUN_SHELL=/bin/bash
 cmdrun run build
 
-# Disable colors
+# カラーを無効化
 export NO_COLOR=1
 cmdrun list
 
-# Enable debug logging
+# デバッグログを有効化
 export CMDRUN_LOG=debug
 cmdrun run test
 ```
 
 ---
 
-## Advanced Usage
+## 高度な使用方法
 
-### Parallel Execution
+### 並列実行
 
-Execute command dependencies in parallel for faster builds:
+依存関係を並列実行して高速化:
 
 ```bash
-# Sequential (default)
+# 逐次実行 (デフォルト)
 cmdrun run build
-# Executes: lint → test → compile → package (one by one)
+# 実行順序: lint → test → compile → package (一つずつ)
 
-# Parallel
+# 並列実行
 cmdrun run build --parallel
-# Group 1: lint, test (parallel)
-# Group 2: compile
-# Group 3: package
+# グループ1: lint, test (並列)
+# グループ2: compile
+# グループ3: package
 ```
 
-### Passing Arguments
+### 引数の渡し方
 
-Pass additional arguments to commands:
+コマンドに追加の引数を渡す:
 
 ```bash
-# Arguments after -- are passed to the command
+# -- 以降の引数がコマンドに渡される
 cmdrun run test -- --verbose --filter integration
 
-# In commands.toml:
+# commands.tomlでの定義:
 [commands.test]
 cmd = "cargo test"
-# Actual execution: cargo test --verbose --filter integration
+# 実際の実行: cargo test --verbose --filter integration
 ```
 
-### Working with Multiple Configs
-
-```bash
-# Validate specific config
-cmdrun validate --path ./configs/production.toml
-
-# Remove from specific config
-cmdrun remove old-cmd --config ./configs/dev.toml
-
-# Initialize at specific location
-cmdrun init --output ./configs/new-project.toml
-```
-
-### Scripting Integration
+### スクリプトとの統合
 
 ```bash
 #!/bin/bash
-# CI/CD script example
+# CI/CDスクリプト例
 
-set -e  # Exit on error
+set -e  # エラーで終了
 
-# Validate configuration
+# 設定を検証
 cmdrun validate --check-cycles
 
-# Run quality checks in parallel
+# 品質チェックを並列実行
 cmdrun run lint --parallel
 
-# Run tests
+# テストを実行
 cmdrun run test
 
-# Build if all checks pass
+# すべてのチェックが通ればビルド
 cmdrun run build --parallel
 
-echo "Build completed successfully!"
+echo "ビルドが正常に完了しました!"
 ```
 
 ---
 
-## See Also
+## 関連ドキュメント
 
-- [Getting Started Guide](./getting-started.md)
-- [Configuration Reference](../technical/configuration.md)
-- [Parallel Execution Guide](./parallel-execution.md)
-- [Examples](./examples.md)
+- [インストールガイド](INSTALLATION.md)
+- [設定リファレンス](CONFIGURATION.md)
+- [国際化（i18n）](I18N.md)
 
 ---
 
-## Getting Help
+## ヘルプの取得
 
-If you encounter issues or need help:
+問題が発生した場合やヘルプが必要な場合:
 
-1. Run `cmdrun --help` for quick reference
-2. Run `cmdrun <command> --help` for command-specific help
-3. Check the [GitHub Issues](https://github.com/sanae-abe/cmdrun/issues)
-4. Read the [full documentation](https://github.com/sanae-abe/cmdrun/docs)
+1. `cmdrun --help` でクイックリファレンスを確認
+2. `cmdrun <コマンド> --help` でコマンド固有のヘルプを確認
+3. [GitHub Issues](https://github.com/sanae-abe/cmdrun/issues)を確認
 
-**Quick Help Commands:**
+**クイックヘルプコマンド:**
 
 ```bash
-# General help
+# 一般的なヘルプ
 cmdrun --help
 
-# Command-specific help
+# コマンド固有のヘルプ
 cmdrun run --help
 cmdrun add --help
 cmdrun validate --help
 
-# List all commands in your config
+# 設定の全コマンドを一覧表示
 cmdrun list --verbose
 
-# Check configuration validity
+# 設定の有効性を確認
 cmdrun validate --verbose
 ```

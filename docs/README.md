@@ -1,56 +1,42 @@
 # cmdrun Documentation
 
-Welcome to the cmdrun documentation! This directory contains comprehensive guides for users, developers, and contributors.
+> **個人向けグローバルコマンド管理ツール**のドキュメント
 
-## 📚 Documentation Structure
+よく使うコマンドを登録して、どこからでも実行できるようにするツールです。
 
-### User Guide (`user-guide/`)
-Essential documentation for cmdrun users:
+## 📚 ドキュメント構成
 
-- **[Installation Guide](user-guide/INSTALLATION.md)** - Install cmdrun on your system
-- **[CLI Reference](user-guide/CLI.md)** - Complete command-line interface documentation
-- **[Configuration Reference](user-guide/CONFIGURATION.md)** - TOML configuration file guide
-- **[Internationalization (i18n)](user-guide/I18N.md)** - Multi-language support
+### ユーザーガイド (`user-guide/`)
+cmdrunを使い始めるための基本ドキュメント：
 
-### Technical Documentation (`technical/`)
-Deep-dive into cmdrun's architecture and design:
+- **[インストールガイド](user-guide/INSTALLATION.md)** - cmdrunのインストール方法
+- **[CLIリファレンス](user-guide/CLI.md)** - コマンドラインの使い方
+- **[設定リファレンス](user-guide/CONFIGURATION.md)** - 設定ファイル（commands.toml）の書き方
+- **[多言語対応](user-guide/I18N.md)** - 日本語・英語の切り替え
 
-- **[Performance](technical/PERFORMANCE.md)** - Benchmarks and optimization details
-- **[Security](technical/SECURITY.md)** - Security features and best practices
-- **[Cross-platform Support](technical/CROSS_PLATFORM.md)** - Platform compatibility details
-- **[Distribution](technical/DISTRIBUTION.md)** - Release and distribution strategy
+### 技術ドキュメント (`technical/`)
+cmdrunの内部仕様や技術的な詳細：
 
-### Development (`development/`)
-Resources for contributors and maintainers:
+- **[パフォーマンス](technical/PERFORMANCE.md)** - 速度・メモリ使用量の詳細
+- **[セキュリティ](technical/SECURITY.md)** - セキュリティ機能と安全な使い方
+- **[クロスプラットフォーム](technical/CROSS_PLATFORM.md)** - 各OS対応の詳細
 
-- **[Roadmap](development/ROADMAP.md)** - Future plans and feature timeline
+## 🚀 クイックナビゲーション
 
-## 🚀 Quick Navigation
+### 初めての方
+1. [インストールガイド](user-guide/INSTALLATION.md)でインストール
+2. [CLIリファレンス](user-guide/CLI.md)で基本的な使い方を学ぶ
+3. [設定リファレンス](user-guide/CONFIGURATION.md)で高度な設定を知る
 
-### New Users
-1. Start with the [Installation Guide](user-guide/INSTALLATION.md)
-2. Learn the basics from [CLI Reference](user-guide/CLI.md)
-3. Customize your setup with [Configuration Reference](user-guide/CONFIGURATION.md)
+### 既存ユーザー
+- **コマンドの使い方を知りたい** → [CLIリファレンス](user-guide/CLI.md)
+- **設定をカスタマイズしたい** → [設定リファレンス](user-guide/CONFIGURATION.md)
+- **日本語で使いたい** → [多言語対応](user-guide/I18N.md)
 
-### Existing Users
-- **Looking for a specific command?** → [CLI Reference](user-guide/CLI.md)
-- **Need to configure something?** → [Configuration Reference](user-guide/CONFIGURATION.md)
-- **Want multi-language support?** → [Internationalization](user-guide/I18N.md)
+## 📖 メインドキュメント
 
-### Contributors
-1. Read the [Contributing Guidelines](../CONTRIBUTING.md)
-2. Check the [Roadmap](development/ROADMAP.md) for planned features
-3. Review [Security](technical/SECURITY.md) and [Performance](technical/PERFORMANCE.md) docs
+一般的な情報とクイックスタートは[メインREADME](../README.md)を参照してください。
 
-## 📖 Main Documentation
+## 📝 ライセンス
 
-For general information and quick start, see the main [README](../README.md).
-
-## 🔗 External Resources
-
-- [Crates.io](https://crates.io/crates/cmdrun) - Official Rust package
-- [GitHub Repository](https://github.com/sanae-abe/cmdrun) - Source code and issue tracker
-
-## 📝 License
-
-cmdrun is dual-licensed under MIT OR Apache-2.0. See [LICENSE-MIT](../LICENSE-MIT) and [LICENSE-APACHE](../LICENSE-APACHE) for details.
+cmdrunはMITまたはApache-2.0のデュアルライセンスです。詳細は[LICENSE-MIT](../LICENSE-MIT)と[LICENSE-APACHE](../LICENSE-APACHE)を参照してください。

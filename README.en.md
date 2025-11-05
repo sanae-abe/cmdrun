@@ -6,10 +6,6 @@
 >
 > Register your commands once, run them from anywhere. Fast, secure, and cross-platform.
 
-[![Crates.io](https://img.shields.io/crates/v/cmdrun.svg)](https://crates.io/crates/cmdrun)
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
-[![Build Status](https://github.com/sanae-abe/cmdrun/workflows/CI/badge.svg)](https://github.com/sanae-abe/cmdrun/actions)
-
 ## Table of Contents
 
 - [Why cmdrun?](#why-cmdrun)

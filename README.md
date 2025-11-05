@@ -6,10 +6,6 @@
 >
 > コマンドを一度登録すれば、どこからでも実行可能。高速・安全・クロスプラットフォーム対応。
 
-[![Crates.io](https://img.shields.io/crates/v/cmdrun.svg)](https://crates.io/crates/cmdrun)
-[![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
-[![Build Status](https://github.com/sanae-abe/cmdrun/workflows/CI/badge.svg)](https://github.com/sanae-abe/cmdrun/actions)
-
 ## 目次
 
 - [cmdrunの特徴](#cmdrunの特徴)
