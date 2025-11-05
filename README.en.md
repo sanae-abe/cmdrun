@@ -154,6 +154,8 @@ cmdrun add docker-clean "docker system prune -af" "Clean up unused Docker resour
 cmdrun add db-backup "pg_dump mydb > backup_$(date +%Y%m%d).sql" "Backup database"
 ```
 
+![Adding Commands](docs/screenshots/add.webp)
+
 #### Run and manage your commands
 
 ```bash
@@ -169,6 +171,10 @@ cmdrun list docker
 # Remove a command
 cmdrun remove dev
 ```
+
+![Running Commands](docs/screenshots/run.webp)
+
+![Listing Commands](docs/screenshots/list.webp)
 
 #### Configuration management
 
@@ -403,7 +409,6 @@ cmd.linux = "xdg-open http://localhost:3000"
 ## Documentation
 
 ### User Guide
-- [Installation Guide](docs/user-guide/INSTALLATION.md)
 - [CLI Reference](docs/user-guide/CLI.md)
 - [Configuration Reference](docs/user-guide/CONFIGURATION.md)
 - [Internationalization (i18n)](docs/user-guide/I18N.md)

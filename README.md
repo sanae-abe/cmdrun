@@ -133,6 +133,8 @@ cmdrun add docker-clean "docker system prune -af" "未使用のDockerリソー�
 cmdrun add db-backup "pg_dump mydb > backup_$(date +%Y%m%d).sql" "データベースをバックアップ"
 ```
 
+![コマンド追加](docs/screenshots/add.webp)
+
 #### コマンドを実行・管理
 
 ```bash
@@ -148,6 +150,10 @@ cmdrun list docker
 # コマンドを削除
 cmdrun remove dev
 ```
+
+![コマンド実行](docs/screenshots/run.webp)
+
+![コマンド一覧](docs/screenshots/list.webp)
 
 #### 設定管理
 
@@ -382,7 +388,6 @@ cmd.linux = "xdg-open http://localhost:3000"
 ## ドキュメント
 
 ### ユーザーガイド
-- [インストールガイド](docs/user-guide/INSTALLATION.md)
 - [CLIリファレンス](docs/user-guide/CLI.md)
 - [設定リファレンス](docs/user-guide/CONFIGURATION.md)
 - [国際化（i18n）](docs/user-guide/I18N.md)
