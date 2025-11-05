@@ -402,18 +402,23 @@ mod tests {
             use std::fs::Permissions;
             use std::os::unix::fs::PermissionsExt;
 
-            let perms = Permissions::from_mode(0o444);
+            // Set directory to read-only (no write permission: 0o555)
+            let perms = Permissions::from_mode(0o555);
             std::fs::set_permissions(&readonly_dir, perms).unwrap();
 
             let output = readonly_dir.join("commands.toml");
             let result = handle_init(None, false, Some(output)).await;
 
-            // Should fail due to permission
-            assert!(result.is_err(), "Should fail on read-only directory");
+            // Restore permissions before assertion for cleanup
+            let write_perms = Permissions::from_mode(0o755);
+            std::fs::set_permissions(&readonly_dir, write_perms).unwrap();
 
-            // Restore permissions for cleanup
-            let perms = Permissions::from_mode(0o755);
-            std::fs::set_permissions(&readonly_dir, perms).unwrap();
+            // Should fail due to permission
+            assert!(
+                result.is_err(),
+                "Should fail on read-only directory, but got: {:?}",
+                result
+            );
         }
     }
 
