@@ -223,10 +223,20 @@ cmd = "cargo test"
         let invalid_toml = "this is not valid TOML [[[";
         let mut file = File::create(&config_path).await.unwrap();
         file.write_all(invalid_toml.as_bytes()).await.unwrap();
+        file.flush().await.unwrap();
+        drop(file);
+
+        // Verify file exists and has invalid content
+        assert!(config_path.exists());
+        let content = fs::read_to_string(&config_path).await.unwrap();
+        assert_eq!(content, invalid_toml);
 
         let loader = ConfigLoader::with_path(&config_path);
         let result = loader.load().await;
-        assert!(result.is_err());
+        assert!(
+            result.is_err(),
+            "Expected error when parsing invalid TOML, but got Ok"
+        );
     }
 
     #[tokio::test]
