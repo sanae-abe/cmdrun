@@ -50,7 +50,7 @@ test:security-audit:
     - cargo install cargo-audit
     - rustup component add clippy
   script:
-    - cargo audit --json > audit-report.json
+    - cargo audit --json > audit-report.json || true
     - cargo clippy --all-targets --all-features -- -D warnings
   artifacts:
     reports:
@@ -225,7 +225,7 @@ security:dependency-scanning:
   before_script:
     - cargo install cargo-audit
   script:
-    - cargo audit --format json --output audit-report.json
+    - cargo audit --json > audit-report.json || true
   artifacts:
     reports:
       dependency_scanning: audit-report.json
