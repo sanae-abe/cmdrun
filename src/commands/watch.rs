@@ -48,6 +48,7 @@ pub async fn handle_watch(
 
     // Set up Ctrl+C handler
     let running = setup_ctrl_c_handler()?;
+    let running_clone = running.clone();
 
     // Run the watcher
     info!(
@@ -56,15 +57,8 @@ pub async fn handle_watch(
     );
     println!();
 
-    let result = runner.run().await;
-
-    // Check if we were interrupted
-    if !running.load(std::sync::atomic::Ordering::SeqCst) {
-        info!("Watch mode stopped by user");
-        return Ok(());
-    }
-
-    result
+    // Run with shutdown signal
+    runner.run_with_shutdown(running_clone).await
 }
 
 /// Display watch configuration information
