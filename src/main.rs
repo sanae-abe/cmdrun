@@ -4,7 +4,7 @@
 
 use anyhow::Result;
 use clap::Parser;
-use cmdrun::cli::{Cli, Commands, GraphFormat};
+use cmdrun::cli::{Cli, Commands, ConfigAction, GraphFormat};
 use cmdrun::command::dependency::DependencyGraph;
 use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
 use cmdrun::command::graph_visualizer::GraphVisualizer;
@@ -89,6 +89,17 @@ async fn run(cli: Cli) -> Result<()> {
         Commands::CompletionList => {
             list_completion().await?;
         }
+        Commands::Config { action } => match action {
+            ConfigAction::Get { key } => {
+                cmdrun::commands::handle_get(&key).await?;
+            }
+            ConfigAction::Set { key, value } => {
+                cmdrun::commands::handle_set(&key, &value).await?;
+            }
+            ConfigAction::Show => {
+                cmdrun::commands::handle_show().await?;
+            }
+        },
     }
 
     Ok(())

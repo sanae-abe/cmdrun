@@ -51,13 +51,60 @@
 
 ### Installation
 
-#### Cargo (Recommended)
+#### Install Rust Toolchain (if not already installed)
+
+```bash
+# 1. Download and run Rustup (Rust installer)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 2. Load environment variables
+source ~/.cargo/env
+
+# Or open a new terminal, or run:
+# For bash
+source ~/.bashrc
+
+# For zsh (macOS default)
+source ~/.zshrc
+
+# 3. Verify installation
+rustc --version
+cargo --version
+```
+
+#### Install cmdrun
+
+**Option 1: From Source (Recommended for Development)**
+
+```bash
+# 1. Clone the repository
+git clone ssh://git@rendezvous.m3.com:3789/sanae-abe/cmdrun.git
+cd cmdrun
+
+# 2. Build and install
+cargo install --path .
+
+# 3. Verify installation
+cmdrun --version
+cmdrun --help
+```
+
+**Option 2: From crates.io**
+
 ```bash
 cargo install cmdrun
 ```
 
-#### Manual Installation
-Download the latest binary from [Releases](https://github.com/sanae-abe/cmdrun/releases).
+#### Update
+
+```bash
+# If installed from source
+cd cmdrun  # Navigate to project directory
+git pull
+
+# Rebuild and install
+cargo install --path . --force
+```
 
 <!-- Future installation methods (commented out until available)
 #### Homebrew (macOS/Linux)
@@ -127,6 +174,11 @@ cmdrun list
 # Visualize dependency graph
 cmdrun graph
 
+# Manage configuration
+cmdrun config show              # Show all settings
+cmdrun config get language      # Get a specific setting
+cmdrun config set language japanese  # Change language to Japanese
+
 # Show help
 cmdrun --help
 ```
@@ -142,9 +194,28 @@ cmd = "scp dist/ ${DEPLOY_USER:?DEPLOY_USER not set}@${DEPLOY_HOST:?DEPLOY_HOST 
 
 Supported syntax:
 - `${VAR}` - Basic expansion
+- `${1}`, `${2}`, ... - Positional arguments
 - `${VAR:-default}` - Default value
 - `${VAR:?error}` - Required variable
 - `${VAR:+value}` - Conditional substitution
+
+**Positional Arguments Example:**
+
+```toml
+[commands.convert]
+description = "Convert image format"
+cmd = "sharp -i ${1} -f ${2:-webp} -q ${3:-80} -o ${4:-output.webp}"
+```
+
+```bash
+# Usage with arguments
+cmdrun run convert input.png webp 90 output.webp
+# Expands to: sharp -i input.png -f webp -q 90 -o output.webp
+
+# Using default values
+cmdrun run convert input.png
+# Expands to: sharp -i input.png -f webp -q 80 -o output.webp
+```
 
 ### Dependencies
 

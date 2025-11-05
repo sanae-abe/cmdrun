@@ -51,13 +51,60 @@
 
 ### インストール
 
-#### Cargo（推奨）
+#### Rustツールチェーンのインストール（未インストールの場合）
+
+```bash
+# 1. Rustup（Rustインストーラー）をダウンロード・実行
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 2. 環境変数を読み込み
+source ~/.cargo/env
+
+# 新しいターミナルを開くか、以下を実行
+# bash使用時
+source ~/.bashrc
+
+# zsh使用時（macOS標準）
+source ~/.zshrc
+
+# 3. インストール確認
+rustc --version
+cargo --version
+```
+
+#### cmdrunのインストール
+
+**方法1: ソースからインストール（開発推奨）**
+
+```bash
+# 1. リポジトリをクローン
+git clone ssh://git@rendezvous.m3.com:3789/sanae-abe/cmdrun.git
+cd cmdrun
+
+# 2. ビルド&インストール
+cargo install --path .
+
+# 3. 動作確認
+cmdrun --version
+cmdrun --help
+```
+
+**方法2: crates.ioからインストール**
+
 ```bash
 cargo install cmdrun
 ```
 
-#### 手動インストール
-最新のバイナリを[Releases](https://github.com/sanae-abe/cmdrun/releases)からダウンロードしてください。
+#### アップデート
+
+```bash
+# ソースからインストールした場合
+cd cmdrun  # プロジェクトディレクトリ
+git pull
+
+# 再ビルド&インストール
+cargo install --path . --force
+```
 
 <!-- 将来のインストール方法（利用可能になるまでコメントアウト）
 #### Homebrew (macOS/Linux)
@@ -106,6 +153,11 @@ cmdrun run dev
 # 利用可能なコマンドをリスト表示
 cmdrun list
 
+# 設定管理
+cmdrun config show              # 全設定を表示
+cmdrun config get language      # 特定の設定を取得
+cmdrun config set language japanese  # 言語を日本語に変更
+
 # ヘルプを表示
 cmdrun --help
 ```
@@ -121,9 +173,28 @@ cmd = "scp dist/ ${DEPLOY_USER:?DEPLOY_USERが設定されていません}@${DEP
 
 サポートされる構文：
 - `${VAR}` - 基本展開
+- `${1}`, `${2}`, ... - 位置引数
 - `${VAR:-default}` - デフォルト値
 - `${VAR:?error}` - 必須変数
 - `${VAR:+value}` - 条件付き置換
+
+**位置引数の例:**
+
+```toml
+[commands.convert]
+description = "画像フォーマット変換"
+cmd = "sharp -i ${1} -f ${2:-webp} -q ${3:-80} -o ${4:-output.webp}"
+```
+
+```bash
+# 引数を指定して実行
+cmdrun run convert input.png webp 90 output.webp
+# 展開結果: sharp -i input.png -f webp -q 90 -o output.webp
+
+# デフォルト値を使用
+cmdrun run convert input.png
+# 展開結果: sharp -i input.png -f webp -q 80 -o output.webp
+```
 
 ### 依存関係
 
@@ -470,33 +541,5 @@ cargo fmt
 cargo clippy
 ```
 
-## ライセンス
-
-次のいずれかのライセンスの下でライセンスされています：
-
-- Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE)またはhttp://www.apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT)またはhttp://opensource.org/licenses/MIT)
-
-お好きな方をお選びください。
-
-## 謝辞
-
-- [npm scripts](https://docs.npmjs.com/cli/v9/using-npm/scripts)、[make](https://www.gnu.org/software/make/)、[just](https://github.com/casey/just)にインスパイアされました
-- 素晴らしいRustクレートで構築されています：[clap](https://github.com/clap-rs/clap)、[tokio](https://github.com/tokio-rs/tokio)、[serde](https://github.com/serde-rs/serde)
-- すべての[コントリビューター](https://github.com/sanae-abe/cmdrun/graphs/contributors)に感謝します
-
-## サポート
-
-- 📖 [ドキュメント](https://sanae-abe.github.io/cmdrun)
-- 💬 [ディスカッション](https://github.com/sanae-abe/cmdrun/discussions)
-- 🐛 [課題トラッカー](https://github.com/sanae-abe/cmdrun/issues)
-
-<!-- 将来のサポートチャンネル（利用可能になるまでコメントアウト）
-- 🐦 [Twitter](https://twitter.com/sanae_abe)
--->
-
 ---
-
-<p align="center">
-  Rustで❤️を込めて作られました
-</p>
+**開発者**: sanae-abe@m3.com

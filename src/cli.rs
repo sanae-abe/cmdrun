@@ -156,6 +156,34 @@ pub enum Commands {
     /// List command names for completion (internal use)
     #[command(hide = true)]
     CompletionList,
+
+    /// Manage configuration settings
+    Config {
+        #[command(subcommand)]
+        action: ConfigAction,
+    },
+}
+
+/// Configuration management actions
+#[derive(Subcommand, Debug)]
+pub enum ConfigAction {
+    /// Get a configuration value
+    Get {
+        /// Configuration key (e.g., language, shell, timeout)
+        key: String,
+    },
+
+    /// Set a configuration value
+    Set {
+        /// Configuration key (e.g., language, shell, timeout)
+        key: String,
+
+        /// Value to set
+        value: String,
+    },
+
+    /// Show all configuration settings
+    Show,
 }
 
 /// Graph output format
