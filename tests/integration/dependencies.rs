@@ -41,7 +41,7 @@ async fn test_dependency_order() {
     let graph = validator.build_dependency_graph().unwrap();
 
     // Get execution order for 'deploy' command (depends on 'build')
-    let order = graph.topological_sort(&vec!["deploy".to_string()]).unwrap();
+    let order = graph.topological_sort(&["deploy".to_string()]).unwrap();
 
     std::env::set_current_dir("../..").ok();
 
@@ -79,18 +79,18 @@ async fn test_chain_dependencies() {
     let graph = validator.build_dependency_graph().unwrap();
 
     // 'chain' depends on both 'hello' and 'test'
-    let order = graph.topological_sort(&vec!["chain".to_string()]).unwrap();
+    let order = graph.topological_sort(&["chain".to_string()]).unwrap();
 
     std::env::set_current_dir("../..").ok();
 
     // All three commands should be in the order
     assert!(
-        order.contains(&"hello".to_string()) || order.len() > 0,
+        order.contains(&"hello".to_string()) || !order.is_empty(),
         "Order should contain commands, got: {:?}",
         order
     );
     assert!(
-        order.contains(&"test".to_string()) || order.len() > 0,
+        order.contains(&"test".to_string()) || !order.is_empty(),
         "Order should contain commands, got: {:?}",
         order
     );
@@ -143,7 +143,7 @@ async fn test_independent_commands() {
     let graph = validator.build_dependency_graph().unwrap();
 
     // 'test' has no dependencies
-    let order = graph.topological_sort(&vec!["test".to_string()]).unwrap();
+    let order = graph.topological_sort(&["test".to_string()]).unwrap();
 
     std::env::set_current_dir("../..").ok();
 
