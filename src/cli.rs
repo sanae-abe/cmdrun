@@ -11,7 +11,11 @@ use std::path::PathBuf;
     long_about = "A modern replacement for package.json scripts and Makefiles"
 )]
 pub struct Cli {
-    /// Path to configuration file
+    /// Path to configuration file (default: ~/.config/cmdrun/commands.toml)
+    ///
+    /// Use this option to specify which configuration file to use.
+    /// This allows you to maintain multiple command sets for different
+    /// purposes (work, personal, projects, environments, etc.)
     #[arg(short, long, value_name = "FILE", global = true)]
     pub config: Option<PathBuf>,
 
@@ -157,7 +161,12 @@ pub enum Commands {
     #[command(hide = true)]
     CompletionList,
 
-    /// Manage configuration settings
+    /// Manage configuration settings (get/set/show configuration values)
+    ///
+    /// This subcommand allows you to view and modify settings within
+    /// your configuration file, such as language, shell, or timeout.
+    /// Note: This is different from --config option which specifies
+    /// which configuration file to use.
     Config {
         #[command(subcommand)]
         action: ConfigAction,
@@ -167,13 +176,21 @@ pub enum Commands {
 /// Configuration management actions
 #[derive(Subcommand, Debug)]
 pub enum ConfigAction {
-    /// Get a configuration value
+    /// Get a specific configuration value
+    ///
+    /// Examples:
+    ///   cmdrun config get language
+    ///   cmdrun config get shell
     Get {
         /// Configuration key (e.g., language, shell, timeout)
         key: String,
     },
 
     /// Set a configuration value
+    ///
+    /// Examples:
+    ///   cmdrun config set language japanese
+    ///   cmdrun config set shell zsh
     Set {
         /// Configuration key (e.g., language, shell, timeout)
         key: String,
@@ -182,7 +199,9 @@ pub enum ConfigAction {
         value: String,
     },
 
-    /// Show all configuration settings
+    /// Show all current configuration settings
+    ///
+    /// Displays all configuration values from the active configuration file
     Show,
 }
 
