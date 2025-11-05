@@ -19,16 +19,39 @@ cmdrunのTOML設定ファイルの完全なリファレンスです。
 
 ### ファイルの場所
 
-cmdrunはグローバル設定ファイルを使用します:
+cmdrunはデフォルトでグローバル設定ファイルを使用します:
 
 - **Linux/macOS**: `~/.config/cmdrun/commands.toml`
 - **Windows**: `%APPDATA%\cmdrun\commands.toml`
+
+### カスタム設定ファイルの指定
+
+`--config`（短縮形: `-c`）オプションで任意の設定ファイルを指定できます:
+
+```bash
+# カスタム設定ファイルを使用
+cmdrun --config ~/work/commands.toml list
+cmdrun -c ~/.cmdrun/personal.toml run dev
+
+# プロジェクト固有の設定を使用
+cmdrun -c ./project-commands.toml run build
+
+# 環境別の設定を切り替え
+cmdrun -c ~/.cmdrun/production.toml run deploy
+cmdrun -c ~/.cmdrun/staging.toml run deploy
+```
+
+**使用例**:
+- **仕事用と個人用の分離**: `~/work/commands.toml`と`~/personal/commands.toml`
+- **プロジェクト固有のコマンド**: プロジェクトディレクトリに`commands.toml`を配置
+- **環境別の設定**: 本番・ステージング・開発環境ごとに異なる設定ファイル
 
 ### 設定ファイルの作成
 
 初回実行時に自動的に作成されます。手動で作成する場合:
 
 ```bash
+# デフォルトの場所に作成
 # Linux/macOS
 mkdir -p ~/.config/cmdrun
 touch ~/.config/cmdrun/commands.toml
@@ -36,6 +59,10 @@ touch ~/.config/cmdrun/commands.toml
 # Windows PowerShell
 New-Item -ItemType Directory -Force -Path "$env:APPDATA\cmdrun"
 New-Item -ItemType File -Force -Path "$env:APPDATA\cmdrun\commands.toml"
+
+# カスタムの場所に作成
+mkdir -p ~/work
+cmdrun init --output ~/work/commands.toml
 ```
 
 ---

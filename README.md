@@ -1,6 +1,6 @@
 # cmdrun
 
-[English](README.md) | [日本語](README.ja.md)
+[日本語](README.md) | [English](README.en.md) 
 
 > **頻繁に使うコマンドを管理する個人向けグローバルコマンド管理ツール**
 >
@@ -296,6 +296,59 @@ $ cmdrun add test-en "echo test" "English test command"
 **現在サポートされているコマンド：**
 - `cmdrun add` - 完全にローカライズ済み（プロンプト、メッセージ、エラー）
 - より多くのコマンドが将来のリリースでローカライズされます
+
+### カスタム設定ファイル
+
+`--config/-c`オプションで複数の設定ファイルを使い分けることができます。
+
+**使用例：**
+
+```bash
+# 仕事用のコマンド
+cmdrun --config ~/work/commands.toml list
+cmdrun -c ~/work/commands.toml run deploy
+
+# 個人用のコマンド
+cmdrun -c ~/personal/commands.toml run backup
+
+# プロジェクト固有のコマンド
+cd ~/projects/myapp
+cmdrun -c ./commands.toml run dev
+```
+
+**ユースケース：**
+
+1. **環境別の設定**
+   ```bash
+   # 本番環境用
+   cmdrun -c ~/.cmdrun/production.toml run deploy
+
+   # ステージング環境用
+   cmdrun -c ~/.cmdrun/staging.toml run deploy
+
+   # 開発環境用
+   cmdrun -c ~/.cmdrun/development.toml run dev
+   ```
+
+2. **複数のプロジェクト管理**
+   ```bash
+   # プロジェクトA
+   cmdrun -c ~/projects/project-a/commands.toml run test
+
+   # プロジェクトB
+   cmdrun -c ~/projects/project-b/commands.toml run test
+   ```
+
+3. **役割別のコマンド**
+   ```bash
+   # システム管理用
+   cmdrun -c ~/.cmdrun/admin.toml run server-check
+
+   # 開発用
+   cmdrun -c ~/.cmdrun/dev.toml run code-review
+   ```
+
+**詳細は[設定リファレンス](docs/user-guide/CONFIGURATION.md#カスタム設定ファイルの指定)を参照してください。**
 
 ## 設定例
 

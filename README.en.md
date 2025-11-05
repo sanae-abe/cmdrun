@@ -1,6 +1,6 @@
 # cmdrun
 
-[English](README.md) | [日本語](README.ja.md)
+[日本語](README.md) | [English](README.en.md) 
 
 > **A personal global command manager for your frequently used commands**
 >
@@ -317,6 +317,59 @@ $ cmdrun add test-en "echo test" "English test command"
 **Currently Supported Commands:**
 - `cmdrun add` - Fully localized (prompts, messages, errors)
 - More commands will be localized in future releases
+
+### Custom Configuration Files
+
+You can use the `--config/-c` option to switch between multiple configuration files.
+
+**Usage Examples:**
+
+```bash
+# Work-related commands
+cmdrun --config ~/work/commands.toml list
+cmdrun -c ~/work/commands.toml run deploy
+
+# Personal commands
+cmdrun -c ~/personal/commands.toml run backup
+
+# Project-specific commands
+cd ~/projects/myapp
+cmdrun -c ./commands.toml run dev
+```
+
+**Use Cases:**
+
+1. **Environment-specific configurations**
+   ```bash
+   # Production environment
+   cmdrun -c ~/.cmdrun/production.toml run deploy
+
+   # Staging environment
+   cmdrun -c ~/.cmdrun/staging.toml run deploy
+
+   # Development environment
+   cmdrun -c ~/.cmdrun/development.toml run dev
+   ```
+
+2. **Multiple project management**
+   ```bash
+   # Project A
+   cmdrun -c ~/projects/project-a/commands.toml run test
+
+   # Project B
+   cmdrun -c ~/projects/project-b/commands.toml run test
+   ```
+
+3. **Role-based command sets**
+   ```bash
+   # System administration
+   cmdrun -c ~/.cmdrun/admin.toml run server-check
+
+   # Development tasks
+   cmdrun -c ~/.cmdrun/dev.toml run code-review
+   ```
+
+**For more details, see [Configuration Reference](docs/user-guide/CONFIGURATION.md#custom-configuration-file-specification).**
 
 ## Configuration Examples
 
