@@ -5,6 +5,7 @@ use cmdrun::config::validation::ConfigValidator;
 
 #[tokio::test]
 async fn test_dependency_graph_simple() {
+    let original_dir = std::env::current_dir().unwrap();
     std::env::set_current_dir("tests/fixtures").ok();
 
     let loader = ConfigLoader::new();
@@ -13,7 +14,7 @@ async fn test_dependency_graph_simple() {
     let validator = ConfigValidator::new(&config);
     let graph = validator.build_dependency_graph();
 
-    std::env::set_current_dir("../..").ok();
+    std::env::set_current_dir(original_dir).ok();
 
     assert!(graph.is_ok(), "Dependency graph should build successfully");
 
@@ -32,6 +33,7 @@ async fn test_dependency_graph_simple() {
 
 #[tokio::test]
 async fn test_dependency_order() {
+    let original_dir = std::env::current_dir().unwrap();
     std::env::set_current_dir("tests/fixtures").ok();
 
     let loader = ConfigLoader::new();
@@ -43,7 +45,7 @@ async fn test_dependency_order() {
     // Get execution order for 'deploy' command (depends on 'build')
     let order = graph.topological_sort(&["deploy".to_string()]).unwrap();
 
-    std::env::set_current_dir("../..").ok();
+    std::env::set_current_dir(original_dir).ok();
 
     // Both commands should be in the execution order
     assert!(
@@ -70,6 +72,7 @@ async fn test_dependency_order() {
 
 #[tokio::test]
 async fn test_chain_dependencies() {
+    let original_dir = std::env::current_dir().unwrap();
     std::env::set_current_dir("tests/fixtures").ok();
 
     let loader = ConfigLoader::new();
@@ -81,7 +84,7 @@ async fn test_chain_dependencies() {
     // 'chain' depends on both 'hello' and 'test'
     let order = graph.topological_sort(&["chain".to_string()]).unwrap();
 
-    std::env::set_current_dir("../..").ok();
+    std::env::set_current_dir(original_dir).ok();
 
     // All three commands should be in the order
     assert!(
@@ -163,6 +166,7 @@ async fn test_no_circular_dependency() {
 
 #[tokio::test]
 async fn test_independent_commands() {
+    let original_dir = std::env::current_dir().unwrap();
     std::env::set_current_dir("tests/fixtures").ok();
 
     let loader = ConfigLoader::new();
@@ -174,7 +178,7 @@ async fn test_independent_commands() {
     // 'test' has no dependencies
     let order = graph.topological_sort(&["test".to_string()]).unwrap();
 
-    std::env::set_current_dir("../..").ok();
+    std::env::set_current_dir(original_dir).ok();
 
     assert_eq!(
         order.len(),
