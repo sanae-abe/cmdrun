@@ -3,7 +3,7 @@
 use anyhow::{Context, Result};
 use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Template types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -16,7 +16,7 @@ pub enum Template {
 }
 
 impl Template {
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse_template(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "web" => Some(Self::Web),
             "rust" => Some(Self::Rust),
@@ -94,7 +94,7 @@ pub async fn handle_init(
     let template = if interactive {
         select_template_interactive()?
     } else if let Some(t) = template {
-        Template::from_str(&t).ok_or_else(|| {
+        Template::parse_template(&t).ok_or_else(|| {
             anyhow::anyhow!(
                 "Unknown template: {}. Available templates: web, rust, node, python, default",
                 t
@@ -151,7 +151,7 @@ fn select_template_interactive() -> Result<Template> {
 }
 
 /// Print next steps after initialization
-fn print_next_steps(output_path: &PathBuf) {
+fn print_next_steps(output_path: &Path) {
     println!("{}", "Next steps:".cyan().bold());
     println!();
     println!(
@@ -186,15 +186,15 @@ mod tests {
 
     #[test]
     fn test_template_from_str() {
-        assert_eq!(Template::from_str("web"), Some(Template::Web));
-        assert_eq!(Template::from_str("rust"), Some(Template::Rust));
-        assert_eq!(Template::from_str("node"), Some(Template::Node));
-        assert_eq!(Template::from_str("nodejs"), Some(Template::Node));
-        assert_eq!(Template::from_str("npm"), Some(Template::Node));
-        assert_eq!(Template::from_str("python"), Some(Template::Python));
-        assert_eq!(Template::from_str("py"), Some(Template::Python));
-        assert_eq!(Template::from_str("default"), Some(Template::Default));
-        assert_eq!(Template::from_str("unknown"), None);
+        assert_eq!(Template::parse_template("web"), Some(Template::Web));
+        assert_eq!(Template::parse_template("rust"), Some(Template::Rust));
+        assert_eq!(Template::parse_template("node"), Some(Template::Node));
+        assert_eq!(Template::parse_template("nodejs"), Some(Template::Node));
+        assert_eq!(Template::parse_template("npm"), Some(Template::Node));
+        assert_eq!(Template::parse_template("python"), Some(Template::Python));
+        assert_eq!(Template::parse_template("py"), Some(Template::Python));
+        assert_eq!(Template::parse_template("default"), Some(Template::Default));
+        assert_eq!(Template::parse_template("unknown"), None);
     }
 
     #[test]
@@ -323,25 +323,25 @@ mod tests {
 
     #[test]
     fn test_template_from_str_case_insensitive() {
-        assert_eq!(Template::from_str("WEB"), Some(Template::Web));
-        assert_eq!(Template::from_str("RUST"), Some(Template::Rust));
-        assert_eq!(Template::from_str("NODE"), Some(Template::Node));
-        assert_eq!(Template::from_str("PYTHON"), Some(Template::Python));
-        assert_eq!(Template::from_str("Default"), Some(Template::Default));
+        assert_eq!(Template::parse_template("WEB"), Some(Template::Web));
+        assert_eq!(Template::parse_template("RUST"), Some(Template::Rust));
+        assert_eq!(Template::parse_template("NODE"), Some(Template::Node));
+        assert_eq!(Template::parse_template("PYTHON"), Some(Template::Python));
+        assert_eq!(Template::parse_template("Default"), Some(Template::Default));
     }
 
     #[test]
     fn test_template_from_str_edge_cases() {
         // Empty string
-        assert_eq!(Template::from_str(""), None);
+        assert_eq!(Template::parse_template(""), None);
 
         // Whitespace
-        assert_eq!(Template::from_str(" "), None);
-        assert_eq!(Template::from_str("  web  "), None);
+        assert_eq!(Template::parse_template(" "), None);
+        assert_eq!(Template::parse_template("  web  "), None);
 
         // Special characters
-        assert_eq!(Template::from_str("web!"), None);
-        assert_eq!(Template::from_str("rust@"), None);
+        assert_eq!(Template::parse_template("web!"), None);
+        assert_eq!(Template::parse_template("rust@"), None);
     }
 
     #[test]

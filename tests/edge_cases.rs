@@ -2,7 +2,7 @@
 
 use ahash::AHashMap;
 use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig, GlobalConfig};
-use cmdrun::security::validation::{CommandValidator, ValidationResult};
+use cmdrun::security::validation::CommandValidator;
 
 #[cfg(test)]
 mod edge_case_tests {

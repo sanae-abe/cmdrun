@@ -61,7 +61,7 @@ pub async fn handle_remove(id: String, force: bool, config_path: Option<PathBuf>
             }
         }
         crate::config::schema::CommandSpec::Platform(_) => {
-            println!("  {} {}", "Type:".dimmed(), "Platform-specific");
+            println!("  {} Platform-specific", "Type:".dimmed());
         }
     }
 

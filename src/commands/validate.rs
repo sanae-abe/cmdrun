@@ -127,7 +127,7 @@ pub async fn handle_validate(
         println!("{}", "Checking for circular dependencies...".cyan());
 
         for (name, _) in &config.commands {
-            if let Err(e) = validator.compute_execution_order(&[name.clone()]) {
+            if let Err(e) = validator.compute_execution_order(std::slice::from_ref(name)) {
                 report.add_error(format!("Circular dependency in '{}': {}", name, e));
             } else if verbose {
                 report.add_info(format!("✓ No circular dependencies for '{}'", name));
@@ -185,7 +185,7 @@ pub async fn handle_validate(
 
                 // Show execution order for some commands
                 for (name, _) in config.commands.iter().take(3) {
-                    if let Ok(order) = validator.compute_execution_order(&[name.clone()]) {
+                    if let Ok(order) = validator.compute_execution_order(std::slice::from_ref(name)) {
                         if order.len() > 1 {
                             println!("  {} Execution order: {}", "→".blue(), order.join(" → "));
                         }

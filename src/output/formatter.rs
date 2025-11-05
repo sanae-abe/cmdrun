@@ -190,7 +190,6 @@ impl Default for OutputFormatter {
 }
 
 /// 簡易フォーマット関数（グローバル）
-
 /// 成功メッセージをフォーマット
 pub fn format_success(message: &str) -> String {
     OutputFormatter::new().success(message)

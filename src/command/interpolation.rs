@@ -12,11 +12,11 @@ use crate::error::{InterpolationError, Result};
 use ahash::AHashMap;
 use regex::Regex;
 use std::env;
-use std::sync::LazyLock;
+use once_cell::sync::Lazy;
 
 /// 変数展開パターン（コンパイル時最適化）
 /// 位置引数（${1}, ${2}等）と通常変数（${VAR}）の両方に対応
-static VAR_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+static VAR_PATTERN: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(:[?+\-])?([^}]*)?\}").unwrap()
 });
 

@@ -2,7 +2,7 @@
 //!
 //! 危険なコマンドパターンが適切にブロックされることを確認
 
-use cmdrun::security::{CommandValidator, ValidationResult};
+use cmdrun::security::CommandValidator;
 
 #[cfg(test)]
 mod injection_tests {

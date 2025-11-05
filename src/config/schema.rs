@@ -38,19 +38,14 @@ impl Default for CommandsConfig {
 }
 
 /// 言語設定
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum Language {
     /// 英語
+    #[default]
     English,
     /// 日本語
     Japanese,
-}
-
-impl Default for Language {
-    fn default() -> Self {
-        Language::English
-    }
 }
 
 /// グローバル設定

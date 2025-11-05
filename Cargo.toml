@@ -70,6 +70,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 
 # 正規表現
 regex = { version = "1.10", default-features = false, features = ["std", "perf"] }
+once_cell = "1.19"  # LazyStatic代替（正規表現キャッシュ等）
 
 # 日時操作
 chrono = "0.4"

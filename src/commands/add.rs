@@ -34,29 +34,26 @@ pub async fn handle_add(
     let theme = ColorfulTheme::default();
 
     // If all arguments provided, skip interactive mode
-    if id.is_some() && command.is_some() && description.is_some() {
-        let id = id.unwrap();
-        let command = command.unwrap();
-        let description = description.unwrap();
+    if let (Some(ref id_val), Some(ref command_val), Some(ref description_val)) = (&id, &command, &description) {
 
-        if id.trim().is_empty() {
+        if id_val.trim().is_empty() {
             bail!("{}", get_message(MessageKey::ErrorEmptyCommandId, lang));
         }
-        if command.trim().is_empty() {
+        if command_val.trim().is_empty() {
             bail!("{}", get_message(MessageKey::ErrorEmptyCommand, lang));
         }
-        if description.trim().is_empty() {
+        if description_val.trim().is_empty() {
             bail!("{}", get_message(MessageKey::ErrorEmptyDescription, lang));
         }
 
-        return add_command_to_config(id, command, description, category, tags, lang, config_path)
+        return add_command_to_config(id_val.clone(), command_val.clone(), description_val.clone(), category, tags, lang, config_path)
             .await;
     }
 
     // Interactive mode with back navigation
-    let mut input_id = id.clone().unwrap_or_default();
-    let mut input_command = command.clone().unwrap_or_default();
-    let mut input_description = description.clone().unwrap_or_default();
+    let mut input_id = id.unwrap_or_default();
+    let mut input_command = command.unwrap_or_default();
+    let mut input_description = description.unwrap_or_default();
 
     // Error messages for validation (static lifetime required by dialoguer)
     let err_empty_id = get_message(MessageKey::ErrorEmptyCommandId, lang);

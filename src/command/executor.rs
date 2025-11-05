@@ -306,7 +306,7 @@ impl CommandExecutor {
     }
 
     /// 出力読み取り（リアルタイム表示）
-    async fn read_output<R>(reader: BufReader<R>, color: bool) -> String
+    async fn read_output<R>(reader: BufReader<R>, _color: bool) -> String
     where
         R: tokio::io::AsyncRead + Unpin,
     {
@@ -314,11 +314,7 @@ impl CommandExecutor {
         let mut lines = reader.lines();
 
         while let Ok(Some(line)) = lines.next_line().await {
-            if color {
-                println!("{}", line);
-            } else {
-                println!("{}", line);
-            }
+            println!("{}", line);
             output.push_str(&line);
             output.push('\n');
         }

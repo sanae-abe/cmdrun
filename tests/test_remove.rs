@@ -2,7 +2,6 @@
 
 use cmdrun::commands::handle_remove;
 use cmdrun::config::loader::ConfigLoader;
-use std::path::PathBuf;
 use tempfile::TempDir;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;

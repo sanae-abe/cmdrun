@@ -124,7 +124,7 @@ pub enum Commands {
         description: Option<String>,
 
         /// Category for the command
-        #[arg(short, long)]
+        #[arg(short = 'C', long)]
         category: Option<String>,
 
         /// Tags (comma-separated)

@@ -158,6 +158,10 @@ cmdrun config show
 # 言語設定を変更
 cmdrun config set language japanese
 
+# カスタム設定ファイルを使用
+cmdrun --config ~/work/commands.toml list
+cmdrun -c ~/.cmdrun/personal.toml run dev
+
 # ヘルプを表示
 cmdrun --help
 ```
@@ -165,6 +169,7 @@ cmdrun --help
 **設定ファイルの場所:**
 - Linux/macOS: `~/.config/cmdrun/commands.toml`
 - Windows: `%APPDATA%\cmdrun\commands.toml`
+- カスタムパス: `--config/-c` オプションで任意のパスを指定可能
 
 ## 機能
 
