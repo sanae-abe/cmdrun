@@ -185,7 +185,8 @@ pub async fn handle_validate(
 
                 // Show execution order for some commands
                 for (name, _) in config.commands.iter().take(3) {
-                    if let Ok(order) = validator.compute_execution_order(std::slice::from_ref(name)) {
+                    if let Ok(order) = validator.compute_execution_order(std::slice::from_ref(name))
+                    {
                         if order.len() > 1 {
                             println!("  {} Execution order: {}", "→".blue(), order.join(" → "));
                         }

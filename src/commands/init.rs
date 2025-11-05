@@ -509,7 +509,7 @@ mod tests {
     #[test]
     fn test_template_clone() {
         let original = Template::Rust;
-        let cloned = original.clone();
+        let cloned = original;
         assert_eq!(original, cloned);
     }
 

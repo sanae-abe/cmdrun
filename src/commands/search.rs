@@ -125,14 +125,13 @@ pub async fn handle_search(keyword: String, config_path: Option<PathBuf>) -> Res
 
 #[cfg(test)]
 mod tests {
-    use super::*;
 
-    #[tokio::test]
-    async fn test_search_matching() {
-        // This is a conceptual test - actual testing would require
-        // setting up a temporary config file
-        assert!(true);
-    }
+    // TODO: Implement actual search test with temporary config file
+    // #[tokio::test]
+    // async fn test_search_matching() {
+    //     // This is a conceptual test - actual testing would require
+    //     // setting up a temporary config file
+    // }
 
     #[test]
     fn test_keyword_case_insensitive() {

@@ -34,8 +34,9 @@ pub async fn handle_add(
     let theme = ColorfulTheme::default();
 
     // If all arguments provided, skip interactive mode
-    if let (Some(ref id_val), Some(ref command_val), Some(ref description_val)) = (&id, &command, &description) {
-
+    if let (Some(ref id_val), Some(ref command_val), Some(ref description_val)) =
+        (&id, &command, &description)
+    {
         if id_val.trim().is_empty() {
             bail!("{}", get_message(MessageKey::ErrorEmptyCommandId, lang));
         }
@@ -46,8 +47,16 @@ pub async fn handle_add(
             bail!("{}", get_message(MessageKey::ErrorEmptyDescription, lang));
         }
 
-        return add_command_to_config(id_val.clone(), command_val.clone(), description_val.clone(), category, tags, lang, config_path)
-            .await;
+        return add_command_to_config(
+            id_val.clone(),
+            command_val.clone(),
+            description_val.clone(),
+            category,
+            tags,
+            lang,
+            config_path,
+        )
+        .await;
     }
 
     // Interactive mode with back navigation

@@ -20,13 +20,13 @@ async fn test_dependency_graph_simple() {
     let graph = graph.unwrap();
 
     // Verify graph can resolve dependencies for these commands
-    let test_order = graph.topological_sort(&vec!["test".to_string()]);
+    let test_order = graph.topological_sort(&["test".to_string()]);
     assert!(test_order.is_ok(), "Should resolve 'test' command");
 
-    let build_order = graph.topological_sort(&vec!["build".to_string()]);
+    let build_order = graph.topological_sort(&["build".to_string()]);
     assert!(build_order.is_ok(), "Should resolve 'build' command");
 
-    let deploy_order = graph.topological_sort(&vec!["deploy".to_string()]);
+    let deploy_order = graph.topological_sort(&["deploy".to_string()]);
     assert!(deploy_order.is_ok(), "Should resolve 'deploy' command");
 }
 

@@ -136,8 +136,10 @@ async fn test_command_exit_code() {
 
 #[tokio::test]
 async fn test_timeout() {
-    let mut ctx = ExecutionContext::default();
-    ctx.timeout = Some(1); // 1 second timeout
+    let ctx = ExecutionContext {
+        timeout: Some(1), // 1 second timeout
+        ..Default::default()
+    };
 
     let executor = CommandExecutor::new(ctx);
 

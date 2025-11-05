@@ -549,7 +549,7 @@ mod tests {
     #[test]
     fn test_dangerous_patterns_with_strict_mode() {
         let strict = CommandValidator::new().with_strict_mode(true);
-        let non_strict = CommandValidator::new().with_strict_mode(false);
+        let _non_strict = CommandValidator::new().with_strict_mode(false);
 
         // Test eval - always dangerous
         assert!(!strict.validate("eval echo test").is_safe());
