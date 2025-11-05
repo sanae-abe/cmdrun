@@ -15,9 +15,7 @@ variables:
 
 # キャッシュ設定（ビルド高速化）
 cache:
-  key:
-    files:
-      - Cargo.lock
+  key: "$CI_COMMIT_REF_SLUG"
   paths:
     - .cargo/
     - target/
@@ -36,6 +34,7 @@ test:cargo-test:
   before_script:
     - rustc --version
     - cargo --version
+    - cargo clean  # キャッシュ問題回避のためクリーンビルド
   script:
     - cargo test --all-features --verbose
   artifacts:
