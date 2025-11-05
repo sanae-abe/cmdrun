@@ -126,6 +126,8 @@ build:macos-x64:
   tags:
     - macos  # macOS専用ランナーが必要
   allow_failure: true  # macOSランナーがない場合は失敗を許可
+  when: manual  # 手動実行のみ（macOSランナーが利用可能な場合に実行）
+  timeout: 30m  # タイムアウトを30分に設定（デフォルト1時間）
 
 # 📦 Package Registry公開
 publish:package-registry:
