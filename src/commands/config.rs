@@ -9,8 +9,12 @@ use toml_edit::DocumentMut;
 use crate::config::loader::ConfigLoader;
 
 /// Get a configuration value
-pub async fn handle_get(key: &str) -> Result<()> {
-    let config_loader = ConfigLoader::new();
+pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     match key {
@@ -33,8 +37,12 @@ pub async fn handle_get(key: &str) -> Result<()> {
 }
 
 /// Set a configuration value
-pub async fn handle_set(key: &str, value: &str) -> Result<()> {
-    let config_path = get_config_path()?;
+pub async fn handle_set(key: &str, value: &str, config_file_path: Option<PathBuf>) -> Result<()> {
+    let config_path = if let Some(path) = config_file_path {
+        path
+    } else {
+        get_config_path()?
+    };
     let content = fs::read_to_string(&config_path)?;
     let mut doc = content.parse::<DocumentMut>()?;
 
@@ -76,8 +84,12 @@ pub async fn handle_set(key: &str, value: &str) -> Result<()> {
 }
 
 /// Show all configuration settings
-pub async fn handle_show() -> Result<()> {
-    let config_loader = ConfigLoader::new();
+pub async fn handle_show(config_path: Option<PathBuf>) -> Result<()> {
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     let lang = match config.config.language {

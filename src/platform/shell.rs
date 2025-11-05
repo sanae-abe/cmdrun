@@ -30,7 +30,11 @@ pub enum Platform {
 impl ShellInfo {
     /// シェル情報を作成
     pub fn new(name: String, path: PathBuf, platform: Platform) -> Self {
-        Self { name, path, platform }
+        Self {
+            name,
+            path,
+            platform,
+        }
     }
 
     /// コマンドライン引数を取得（シェル実行用）
@@ -73,8 +77,7 @@ pub fn get_shell_by_name(name: &str) -> Result<ShellInfo> {
     };
 
     // シェルのパスを検索
-    let path = which::which(name)
-        .with_context(|| format!("Shell '{}' not found in PATH", name))?;
+    let path = which::which(name).with_context(|| format!("Shell '{}' not found in PATH", name))?;
 
     debug!("Found shell '{}' at {}", name, path.display());
 
@@ -135,7 +138,11 @@ fn detect_windows_shell() -> Result<ShellInfo> {
     let cmd_path = PathBuf::from(r"C:\Windows\System32\cmd.exe");
     if cmd_path.exists() {
         debug!("Using fallback cmd.exe");
-        return Ok(ShellInfo::new("cmd".to_string(), cmd_path, Platform::Windows));
+        return Ok(ShellInfo::new(
+            "cmd".to_string(),
+            cmd_path,
+            Platform::Windows,
+        ));
     }
 
     anyhow::bail!("No suitable Windows shell found")
@@ -218,11 +225,7 @@ mod tests {
 
     #[test]
     fn test_shell_command_args_pwsh() {
-        let shell = ShellInfo::new(
-            "pwsh".to_string(),
-            PathBuf::from("pwsh"),
-            Platform::Windows,
-        );
+        let shell = ShellInfo::new("pwsh".to_string(), PathBuf::from("pwsh"), Platform::Windows);
 
         let args = shell.get_command_args("echo hello");
         assert_eq!(args.len(), 4);

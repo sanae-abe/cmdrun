@@ -5,10 +5,15 @@ use crate::config::schema::{CommandSpec, CommandsConfig};
 use anyhow::Result;
 use colored::*;
 use std::io::{self, Write};
+use std::path::PathBuf;
 
 /// Show detailed information about a command
-pub async fn handle_info(command_id: Option<String>) -> Result<()> {
-    let config_loader = ConfigLoader::new();
+pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf>) -> Result<()> {
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     // Get command ID (from argument or interactive selection)
@@ -102,11 +107,7 @@ pub async fn handle_info(command_id: Option<String>) -> Result<()> {
         "Parallel:".dimmed(),
         format_bool(command.parallel)
     );
-    println!(
-        "  {} {}",
-        "Confirm:".dimmed(),
-        format_bool(command.confirm)
-    );
+    println!("  {} {}", "Confirm:".dimmed(), format_bool(command.confirm));
     if let Some(timeout) = command.timeout {
         println!("  {} {}s", "Timeout:".dimmed(), timeout);
     }

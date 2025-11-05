@@ -9,8 +9,10 @@
 ## Table of Contents
 
 - [Why cmdrun?](#why-cmdrun)
-- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
 - [Features](#features)
+- [Configuration Examples](#configuration-examples)
 - [Documentation](#documentation)
 - [License](#license)
 
@@ -36,16 +38,14 @@
 - **Powerful features** - Dependencies, parallel execution, hooks
 - **Great errors** - Detailed error messages with context
 
-## Quick Start
+## Installation
 
 ### System Requirements
 
 - **Operating System**: Linux, macOS, Windows, FreeBSD
 - **For building from source**: Rust 1.70+ (MSRV)
 
-### Installation
-
-#### Install Rust Toolchain (if not already installed)
+### Install Rust Toolchain (if not already installed)
 
 ```bash
 # 1. Download and run Rustup (Rust installer)
@@ -66,7 +66,7 @@ rustc --version
 cargo --version
 ```
 
-#### Install cmdrun
+### Install cmdrun
 
 **Option 1: From Source (Recommended for Development)**
 
@@ -89,7 +89,7 @@ cmdrun --help
 cargo install cmdrun
 ```
 
-#### Update
+### Update
 
 ```bash
 # If installed from source
@@ -99,6 +99,29 @@ git pull
 # Rebuild and install
 cargo install --path . --force
 ```
+
+### Uninstall
+
+```bash
+# 1. Remove binary
+cargo uninstall cmdrun
+
+# 2. Remove configuration files (optional)
+# Linux/macOS
+rm -rf ~/.config/cmdrun
+
+# Windows (run in PowerShell)
+# Remove-Item -Recurse -Force "$env:APPDATA\cmdrun"
+
+# 3. Remove project directory (optional)
+# cd ..
+# rm -rf cmdrun
+```
+
+**Note:**
+- `cargo uninstall cmdrun` only removes the executable
+- Configuration files (commands.toml, etc.) need to be removed manually
+- Skip step 2 if you want to keep your settings
 
 <!-- Future installation methods (commented out until available)
 #### Homebrew (macOS/Linux)
@@ -113,7 +136,7 @@ scoop install cmdrun
 ```
 -->
 
-### Basic Usage
+## Basic Usage
 
 cmdrun is a **personal global command manager** that allows you to register and run frequently used commands from anywhere on your system.
 
@@ -290,7 +313,7 @@ $ cmdrun add test-en "echo test" "English test command"
 - `cmdrun add` - Fully localized (prompts, messages, errors)
 - More commands will be localized in future releases
 
-### Advanced Configuration Examples
+## Configuration Examples
 
 You can edit the configuration file (`~/.config/cmdrun/commands.toml`) directly for advanced features:
 

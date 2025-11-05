@@ -11,6 +11,10 @@ use std::path::PathBuf;
     long_about = "A modern replacement for package.json scripts and Makefiles"
 )]
 pub struct Cli {
+    /// Path to configuration file
+    #[arg(short, long, value_name = "FILE", global = true)]
+    pub config: Option<PathBuf>,
+
     /// Subcommand to execute
     #[command(subcommand)]
     pub command: Commands,
@@ -106,10 +110,6 @@ pub enum Commands {
         /// Skip confirmation prompt
         #[arg(short, long)]
         force: bool,
-
-        /// Path to configuration file
-        #[arg(short = 'c', long)]
-        config: Option<PathBuf>,
     },
 
     /// Add a new command to the configuration

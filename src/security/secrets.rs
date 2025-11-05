@@ -125,14 +125,20 @@ impl SensitiveEnv {
     }
 
     /// 環境変数マップをマスキング（ログ出力用）
-    pub fn mask_env_map(&self, env: &std::collections::HashMap<String, String>) -> std::collections::HashMap<String, String> {
+    pub fn mask_env_map(
+        &self,
+        env: &std::collections::HashMap<String, String>,
+    ) -> std::collections::HashMap<String, String> {
         env.iter()
             .map(|(k, v)| (k.clone(), self.mask_value(k, v)))
             .collect()
     }
 
     /// AHashMap版のマスキング
-    pub fn mask_ahash_map(&self, env: &ahash::AHashMap<String, String>) -> ahash::AHashMap<String, String> {
+    pub fn mask_ahash_map(
+        &self,
+        env: &ahash::AHashMap<String, String>,
+    ) -> ahash::AHashMap<String, String> {
         env.iter()
             .map(|(k, v)| (k.clone(), self.mask_value(k, v)))
             .collect()

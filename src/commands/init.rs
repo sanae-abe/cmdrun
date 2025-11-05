@@ -173,11 +173,7 @@ fn print_next_steps(output_path: &PathBuf) {
 
     // Example commands based on templates
     println!("{}", "Example commands:".dimmed());
-    println!(
-        "  {} {}",
-        "$".dimmed(),
-        "cmdrun list --verbose".dimmed()
-    );
+    println!("  {} {}", "$".dimmed(), "cmdrun list --verbose".dimmed());
     println!("  {} {}", "$".dimmed(), "cmdrun run dev".dimmed());
     println!("  {} {}", "$".dimmed(), "cmdrun run build".dimmed());
     println!();
@@ -212,10 +208,7 @@ mod tests {
 
     #[test]
     fn test_template_description() {
-        assert_eq!(
-            Template::Web.description(),
-            "Web development (HTML/CSS/JS)"
-        );
+        assert_eq!(Template::Web.description(), "Web development (HTML/CSS/JS)");
         assert_eq!(Template::Rust.description(), "Rust project");
         assert_eq!(Template::Node.description(), "Node.js project");
         assert_eq!(Template::Python.description(), "Python project");
@@ -296,10 +289,7 @@ mod tests {
         let result = handle_init(None, false, Some(output)).await;
         assert!(result.is_err(), "Init should fail if file exists");
         assert!(
-            result
-                .unwrap_err()
-                .to_string()
-                .contains("already exists"),
+            result.unwrap_err().to_string().contains("already exists"),
             "Error message should mention file already exists"
         );
     }
@@ -309,12 +299,7 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let output = temp_dir.path().join("commands.toml");
 
-        let result = handle_init(
-            Some("invalid_template".to_string()),
-            false,
-            Some(output),
-        )
-        .await;
+        let result = handle_init(Some("invalid_template".to_string()), false, Some(output)).await;
 
         assert!(result.is_err(), "Init should fail with invalid template");
         assert!(
@@ -435,11 +420,18 @@ mod tests {
     #[tokio::test]
     async fn test_handle_init_nested_path() {
         let temp_dir = TempDir::new().unwrap();
-        let nested = temp_dir.path().join("nested").join("path").join("commands.toml");
+        let nested = temp_dir
+            .path()
+            .join("nested")
+            .join("path")
+            .join("commands.toml");
 
         // Should fail because parent directory doesn't exist
         let result = handle_init(None, false, Some(nested)).await;
-        assert!(result.is_err(), "Should fail on non-existent parent directory");
+        assert!(
+            result.is_err(),
+            "Should fail on non-existent parent directory"
+        );
     }
 
     #[tokio::test]
@@ -447,8 +439,15 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
 
         for template in Template::all() {
-            let output = temp_dir.path().join(format!("{}_test.toml", template.name()));
-            let result = handle_init(Some(template.name().to_string()), false, Some(output.clone())).await;
+            let output = temp_dir
+                .path()
+                .join(format!("{}_test.toml", template.name()));
+            let result = handle_init(
+                Some(template.name().to_string()),
+                false,
+                Some(output.clone()),
+            )
+            .await;
 
             assert!(
                 result.is_ok(),
@@ -457,7 +456,11 @@ mod tests {
                 result.err()
             );
 
-            assert!(output.exists(), "{} output file should exist", template.name());
+            assert!(
+                output.exists(),
+                "{} output file should exist",
+                template.name()
+            );
 
             // Verify content is valid TOML
             let content = std::fs::read_to_string(&output).unwrap();
@@ -489,7 +492,10 @@ mod tests {
 
             // Should fail because symlink points to existing file
             let result = handle_init(None, false, Some(link)).await;
-            assert!(result.is_err(), "Should fail when symlink points to existing file");
+            assert!(
+                result.is_err(),
+                "Should fail when symlink points to existing file"
+            );
         }
     }
 

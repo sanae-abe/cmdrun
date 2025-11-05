@@ -166,7 +166,10 @@ pub async fn handle_validate(
             if config.commands.contains_key(target) {
                 println!("  {} {} -> {}", "✓".green(), alias, target);
             } else {
-                report.add_error(format!("Alias '{}' points to non-existent command '{}'", alias, target));
+                report.add_error(format!(
+                    "Alias '{}' points to non-existent command '{}'",
+                    alias, target
+                ));
             }
         }
     }

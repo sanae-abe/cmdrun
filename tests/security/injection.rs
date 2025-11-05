@@ -22,11 +22,7 @@ mod injection_tests {
 
         for cmd in dangerous_commands {
             let result = validator.validate(cmd);
-            assert!(
-                !result.is_safe(),
-                "Command should be rejected: {}",
-                cmd
-            );
+            assert!(!result.is_safe(), "Command should be rejected: {}", cmd);
         }
     }
 
@@ -42,11 +38,7 @@ mod injection_tests {
 
         for cmd in dangerous_commands {
             let result = validator.validate(cmd);
-            assert!(
-                !result.is_safe(),
-                "Command should be rejected: {}",
-                cmd
-            );
+            assert!(!result.is_safe(), "Command should be rejected: {}", cmd);
         }
     }
 
@@ -54,11 +46,7 @@ mod injection_tests {
     fn test_command_injection_substitution() {
         let validator = CommandValidator::new();
 
-        let dangerous_commands = vec![
-            "echo $(whoami)",
-            "echo `cat /etc/passwd`",
-            "ls $(ls -la /)",
-        ];
+        let dangerous_commands = vec!["echo $(whoami)", "echo `cat /etc/passwd`", "ls $(ls -la /)"];
 
         for cmd in dangerous_commands {
             let result = validator.validate(cmd);
@@ -100,7 +88,7 @@ mod injection_tests {
             "dd if=/dev/zero of=/dev/sda",
             "mkfs.ext4 /dev/sda1",
             "format c:",
-            ":(){:|:&};:",  // フォークボム
+            ":(){:|:&};:", // フォークボム
         ];
 
         for cmd in dangerous_commands {
@@ -173,7 +161,10 @@ mod injection_tests {
 
         let long_cmd = "echo ".to_string() + &"A".repeat(200);
         let result = validator.validate(&long_cmd);
-        assert!(!result.is_safe(), "Excessively long command should be rejected");
+        assert!(
+            !result.is_safe(),
+            "Excessively long command should be rejected"
+        );
     }
 
     /// 安全なコマンドは許可される
@@ -227,11 +218,7 @@ mod injection_tests {
             .allow_variable_expansion()
             .with_strict_mode(false);
 
-        let commands = vec![
-            "echo $HOME",
-            "echo ${USER}",
-            "ls ${PWD}",
-        ];
+        let commands = vec!["echo $HOME", "echo ${USER}", "ls ${PWD}"];
 
         for cmd in commands {
             let result = validator.validate(cmd);
@@ -294,10 +281,10 @@ mod injection_tests {
 /// 実際のコマンド実行での統合テスト
 #[cfg(test)]
 mod integration_tests {
+    use ahash::AHashMap;
     use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
     use cmdrun::config::schema::Command;
     use cmdrun::config::CommandSpec;
-    use ahash::AHashMap;
 
     /// 危険なコマンドは実行前にブロックされる
     #[tokio::test]

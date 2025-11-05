@@ -4,10 +4,15 @@ use crate::config::loader::ConfigLoader;
 use crate::config::schema::CommandSpec;
 use anyhow::Result;
 use colored::*;
+use std::path::PathBuf;
 
 /// Search commands by keyword (case-insensitive)
-pub async fn handle_search(keyword: String) -> Result<()> {
-    let config_loader = ConfigLoader::new();
+pub async fn handle_search(keyword: String, config_path: Option<PathBuf>) -> Result<()> {
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     let keyword_lower = keyword.to_lowercase();
@@ -100,12 +105,7 @@ pub async fn handle_search(keyword: String) -> Result<()> {
     results.sort_by(|a, b| a.0.cmp(&b.0));
 
     for (name, description, locations) in results {
-        println!(
-            "  {} {} - {}",
-            "•".blue(),
-            name.green().bold(),
-            description
-        );
+        println!("  {} {} - {}", "•".blue(), name.green().bold(), description);
         println!(
             "    {} {}",
             "Matched in:".dimmed(),

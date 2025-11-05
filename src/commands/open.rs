@@ -7,8 +7,12 @@ use std::process::Command;
 use tracing::{debug, info};
 
 /// Open the configuration file in the default editor
-pub async fn handle_open() -> Result<()> {
-    let config_path = find_config_file().await?;
+pub async fn handle_open(config_file_path: Option<PathBuf>) -> Result<()> {
+    let config_path = if let Some(path) = config_file_path {
+        path
+    } else {
+        find_config_file().await?
+    };
 
     info!("Opening configuration file: {}", config_path.display());
     println!(
@@ -27,8 +31,7 @@ async fn find_config_file() -> Result<PathBuf> {
     const CONFIG_FILENAMES: &[&str] = &["commands.toml", ".cmdrun.toml", "cmdrun.toml"];
 
     // Search in current directory and upwards
-    let current_dir = std::env::current_dir()
-        .context("Failed to get current directory")?;
+    let current_dir = std::env::current_dir().context("Failed to get current directory")?;
 
     if let Some(path) = search_upwards(&current_dir, CONFIG_FILENAMES).await? {
         return Ok(path);
@@ -52,7 +55,10 @@ async fn find_config_file() -> Result<PathBuf> {
 }
 
 /// Search upwards from a directory for config files
-async fn search_upwards(start_dir: &std::path::Path, filenames: &[&str]) -> Result<Option<PathBuf>> {
+async fn search_upwards(
+    start_dir: &std::path::Path,
+    filenames: &[&str],
+) -> Result<Option<PathBuf>> {
     let mut current = start_dir.to_path_buf();
 
     loop {
@@ -106,11 +112,7 @@ fn open_in_editor(path: &std::path::Path) -> Result<()> {
                 .with_context(|| format!("Failed to execute editor: {}", cmd))?;
 
             if status.success() {
-                println!(
-                    "{} Opened in {}",
-                    "✓".green().bold(),
-                    cmd.bright_white()
-                );
+                println!("{} Opened in {}", "✓".green().bold(), cmd.bright_white());
                 return Ok(());
             }
         }

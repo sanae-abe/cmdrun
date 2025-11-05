@@ -30,16 +30,32 @@ pub async fn handle_remove(id: String, force: bool, config_path: Option<PathBuf>
 
     // Display command information
     println!("{}", "Removal target:".cyan().bold());
-    println!("  {} {}", format!("{}:", get_message(MessageKey::LabelId, lang)).dimmed(), id.green().bold());
-    println!("  {} {}", format!("{}:", get_message(MessageKey::LabelDescription, lang)).dimmed(), command.description);
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelId, lang)).dimmed(),
+        id.green().bold()
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelDescription, lang)).dimmed(),
+        command.description
+    );
 
     // Show command content
     match &command.cmd {
         crate::config::schema::CommandSpec::Single(cmd) => {
-            println!("  {} {}", format!("{}:", get_message(MessageKey::LabelCommand, lang)).dimmed(), cmd);
+            println!(
+                "  {} {}",
+                format!("{}:", get_message(MessageKey::LabelCommand, lang)).dimmed(),
+                cmd
+            );
         }
         crate::config::schema::CommandSpec::Multiple(cmds) => {
-            println!("  {} ({} commands)", format!("{}:", get_message(MessageKey::LabelCommand, lang)).dimmed(), cmds.len());
+            println!(
+                "  {} ({} commands)",
+                format!("{}:", get_message(MessageKey::LabelCommand, lang)).dimmed(),
+                cmds.len()
+            );
             for (i, cmd) in cmds.iter().enumerate() {
                 println!("    {}. {}", i + 1, cmd);
             }
@@ -56,14 +72,21 @@ pub async fn handle_remove(id: String, force: bool, config_path: Option<PathBuf>
 
     // Show tags if any
     if !command.tags.is_empty() {
-        println!("  {} {:?}", format!("{}:", get_message(MessageKey::LabelTags, lang)).dimmed(), command.tags);
+        println!(
+            "  {} {:?}",
+            format!("{}:", get_message(MessageKey::LabelTags, lang)).dimmed(),
+            command.tags
+        );
     }
 
     println!();
 
     // Confirmation prompt (unless --force)
     if !force {
-        print!("{}", format!("{} (y/N): ", get_message(MessageKey::PromptConfirm, lang)).yellow());
+        print!(
+            "{}",
+            format!("{} (y/N): ", get_message(MessageKey::PromptConfirm, lang)).yellow()
+        );
         io::stdout().flush()?;
 
         let mut input = String::new();
@@ -216,11 +239,7 @@ cmd = "cargo build"
         file.write_all(toml_content.as_bytes()).await.unwrap();
 
         // Remove the "test" command with force flag
-        let result = handle_remove(
-            "test".to_string(),
-            true,
-            Some(config_path.clone())
-        ).await;
+        let result = handle_remove("test".to_string(), true, Some(config_path.clone())).await;
 
         assert!(result.is_ok());
 
@@ -250,11 +269,7 @@ cmd = "cargo test"
         file.write_all(toml_content.as_bytes()).await.unwrap();
 
         // Try to remove a command that doesn't exist
-        let result = handle_remove(
-            "nonexistent".to_string(),
-            true,
-            Some(config_path)
-        ).await;
+        let result = handle_remove("nonexistent".to_string(), true, Some(config_path)).await;
 
         assert!(result.is_err());
         assert!(result.unwrap_err().to_string().contains("not found"));
@@ -282,7 +297,12 @@ cmd = "cargo test"
 
         // Verify backup exists
         assert!(backup_path.exists());
-        assert!(backup_path.file_name().unwrap().to_str().unwrap().contains("backup"));
+        assert!(backup_path
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap()
+            .contains("backup"));
 
         // Verify backup content matches original
         let original_content = tokio::fs::read_to_string(&config_path).await.unwrap();

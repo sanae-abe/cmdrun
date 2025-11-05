@@ -88,12 +88,7 @@ impl<'a> GraphVisualizer<'a> {
                         format!("({} dependencies)", cmd.deps.len()).dimmed()
                     )?;
                     for dep in &cmd.deps {
-                        writeln!(
-                            &mut output,
-                            "  {} {}",
-                            "└─►".blue(),
-                            dep.bright_yellow()
-                        )?;
+                        writeln!(&mut output, "  {} {}", "└─►".blue(), dep.bright_yellow())?;
                     }
                     writeln!(&mut output)?;
                 }
@@ -119,11 +114,7 @@ impl<'a> GraphVisualizer<'a> {
 
         // 現在のノード
         let connector = if is_last { "└─" } else { "├─" };
-        let icon = if cmd.deps.is_empty() {
-            "📦"
-        } else {
-            "🔗"
-        };
+        let icon = if cmd.deps.is_empty() { "📦" } else { "🔗" };
 
         writeln!(
             output,
@@ -186,11 +177,7 @@ impl<'a> GraphVisualizer<'a> {
             }
 
             if group.commands.len() > 1 {
-                writeln!(
-                    output,
-                    "  {} Can run in parallel",
-                    "⚡".bright_white()
-                )?;
+                writeln!(output, "  {} Can run in parallel", "⚡".bright_white())?;
             }
             writeln!(output)?;
         }
@@ -204,7 +191,10 @@ impl<'a> GraphVisualizer<'a> {
 
         writeln!(&mut output, "digraph dependencies {{")?;
         writeln!(&mut output, "  rankdir=TB;")?;
-        writeln!(&mut output, "  node [shape=box, style=rounded, fontname=\"Arial\"];")?;
+        writeln!(
+            &mut output,
+            "  node [shape=box, style=rounded, fontname=\"Arial\"];"
+        )?;
         writeln!(&mut output)?;
 
         // ノードのスタイル定義
@@ -314,7 +304,10 @@ impl<'a> GraphVisualizer<'a> {
 
         writeln!(&mut output)?;
         writeln!(&mut output, "  %% Styling")?;
-        writeln!(&mut output, "  classDef default fill:#e1f5ff,stroke:#01579b,stroke-width:2px")?;
+        writeln!(
+            &mut output,
+            "  classDef default fill:#e1f5ff,stroke:#01579b,stroke-width:2px"
+        )?;
 
         Ok(output)
     }
@@ -377,8 +370,8 @@ impl<'a> GraphVisualizer<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use ahash::AHashMap;
     use crate::config::schema::{Command, CommandSpec, GlobalConfig};
+    use ahash::AHashMap;
 
     fn create_test_config() -> CommandsConfig {
         let mut commands = AHashMap::new();
@@ -561,10 +554,7 @@ mod tests {
 
     #[test]
     fn test_escape_dot_string() {
-        assert_eq!(
-            GraphVisualizer::<'_>::escape_dot_string("hello"),
-            "hello"
-        );
+        assert_eq!(GraphVisualizer::<'_>::escape_dot_string("hello"), "hello");
         assert_eq!(
             GraphVisualizer::<'_>::escape_dot_string("hello\\world"),
             "hello\\\\world"
@@ -602,10 +592,7 @@ mod tests {
 
     #[test]
     fn test_sanitize_mermaid_id() {
-        assert_eq!(
-            GraphVisualizer::<'_>::sanitize_mermaid_id("hello"),
-            "hello"
-        );
+        assert_eq!(GraphVisualizer::<'_>::sanitize_mermaid_id("hello"), "hello");
         assert_eq!(
             GraphVisualizer::<'_>::sanitize_mermaid_id("hello-world"),
             "hello_world"

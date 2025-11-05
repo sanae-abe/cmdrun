@@ -46,8 +46,14 @@ async fn test_dependency_order() {
     std::env::set_current_dir("../..").ok();
 
     // Both commands should be in the execution order
-    assert!(order.contains(&"build".to_string()), "Build should be in execution order");
-    assert!(order.contains(&"deploy".to_string()), "Deploy should be in execution order");
+    assert!(
+        order.contains(&"build".to_string()),
+        "Build should be in execution order"
+    );
+    assert!(
+        order.contains(&"deploy".to_string()),
+        "Deploy should be in execution order"
+    );
 
     // Find indices
     let build_index = order.iter().position(|cmd| cmd == "build").unwrap();
@@ -96,7 +102,11 @@ async fn test_chain_dependencies() {
 
     // 'chain' should be last if all dependencies are included
     if order.len() > 1 {
-        assert_eq!(order.last().unwrap(), "chain", "Chain should be last in execution order");
+        assert_eq!(
+            order.last().unwrap(),
+            "chain",
+            "Chain should be last in execution order"
+        );
     }
 }
 
@@ -115,7 +125,11 @@ async fn test_no_circular_dependency() {
     if let Err(ref e) = result {
         eprintln!("Validation error: {}", e);
     }
-    assert!(result.is_ok(), "Validation should pass (no circular dependencies): {:?}", result);
+    assert!(
+        result.is_ok(),
+        "Validation should pass (no circular dependencies): {:?}",
+        result
+    );
 }
 
 #[tokio::test]
@@ -133,7 +147,11 @@ async fn test_independent_commands() {
 
     std::env::set_current_dir("../..").ok();
 
-    assert_eq!(order.len(), 1, "Independent command should have only itself");
+    assert_eq!(
+        order.len(),
+        1,
+        "Independent command should have only itself"
+    );
     assert_eq!(order[0], "test", "Should be the command itself");
 }
 
@@ -169,5 +187,8 @@ async fn test_missing_dependency() {
     let validator = ConfigValidator::new(&config);
     let result = validator.validate();
 
-    assert!(result.is_err(), "Should fail validation due to missing dependency");
+    assert!(
+        result.is_err(),
+        "Should fail validation due to missing dependency"
+    );
 }

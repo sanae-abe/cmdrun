@@ -34,21 +34,30 @@ deps = ["build", "test"]
     file.write_all(toml_content.as_bytes()).await.unwrap();
 
     // Remove the "test" command with force flag
-    let result = handle_remove(
-        "test".to_string(),
-        true,
-        Some(config_path.clone())
-    ).await;
+    let result = handle_remove("test".to_string(), true, Some(config_path.clone())).await;
 
-    assert!(result.is_ok(), "Failed to remove command: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to remove command: {:?}",
+        result.err()
+    );
 
     // Verify the command was removed
     let loader = ConfigLoader::with_path(&config_path);
     let config = loader.load().await.unwrap();
 
-    assert!(!config.commands.contains_key("test"), "Command 'test' should be removed");
-    assert!(config.commands.contains_key("build"), "Command 'build' should still exist");
-    assert!(config.commands.contains_key("deploy"), "Command 'deploy' should still exist");
+    assert!(
+        !config.commands.contains_key("test"),
+        "Command 'test' should be removed"
+    );
+    assert!(
+        config.commands.contains_key("build"),
+        "Command 'build' should still exist"
+    );
+    assert!(
+        config.commands.contains_key("deploy"),
+        "Command 'deploy' should still exist"
+    );
 }
 
 #[tokio::test]
@@ -69,15 +78,18 @@ cmd = "cargo test"
     file.write_all(toml_content.as_bytes()).await.unwrap();
 
     // Try to remove a command that doesn't exist
-    let result = handle_remove(
-        "nonexistent".to_string(),
-        true,
-        Some(config_path)
-    ).await;
+    let result = handle_remove("nonexistent".to_string(), true, Some(config_path)).await;
 
-    assert!(result.is_err(), "Should fail when removing nonexistent command");
+    assert!(
+        result.is_err(),
+        "Should fail when removing nonexistent command"
+    );
     let err_msg = result.unwrap_err().to_string();
-    assert!(err_msg.contains("not found"), "Error should mention command not found, got: {}", err_msg);
+    assert!(
+        err_msg.contains("not found"),
+        "Error should mention command not found, got: {}",
+        err_msg
+    );
 }
 
 #[tokio::test]
@@ -99,20 +111,21 @@ tags = ["testing"]
     file.write_all(toml_content.as_bytes()).await.unwrap();
 
     // Remove command with force
-    let result = handle_remove(
-        "test".to_string(),
-        true,
-        Some(config_path.clone())
-    ).await;
+    let result = handle_remove("test".to_string(), true, Some(config_path.clone())).await;
 
-    assert!(result.is_ok(), "Failed to remove command: {:?}", result.err());
+    assert!(
+        result.is_ok(),
+        "Failed to remove command: {:?}",
+        result.err()
+    );
 
     // Check that a backup file was created
     let backup_files: Vec<_> = std::fs::read_dir(temp_dir.path())
         .unwrap()
         .filter_map(Result::ok)
         .filter(|entry| {
-            entry.file_name()
+            entry
+                .file_name()
                 .to_str()
                 .map(|s| s.contains("backup"))
                 .unwrap_or(false)
@@ -122,9 +135,17 @@ tags = ["testing"]
     assert_eq!(backup_files.len(), 1, "Should have exactly one backup file");
 
     // Verify backup content matches original
-    let backup_content = tokio::fs::read_to_string(backup_files[0].path()).await.unwrap();
-    assert!(backup_content.contains("Run tests"), "Backup should contain original command");
-    assert!(backup_content.contains("cargo test"), "Backup should contain original cmd");
+    let backup_content = tokio::fs::read_to_string(backup_files[0].path())
+        .await
+        .unwrap();
+    assert!(
+        backup_content.contains("Run tests"),
+        "Backup should contain original command"
+    );
+    assert!(
+        backup_content.contains("cargo test"),
+        "Backup should contain original cmd"
+    );
 }
 
 #[tokio::test]
@@ -155,19 +176,27 @@ deps = ["test"]
     file.write_all(toml_content.as_bytes()).await.unwrap();
 
     // Remove the "lint" command (which is a dependency of test)
-    let result = handle_remove(
-        "lint".to_string(),
-        true,
-        Some(config_path.clone())
-    ).await;
+    let result = handle_remove("lint".to_string(), true, Some(config_path.clone())).await;
 
-    assert!(result.is_ok(), "Should be able to remove command even if it's a dependency");
+    assert!(
+        result.is_ok(),
+        "Should be able to remove command even if it's a dependency"
+    );
 
     // Verify the command was removed
     let loader = ConfigLoader::with_path(&config_path);
     let config = loader.load().await.unwrap();
 
-    assert!(!config.commands.contains_key("lint"), "Command 'lint' should be removed");
-    assert!(config.commands.contains_key("test"), "Command 'test' should still exist");
-    assert!(config.commands.contains_key("build"), "Command 'build' should still exist");
+    assert!(
+        !config.commands.contains_key("lint"),
+        "Command 'lint' should be removed"
+    );
+    assert!(
+        config.commands.contains_key("test"),
+        "Command 'test' should still exist"
+    );
+    assert!(
+        config.commands.contains_key("build"),
+        "Command 'build' should still exist"
+    );
 }

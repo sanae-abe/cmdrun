@@ -78,8 +78,7 @@ impl CommandExecutor {
         // バリデーターを設定（strictモードに応じて）
         let validator = if context.strict {
             // strictモードでも変数展開は許可する（安全な展開のみ）
-            CommandValidator::new()
-                .allow_variable_expansion()
+            CommandValidator::new().allow_variable_expansion()
         } else {
             CommandValidator::new()
                 .with_strict_mode(false)
@@ -185,7 +184,11 @@ impl CommandExecutor {
     }
 
     /// 単一コマンド実行
-    async fn execute_single(&self, command: &str, env: &AHashMap<String, String>) -> Result<ExecutionResult> {
+    async fn execute_single(
+        &self,
+        command: &str,
+        env: &AHashMap<String, String>,
+    ) -> Result<ExecutionResult> {
         let start = Instant::now();
 
         // セキュリティ検証
@@ -333,10 +336,7 @@ impl CommandExecutor {
     }
 
     /// 複数コマンドを並列実行
-    pub async fn execute_parallel(
-        &self,
-        commands: &[&Command],
-    ) -> Result<Vec<ExecutionResult>> {
+    pub async fn execute_parallel(&self, commands: &[&Command]) -> Result<Vec<ExecutionResult>> {
         if commands.is_empty() {
             return Ok(Vec::new());
         }

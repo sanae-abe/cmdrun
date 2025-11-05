@@ -32,7 +32,10 @@ fn print_installation_instructions(shell: Shell) {
             println!("    {}", "eval \"$(cmdrun completion bash)\"".dimmed());
             println!();
             println!("  Or save to completion directory:");
-            println!("    {}", "cmdrun completion bash > /etc/bash_completion.d/cmdrun".dimmed());
+            println!(
+                "    {}",
+                "cmdrun completion bash > /etc/bash_completion.d/cmdrun".dimmed()
+            );
         }
         Shell::Zsh => {
             println!();
@@ -40,7 +43,10 @@ fn print_installation_instructions(shell: Shell) {
             println!("    {}", "eval \"$(cmdrun completion zsh)\"".dimmed());
             println!();
             println!("  Or save to completion directory:");
-            println!("    {}", "cmdrun completion zsh > \"${fpath[1]}/_cmdrun\"".dimmed());
+            println!(
+                "    {}",
+                "cmdrun completion zsh > \"${fpath[1]}/_cmdrun\"".dimmed()
+            );
         }
         Shell::Fish => {
             println!();
@@ -110,7 +116,11 @@ mod tests {
             let mut cmd = Cli::command();
             let mut buf = Vec::new();
             generate(shell, &mut cmd, "cmdrun", &mut buf);
-            assert!(!buf.is_empty(), "Failed to generate completion for {:?}", shell);
+            assert!(
+                !buf.is_empty(),
+                "Failed to generate completion for {:?}",
+                shell
+            );
         }
     }
 }

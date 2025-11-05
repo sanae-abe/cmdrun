@@ -16,8 +16,9 @@ use std::sync::LazyLock;
 
 /// 変数展開パターン（コンパイル時最適化）
 /// 位置引数（${1}, ${2}等）と通常変数（${VAR}）の両方に対応
-static VAR_PATTERN: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(:[?+\-])?([^}]*)?\}").unwrap());
+static VAR_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(:[?+\-])?([^}]*)?\}").unwrap()
+});
 
 /// 変数コンテキスト
 #[derive(Debug, Clone)]
@@ -123,7 +124,8 @@ impl InterpolationContext {
 
             // ${VAR:-default} - デフォルト値
             Some(":-") => Ok(var_value
-                .filter(|v| !v.is_empty()).cloned()
+                .filter(|v| !v.is_empty())
+                .cloned()
                 .unwrap_or_else(|| operand.to_string())),
 
             // ${VAR:?error_message} - 必須変数
@@ -296,7 +298,9 @@ mod tests {
         let ctx = InterpolationContext::new(false).with_env_map(env);
 
         // 1は定義済み、2は未定義でデフォルト値使用
-        let result = ctx.interpolate("sharp -i ${1} -o ${2:-output.webp}").unwrap();
+        let result = ctx
+            .interpolate("sharp -i ${1} -o ${2:-output.webp}")
+            .unwrap();
         assert_eq!(result, "sharp -i input.png -o output.webp");
     }
 

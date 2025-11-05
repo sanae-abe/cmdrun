@@ -54,8 +54,7 @@ impl ConfigLoader {
     /// 設定ファイルを探索
     async fn find_config(&self) -> Result<PathBuf> {
         // カレントディレクトリから上位ディレクトリへ探索
-        let current_dir = std::env::current_dir()
-            .context("Failed to get current directory")?;
+        let current_dir = std::env::current_dir().context("Failed to get current directory")?;
 
         if let Some(path) = self.search_upwards(&current_dir).await? {
             return Ok(path);

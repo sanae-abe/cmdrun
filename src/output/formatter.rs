@@ -118,7 +118,11 @@ impl OutputFormatter {
     /// セクションヘッダー
     pub fn section_header(&self, title: &str) -> String {
         if self.colors_enabled {
-            format!("\n{}\n{}", title.bold().underline(), "─".repeat(title.len()).dimmed())
+            format!(
+                "\n{}\n{}",
+                title.bold().underline(),
+                "─".repeat(title.len()).dimmed()
+            )
         } else {
             format!("\n{}\n{}", title, "─".repeat(title.len()))
         }

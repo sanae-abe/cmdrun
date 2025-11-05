@@ -80,7 +80,8 @@ impl CommandValidator {
     ];
 
     /// 基本的に許可されるメタ文字（非厳格モード）
-    const ALLOWED_BASIC_METACHARACTERS: &'static [char] = &['-', '_', '.', '/', ':', '=', ',', ' ', '\'', '\\', '"'];
+    const ALLOWED_BASIC_METACHARACTERS: &'static [char] =
+        &['-', '_', '.', '/', ':', '=', ',', ' ', '\'', '\\', '"'];
 
     /// 危険なパターン（正規表現）
     const DANGEROUS_PATTERNS: &'static [&'static str] = &[
@@ -108,7 +109,7 @@ impl CommandValidator {
         "dd if=",
         "mkfs",
         "format",
-        ":(){:|:&};:",  // フォークボム
+        ":(){:|:&};:", // フォークボム
     ];
 
     /// 新しいバリデーターを作成
@@ -116,10 +117,7 @@ impl CommandValidator {
         Self {
             max_length: Self::DEFAULT_MAX_LENGTH,
             strict: true,
-            allowed_metacharacters: Self::ALLOWED_BASIC_METACHARACTERS
-                .iter()
-                .copied()
-                .collect(),
+            allowed_metacharacters: Self::ALLOWED_BASIC_METACHARACTERS.iter().copied().collect(),
             forbidden_words: Self::DEFAULT_FORBIDDEN_WORDS
                 .iter()
                 .map(|s| s.to_string())
@@ -231,9 +229,9 @@ impl CommandValidator {
 
             if let Ok(pattern) = Regex::new(pattern_str) {
                 if pattern.is_match(command) {
-                    return Some(ValidationResult::Denied(
-                        ValidationError::DangerousPattern(pattern_str.to_string()),
-                    ));
+                    return Some(ValidationResult::Denied(ValidationError::DangerousPattern(
+                        pattern_str.to_string(),
+                    )));
                 }
             }
         }
@@ -274,7 +272,10 @@ impl Default for CommandValidator {
 /// 安全なコマンド引数エスケープ
 pub fn escape_shell_arg(arg: &str) -> String {
     // シェル引数を安全にエスケープ
-    if arg.chars().all(|c| c.is_alphanumeric() || c == '-' || c == '_' || c == '.' || c == '/') {
+    if arg
+        .chars()
+        .all(|c| c.is_alphanumeric() || c == '-' || c == '_' || c == '.' || c == '/')
+    {
         // 安全な文字のみの場合はそのまま
         arg.to_string()
     } else {
@@ -325,10 +326,7 @@ mod tests {
 
         let result = validator.validate("echo $(whoami)");
         // コマンド置換は厳格モードで拒否される（メタ文字またはパターン）
-        assert!(
-            !result.is_safe(),
-            "Command substitution should be rejected"
-        );
+        assert!(!result.is_safe(), "Command substitution should be rejected");
 
         let result = validator.validate("echo `whoami`");
         // バッククォートは厳格モードで拒否される（メタ文字またはパターン）
@@ -390,9 +388,7 @@ mod tests {
 
     #[test]
     fn test_pipe_allowed() {
-        let validator = CommandValidator::new()
-            .allow_pipe()
-            .with_strict_mode(false);
+        let validator = CommandValidator::new().allow_pipe().with_strict_mode(false);
 
         let result = validator.validate("ls -la | grep test");
         assert!(result.is_safe());
@@ -450,11 +446,16 @@ mod tests {
     #[test]
     fn test_validation_result_error() {
         assert!(ValidationResult::Safe.error().is_none());
-        assert!(ValidationResult::Warning("test".to_string()).error().is_none());
+        assert!(ValidationResult::Warning("test".to_string())
+            .error()
+            .is_none());
 
         let error = ValidationResult::Denied(ValidationError::EmptyCommand);
         assert!(error.error().is_some());
-        assert!(matches!(error.error().unwrap(), ValidationError::EmptyCommand));
+        assert!(matches!(
+            error.error().unwrap(),
+            ValidationError::EmptyCommand
+        ));
     }
 
     #[test]
@@ -564,12 +565,13 @@ mod tests {
 
     #[test]
     fn test_variable_expansion_with_allowed_flag() {
-        let validator = CommandValidator::new()
-            .allow_variable_expansion();
+        let validator = CommandValidator::new().allow_variable_expansion();
 
         // $, {, } are allowed
         assert!(validator.validate("echo ${VAR}").is_safe());
-        assert!(validator.validate("export PATH=${PATH}:/new/path").is_safe());
+        assert!(validator
+            .validate("export PATH=${PATH}:/new/path")
+            .is_safe());
     }
 
     #[test]
@@ -594,4 +596,3 @@ mod tests {
         assert!(!validator.validate("echo hello; rm -rf /").is_safe());
     }
 }
-

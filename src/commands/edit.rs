@@ -5,13 +5,17 @@ use crate::config::schema::{Command, CommandSpec, CommandsConfig};
 use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use colored::*;
-use dialoguer::{theme::ColorfulTheme, Input, Select, Confirm};
+use dialoguer::{theme::ColorfulTheme, Confirm, Input, Select};
 use std::path::PathBuf;
 use tracing::info;
 
 /// Edit an existing command interactively
-pub async fn handle_edit(command_id: Option<String>) -> Result<()> {
-    let config_loader = ConfigLoader::new();
+pub async fn handle_edit(command_id: Option<String>, config_path: Option<PathBuf>) -> Result<()> {
+    let config_loader = if let Some(ref path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
     let lang = config.config.language;
 
@@ -23,28 +27,61 @@ pub async fn handle_edit(command_id: Option<String>) -> Result<()> {
     };
 
     // Check if command exists
-    let command = config
-        .commands
-        .get(&id)
-        .ok_or_else(|| anyhow::anyhow!("{}", get_message(MessageKey::ErrorCommandNotFound, lang)))?;
+    let command = config.commands.get(&id).ok_or_else(|| {
+        anyhow::anyhow!("{}", get_message(MessageKey::ErrorCommandNotFound, lang))
+    })?;
 
-    println!("{}", get_message(MessageKey::LabelCurrentSettings, lang).cyan().bold());
-    println!("  {} {}", format!("{}:", get_message(MessageKey::LabelId, lang)).white().bold(), id);
-    println!("  {} {}", format!("{}:", get_message(MessageKey::LabelDescription, lang)).white().bold(), command.description);
+    println!(
+        "{}",
+        get_message(MessageKey::LabelCurrentSettings, lang)
+            .cyan()
+            .bold()
+    );
     println!(
         "  {} {}",
-        format!("{}:", get_message(MessageKey::LabelCommand, lang)).white().bold(),
+        format!("{}:", get_message(MessageKey::LabelId, lang))
+            .white()
+            .bold(),
+        id
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelDescription, lang))
+            .white()
+            .bold(),
+        command.description
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelCommand, lang))
+            .white()
+            .bold(),
         format_command_spec(&command.cmd)
     );
-    println!("  {} {:?}", format!("{}:", get_message(MessageKey::LabelTags, lang)).white().bold(), command.tags);
+    println!(
+        "  {} {:?}",
+        format!("{}:", get_message(MessageKey::LabelTags, lang))
+            .white()
+            .bold(),
+        command.tags
+    );
     println!("  {} {}", "Parallel:".white().bold(), command.parallel);
     println!("  {} {}", "Confirm:".white().bold(), command.confirm);
     println!();
 
     // Interactive editing
-    let new_description = prompt_with_default(get_message(MessageKey::PromptDescription, lang), &command.description)?;
-    let new_command_str = prompt_with_default(get_message(MessageKey::PromptCommand, lang), &format_command_spec(&command.cmd))?;
-    let new_tags = prompt_with_default(get_message(MessageKey::PromptTags, lang), &command.tags.join(","))?;
+    let new_description = prompt_with_default(
+        get_message(MessageKey::PromptDescription, lang),
+        &command.description,
+    )?;
+    let new_command_str = prompt_with_default(
+        get_message(MessageKey::PromptCommand, lang),
+        &format_command_spec(&command.cmd),
+    )?;
+    let new_tags = prompt_with_default(
+        get_message(MessageKey::PromptTags, lang),
+        &command.tags.join(","),
+    )?;
     let new_parallel = prompt_bool("Parallel execution", command.parallel)?;
     let new_confirm = prompt_bool("Confirm before execution", command.confirm)?;
 
@@ -63,7 +100,7 @@ pub async fn handle_edit(command_id: Option<String>) -> Result<()> {
     };
 
     // Save to configuration file
-    save_edited_command(&id, updated_command).await?;
+    save_edited_command(&id, updated_command, config_path).await?;
 
     println!(
         "{} {} '{}'",
@@ -76,7 +113,10 @@ pub async fn handle_edit(command_id: Option<String>) -> Result<()> {
 }
 
 /// Select a command interactively from the list
-fn select_command_interactive(config: &CommandsConfig, lang: crate::config::schema::Language) -> Result<String> {
+fn select_command_interactive(
+    config: &CommandsConfig,
+    lang: crate::config::schema::Language,
+) -> Result<String> {
     if config.commands.is_empty() {
         anyhow::bail!("{}", get_message(MessageKey::NoCommandsFound, lang));
     }
@@ -129,24 +169,34 @@ fn format_command_spec(spec: &CommandSpec) -> String {
 }
 
 /// Save edited command to configuration file
-async fn save_edited_command(id: &str, command: Command) -> Result<()> {
-    let config_loader = ConfigLoader::new();
+async fn save_edited_command(id: &str, command: Command, config_path: Option<PathBuf>) -> Result<()> {
+    let config_loader = if let Some(ref path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let mut config = config_loader.load().await?;
 
     // Update the command
     config.commands.insert(id.to_string(), command);
 
     // Find and write to config file
-    let config_path = find_config_file().await
-        .context(get_message(MessageKey::ErrorConfigNotFound, crate::config::schema::Language::default()))?;
-    let toml_content = toml::to_string_pretty(&config)
-        .context("Failed to serialize configuration")?;
+    let config_file_path = if let Some(path) = config_path {
+        path
+    } else {
+        find_config_file().await.context(get_message(
+            MessageKey::ErrorConfigNotFound,
+            crate::config::schema::Language::default(),
+        ))?
+    };
+    let toml_content =
+        toml::to_string_pretty(&config).context("Failed to serialize configuration")?;
 
-    tokio::fs::write(&config_path, toml_content)
+    tokio::fs::write(&config_file_path, toml_content)
         .await
         .context("Failed to write configuration file")?;
 
-    info!("Updated command '{}' in {}", id, config_path.display());
+    info!("Updated command '{}' in {}", id, config_file_path.display());
 
     Ok(())
 }
@@ -155,8 +205,7 @@ async fn save_edited_command(id: &str, command: Command) -> Result<()> {
 async fn find_config_file() -> Result<PathBuf> {
     const CONFIG_FILENAMES: &[&str] = &["commands.toml", ".cmdrun.toml", "cmdrun.toml"];
 
-    let current_dir = std::env::current_dir()
-        .context("Failed to get current directory")?;
+    let current_dir = std::env::current_dir().context("Failed to get current directory")?;
 
     let mut current = current_dir;
     loop {
@@ -195,10 +244,8 @@ mod tests {
         let single = CommandSpec::Single("echo hello".to_string());
         assert_eq!(format_command_spec(&single), "echo hello");
 
-        let multiple = CommandSpec::Multiple(vec![
-            "echo hello".to_string(),
-            "echo world".to_string(),
-        ]);
+        let multiple =
+            CommandSpec::Multiple(vec!["echo hello".to_string(), "echo world".to_string()]);
         assert_eq!(format_command_spec(&multiple), "echo hello && echo world");
     }
 }

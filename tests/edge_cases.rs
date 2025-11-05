@@ -1,8 +1,8 @@
 //! Edge case and error handling tests
 
+use ahash::AHashMap;
 use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig, GlobalConfig};
 use cmdrun::security::validation::{CommandValidator, ValidationResult};
-use ahash::AHashMap;
 
 #[cfg(test)]
 mod edge_case_tests {
@@ -68,7 +68,10 @@ mod edge_case_tests {
 
             // Path traversal is safe in non-strict mode if no dangerous patterns
             let result = validator.validate("cat ../../../etc/passwd");
-            assert!(result.is_safe(), "Path traversal without dangerous patterns should be safe");
+            assert!(
+                result.is_safe(),
+                "Path traversal without dangerous patterns should be safe"
+            );
 
             // With redirect to /etc should fail
             let result = validator.validate("cat file > /etc/passwd");
@@ -81,14 +84,20 @@ mod edge_case_tests {
 
             // Without allowance, ${} should fail
             let result = validator.validate("echo ${PATH}");
-            assert!(!result.is_safe(), "Variable expansion should fail without permission");
+            assert!(
+                !result.is_safe(),
+                "Variable expansion should fail without permission"
+            );
 
             // With allowance, should pass
             let validator = CommandValidator::new()
                 .allow_variable_expansion()
                 .with_strict_mode(false);
             let result = validator.validate("echo ${PATH}");
-            assert!(result.is_safe(), "Variable expansion should be allowed when configured");
+            assert!(
+                result.is_safe(),
+                "Variable expansion should be allowed when configured"
+            );
         }
 
         #[test]
@@ -97,12 +106,13 @@ mod edge_case_tests {
 
             // Multiple dangerous metacharacters
             let result = validator.validate("cat file | grep test > output.txt");
-            assert!(!result.is_safe(), "Multiple metacharacters should fail in strict mode");
+            assert!(
+                !result.is_safe(),
+                "Multiple metacharacters should fail in strict mode"
+            );
 
             // Non-strict with pipe allowed
-            let validator = CommandValidator::new()
-                .with_strict_mode(false)
-                .allow_pipe();
+            let validator = CommandValidator::new().with_strict_mode(false).allow_pipe();
             let result = validator.validate("cat file | grep test");
             assert!(result.is_safe(), "Pipe should be allowed when configured");
         }
@@ -123,7 +133,11 @@ mod edge_case_tests {
 
             for cmd in dangerous_commands {
                 let result = validator.validate(cmd);
-                assert!(!result.is_safe(), "Dangerous command should be rejected: {}", cmd);
+                assert!(
+                    !result.is_safe(),
+                    "Dangerous command should be rejected: {}",
+                    cmd
+                );
             }
         }
 
@@ -163,10 +177,16 @@ mod edge_case_tests {
                 .add_forbidden_word("forbidden_action");
 
             let result = validator.validate("run secret_command");
-            assert!(!result.is_safe(), "Custom forbidden word should be rejected");
+            assert!(
+                !result.is_safe(),
+                "Custom forbidden word should be rejected"
+            );
 
             let result = validator.validate("do forbidden_action");
-            assert!(!result.is_safe(), "Custom forbidden word should be rejected");
+            assert!(
+                !result.is_safe(),
+                "Custom forbidden word should be rejected"
+            );
 
             let result = validator.validate("normal command");
             assert!(result.is_safe(), "Normal command should be allowed");
@@ -289,13 +309,7 @@ mod edge_case_tests {
         #[test]
         fn test_command_with_special_characters_in_name() {
             // Valid command names (alphanumeric, dash, underscore)
-            let valid_names = vec![
-                "test-cmd",
-                "test_cmd",
-                "testCmd",
-                "test123",
-                "123test",
-            ];
+            let valid_names = vec!["test-cmd", "test_cmd", "testCmd", "test123", "123test"];
 
             for name in valid_names {
                 let mut commands = AHashMap::new();

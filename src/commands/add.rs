@@ -49,7 +49,8 @@ pub async fn handle_add(
             bail!("{}", get_message(MessageKey::ErrorEmptyDescription, lang));
         }
 
-        return add_command_to_config(id, command, description, category, tags, lang, config_path).await;
+        return add_command_to_config(id, command, description, category, tags, lang, config_path)
+            .await;
     }
 
     // Interactive mode with back navigation
@@ -108,10 +109,27 @@ pub async fn handle_add(
 
         // Preview
         println!();
-        println!("{}", get_message(MessageKey::LabelPreview, lang).bright_cyan().bold());
-        println!("  {}: {}", get_message(MessageKey::LabelId, lang), input_id.green());
-        println!("  {}: {}", get_message(MessageKey::LabelCommand, lang), input_command.yellow());
-        println!("  {}: {}", get_message(MessageKey::LabelDescription, lang), input_description.white());
+        println!(
+            "{}",
+            get_message(MessageKey::LabelPreview, lang)
+                .bright_cyan()
+                .bold()
+        );
+        println!(
+            "  {}: {}",
+            get_message(MessageKey::LabelId, lang),
+            input_id.green()
+        );
+        println!(
+            "  {}: {}",
+            get_message(MessageKey::LabelCommand, lang),
+            input_command.yellow()
+        );
+        println!(
+            "  {}: {}",
+            get_message(MessageKey::LabelDescription, lang),
+            input_description.white()
+        );
         println!();
 
         // Confirmation with options
@@ -129,7 +147,16 @@ pub async fn handle_add(
         match selection {
             0 => {
                 // Add command
-                return add_command_to_config(input_id, input_command, input_description, category, tags, lang, config_path).await;
+                return add_command_to_config(
+                    input_id,
+                    input_command,
+                    input_description,
+                    category,
+                    tags,
+                    lang,
+                    config_path,
+                )
+                .await;
             }
             1 => {
                 // Edit again - loop continues with current values
@@ -268,8 +295,7 @@ fn get_config_path() -> Result<PathBuf> {
 
         // Create empty TOML with [commands] section
         let initial_content = "# cmdrun commands configuration\n\n[commands]\n";
-        fs::write(&global_path, initial_content)
-            .context("Failed to create initial config file")?;
+        fs::write(&global_path, initial_content).context("Failed to create initial config file")?;
 
         println!(
             "{} Created new config file at {}",

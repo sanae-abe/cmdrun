@@ -31,16 +31,19 @@ async fn main() {
 
 /// Main execution flow
 async fn run(cli: Cli) -> Result<()> {
+    // Extract config path before matching on command
+    let config_path = cli.config.clone();
+
     match cli.command {
         Commands::Run {
             name,
             args,
             parallel,
         } => {
-            run_command(&name, args, parallel).await?;
+            run_command(&name, args, parallel, config_path).await?;
         }
         Commands::List { verbose } => {
-            list_commands(verbose).await?;
+            list_commands(verbose, config_path).await?;
         }
         Commands::Init {
             template,
@@ -56,14 +59,19 @@ async fn run(cli: Cli) -> Result<()> {
         } => {
             cmdrun::commands::handle_validate(path, verbose, check_cycles).await?;
         }
-        Commands::Graph { command, format, output, show_groups } => {
-            show_dependency_graph(command, format, output, show_groups).await?;
+        Commands::Graph {
+            command,
+            format,
+            output,
+            show_groups,
+        } => {
+            show_dependency_graph(command, format, output, show_groups, config_path).await?;
         }
         Commands::Completion { shell } => {
             cmdrun::commands::handle_completion(shell);
         }
-        Commands::Remove { id, force, config } => {
-            cmdrun::commands::handle_remove(id, force, config).await?;
+        Commands::Remove { id, force } => {
+            cmdrun::commands::handle_remove(id, force, config_path).await?;
         }
         Commands::Add {
             id,
@@ -72,32 +80,33 @@ async fn run(cli: Cli) -> Result<()> {
             category,
             tags,
         } => {
-            cmdrun::commands::handle_add(id, command, description, category, tags).await?;
+            cmdrun::commands::handle_add(id, command, description, category, tags, config_path)
+                .await?;
         }
         Commands::Open => {
-            cmdrun::commands::handle_open().await?;
+            cmdrun::commands::handle_open(config_path).await?;
         }
         Commands::Edit { id } => {
-            cmdrun::commands::handle_edit(id).await?;
+            cmdrun::commands::handle_edit(id, config_path).await?;
         }
         Commands::Info { id } => {
-            cmdrun::commands::handle_info(id).await?;
+            cmdrun::commands::handle_info(id, config_path).await?;
         }
         Commands::Search { keyword } => {
-            cmdrun::commands::handle_search(keyword).await?;
+            cmdrun::commands::handle_search(keyword, config_path).await?;
         }
         Commands::CompletionList => {
-            list_completion().await?;
+            list_completion(config_path).await?;
         }
         Commands::Config { action } => match action {
             ConfigAction::Get { key } => {
-                cmdrun::commands::handle_get(&key).await?;
+                cmdrun::commands::handle_get(&key, config_path).await?;
             }
             ConfigAction::Set { key, value } => {
-                cmdrun::commands::handle_set(&key, &value).await?;
+                cmdrun::commands::handle_set(&key, &value, config_path).await?;
             }
             ConfigAction::Show => {
-                cmdrun::commands::handle_show().await?;
+                cmdrun::commands::handle_show(config_path).await?;
             }
         },
     }
@@ -106,9 +115,18 @@ async fn run(cli: Cli) -> Result<()> {
 }
 
 /// Run a command
-async fn run_command(name: &str, args: Vec<String>, parallel: bool) -> Result<()> {
+async fn run_command(
+    name: &str,
+    args: Vec<String>,
+    parallel: bool,
+    config_path: Option<std::path::PathBuf>,
+) -> Result<()> {
     // Load configuration
-    let config_loader = ConfigLoader::new();
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     // Find command
@@ -223,8 +241,12 @@ async fn run_command(name: &str, args: Vec<String>, parallel: bool) -> Result<()
 }
 
 /// List available commands
-async fn list_commands(verbose: bool) -> Result<()> {
-    let config_loader = ConfigLoader::new();
+async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -> Result<()> {
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     if config.commands.is_empty() {
@@ -268,8 +290,12 @@ async fn list_commands(verbose: bool) -> Result<()> {
 }
 
 /// List command names for shell completion
-async fn list_completion() -> Result<()> {
-    let config_loader = ConfigLoader::new();
+async fn list_completion(config_path: Option<std::path::PathBuf>) -> Result<()> {
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     // Output command names one per line for shell completion
@@ -286,8 +312,13 @@ async fn show_dependency_graph(
     format: GraphFormat,
     output_path: Option<std::path::PathBuf>,
     show_groups: bool,
+    config_path: Option<std::path::PathBuf>,
 ) -> Result<()> {
-    let config_loader = ConfigLoader::new();
+    let config_loader = if let Some(path) = config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await?;
 
     // グラフ視覚化
@@ -328,7 +359,6 @@ async fn show_dependency_graph(
 
     Ok(())
 }
-
 
 /// Initialize logging
 fn init_logging(verbose: u8) {

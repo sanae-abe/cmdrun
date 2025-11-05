@@ -214,7 +214,11 @@ impl<'a> ConfigValidator<'a> {
     where
         'a: 'b,
     {
-        self.config.aliases.get(name).map(|s| s.as_str()).unwrap_or(name)
+        self.config
+            .aliases
+            .get(name)
+            .map(|s| s.as_str())
+            .unwrap_or(name)
     }
 
     /// 依存グラフを構築（トポロジカルソート）

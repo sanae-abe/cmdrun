@@ -3,5 +3,5 @@ pub mod schema;
 pub mod validation;
 
 pub use loader::ConfigLoader;
-pub use schema::{CommandsConfig, Command, CommandSpec, GlobalConfig, Language, Platform};
-pub use validation::{ConfigValidator, ValidationError, DependencyGraph};
+pub use schema::{Command, CommandSpec, CommandsConfig, GlobalConfig, Language, Platform};
+pub use validation::{ConfigValidator, DependencyGraph, ValidationError};

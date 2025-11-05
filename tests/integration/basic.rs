@@ -34,10 +34,7 @@ async fn test_multiple_commands() {
 
     let cmd = Command {
         description: "Multiple commands".to_string(),
-        cmd: CommandSpec::Multiple(vec![
-            "echo first".to_string(),
-            "echo second".to_string(),
-        ]),
+        cmd: CommandSpec::Multiple(vec!["echo first".to_string(), "echo second".to_string()]),
         env: Default::default(),
         deps: vec![],
         confirm: false,
@@ -96,7 +93,10 @@ async fn test_config_loader() {
 
     let config = config.unwrap();
     assert!(!config.commands.is_empty(), "Should have commands");
-    assert!(config.commands.contains_key("test"), "Should have 'test' command");
+    assert!(
+        config.commands.contains_key("test"),
+        "Should have 'test' command"
+    );
 }
 
 #[tokio::test]
@@ -119,12 +119,18 @@ async fn test_command_exit_code() {
     };
 
     let result = executor.execute(&cmd).await;
-    assert!(result.is_err(), "Command should fail with non-zero exit code");
+    assert!(
+        result.is_err(),
+        "Command should fail with non-zero exit code"
+    );
 
     // Optionally check the error message contains the exit code
     if let Err(e) = result {
         let error_msg = e.to_string();
-        assert!(error_msg.contains("42"), "Error should mention exit code 42");
+        assert!(
+            error_msg.contains("42"),
+            "Error should mention exit code 42"
+        );
     }
 }
 
