@@ -48,6 +48,7 @@ test:security-audit:
   image: rust:latest
   before_script:
     - cargo install cargo-audit
+    - rustup component add clippy
   script:
     - cargo audit --json > audit-report.json
     - cargo clippy --all-targets --all-features -- -D warnings
