@@ -166,7 +166,7 @@ cmdrun run dev
 cmdrun list
 
 # Search for commands
-cmdrun list docker
+cmdrun search docker
 
 # Remove a command
 cmdrun remove dev

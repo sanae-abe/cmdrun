@@ -145,7 +145,7 @@ cmdrun run dev
 cmdrun list
 
 # コマンドを検索
-cmdrun list docker
+cmdrun search docker
 
 # コマンドを削除
 cmdrun remove dev
