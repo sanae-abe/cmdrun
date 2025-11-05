@@ -171,6 +171,44 @@ pub enum Commands {
         #[command(subcommand)]
         action: ConfigAction,
     },
+
+    /// Watch files and automatically execute commands on changes
+    ///
+    /// Monitor specified files or directories for changes and automatically
+    /// re-execute commands when changes are detected. Useful for development
+    /// workflows with automatic recompilation, testing, or reloading.
+    Watch {
+        /// Command name to execute on file changes
+        command: String,
+
+        /// Additional arguments to pass to the command
+        #[arg(trailing_var_arg = true)]
+        args: Vec<String>,
+
+        /// Paths to watch (default: current directory)
+        #[arg(short = 'p', long = "path", value_name = "PATH")]
+        paths: Vec<PathBuf>,
+
+        /// File patterns to watch (glob patterns, e.g., "**/*.rs")
+        #[arg(short = 'w', long = "pattern", value_name = "PATTERN")]
+        patterns: Vec<String>,
+
+        /// Patterns to exclude (glob patterns)
+        #[arg(short = 'e', long = "exclude", value_name = "PATTERN")]
+        exclude: Vec<String>,
+
+        /// Debounce delay in milliseconds (default: 500ms)
+        #[arg(short, long, value_name = "MS", default_value = "500")]
+        debounce: u64,
+
+        /// Ignore .gitignore files
+        #[arg(long)]
+        ignore_gitignore: bool,
+
+        /// Non-recursive watching
+        #[arg(long)]
+        no_recursive: bool,
+    },
 }
 
 /// Configuration management actions

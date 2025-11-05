@@ -1,6 +1,6 @@
 # cmdrun
 
-[日本語](README.md) | [English](README.en.md) 
+[日本語](README.md) | [English](README.en.md)
 
 > **A personal global command manager for your frequently used commands**
 >
@@ -35,7 +35,7 @@
 
 ### 💎 Developer Experience
 - **TOML configuration** - Type-safe, easy to read
-- **Powerful features** - Dependencies, parallel execution, hooks
+- **Powerful features** - Dependencies, parallel execution, hooks, Watch Mode
 - **Great errors** - Detailed error messages with context
 
 ## Installation
@@ -287,6 +287,38 @@ cmd = "npm run dev"
 env = { PORT = "3000" }  # Command-specific env
 ```
 
+### Watch Mode - File Watching
+
+```toml
+# Define commands as usual in commands.toml
+[commands.dev]
+cmd = "cargo build"
+
+[commands.test]
+cmd = "cargo test"
+```
+
+```bash
+# Run with Watch Mode from command line
+# Watch Rust files and build on changes
+cmdrun watch dev --pattern "**/*.rs"
+
+# Auto-run tests (with 1s debounce)
+cmdrun watch test --pattern "**/*.rs" --debounce 1000
+
+# Watch multiple directories
+cmdrun watch dev --path src --path lib
+```
+
+**Watch Mode Key Features:**
+- **Glob Patterns**: File filtering (e.g., `**/*.rs`, `**/*.ts`)
+- **Exclude Patterns**: Exclude unwanted files/directories (defaults exclude `node_modules`, `target`, etc.)
+- **Debouncing**: Prevent unnecessary executions on frequent changes (default 500ms)
+- **Recursive Watching**: Automatically watch subdirectories (can disable with `--no-recursive`)
+- **gitignore Integration**: Automatically respect `.gitignore` patterns
+
+See [Watch Mode Guide](docs/user-guide/WATCH_MODE.md) for details.
+
 ### Language Settings (i18n)
 
 cmdrun supports internationalization with English and Japanese languages. Configure the language in your `commands.toml`:
@@ -412,6 +444,7 @@ cmd.linux = "xdg-open http://localhost:3000"
 - [CLI Reference](docs/user-guide/CLI.md)
 - [Configuration Reference](docs/user-guide/CONFIGURATION.md)
 - [Internationalization (i18n)](docs/user-guide/I18N.md)
+- [Watch Mode](docs/user-guide/WATCH_MODE.md)
 
 ### Technical Documentation
 - [Performance](docs/technical/PERFORMANCE.md)

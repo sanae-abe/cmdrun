@@ -12,6 +12,7 @@ pub mod output;
 pub mod platform;
 pub mod security;
 pub mod utils;
+pub mod watch;
 
 // Re-export commonly used types
 pub use error::{CmdrunError, Result};

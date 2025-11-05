@@ -36,6 +36,7 @@ tokio = { version = "1.39", features = [
     "fs",              # ファイルシステム操作
     "time",            # タイマー機能
     "signal",          # シグナルハンドリング
+    "sync",            # 同期プリミティブ（mpsc等）
 ] }
 
 # エラーハンドリング（詳細なエラー情報）
@@ -53,6 +54,8 @@ serde_json = { version = "1.0", optional = true }
 walkdir = "2.5"
 globset = "0.4"
 ignore = "0.4"  # .gitignore 対応
+notify = "6.1"  # ファイル監視
+notify-debouncer-full = "0.3"  # イベントデバウンス
 
 # プロセス実行（クロスプラットフォーム） - tokio::process使用
 shell-words = "1.1"  # シェルコマンド解析
@@ -67,6 +70,9 @@ colored = "2.1"
 # ロギング
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# シグナルハンドリング
+ctrlc = "3.4"
 
 # 正規表現
 regex = { version = "1.10", default-features = false, features = ["std", "perf"] }
@@ -141,6 +147,10 @@ path = "tests/integration/basic.rs"
 [[test]]
 name = "dependencies"
 path = "tests/integration/dependencies.rs"
+
+[[test]]
+name = "watch"
+path = "tests/integration/watch.rs"
 
 [[test]]
 name = "security_injection"

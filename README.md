@@ -1,6 +1,6 @@
 # cmdrun
 
-[日本語](README.md) | [English](README.en.md) 
+[日本語](README.md) | [English](README.en.md)
 
 > **頻繁に使うコマンドを管理する個人向けグローバルコマンド管理ツール**
 >
@@ -35,7 +35,7 @@
 
 ### 💎 開発者体験
 - **TOML設定** - 型安全で読みやすい
-- **強力な機能** - 依存関係、並列実行、フック
+- **強力な機能** - 依存関係、並列実行、フック、Watch Mode
 - **優れたエラー表示** - コンテキスト付き詳細エラーメッセージ
 
 ## インストール
@@ -266,6 +266,38 @@ cmd = "npm run dev"
 env = { PORT = "3000" }  # コマンド固有の環境変数
 ```
 
+### Watch Mode - ファイル監視
+
+```toml
+# commands.tomlで通常通りコマンドを定義
+[commands.dev]
+cmd = "cargo build"
+
+[commands.test]
+cmd = "cargo test"
+```
+
+```bash
+# コマンドラインからWatch Modeで実行
+# Rustファイルの変更を監視してビルド
+cmdrun watch dev --pattern "**/*.rs"
+
+# テストの自動実行（デバウンス1秒）
+cmdrun watch test --pattern "**/*.rs" --debounce 1000
+
+# 複数のディレクトリを監視
+cmdrun watch dev --path src --path lib
+```
+
+**Watch Modeの主な機能:**
+- **Globパターン**: ファイルフィルタリング（例: `**/*.rs`, `**/*.ts`）
+- **除外パターン**: 不要なファイル/ディレクトリを除外（デフォルトで`node_modules`, `target`等を除外）
+- **デバウンス**: 頻繁な変更時の不要な実行を防止（デフォルト500ms）
+- **再帰監視**: サブディレクトリも自動監視（`--no-recursive`で無効化可能）
+- **gitignore統合**: `.gitignore`のパターンを自動尊重
+
+詳細は[Watch Modeガイド](docs/user-guide/WATCH_MODE.md)を参照してください。
+
 ### 言語設定（i18n）
 
 cmdrunは英語と日本語の国際化をサポートしています。`commands.toml`で言語を設定できます：
@@ -391,6 +423,7 @@ cmd.linux = "xdg-open http://localhost:3000"
 - [CLIリファレンス](docs/user-guide/CLI.md)
 - [設定リファレンス](docs/user-guide/CONFIGURATION.md)
 - [国際化（i18n）](docs/user-guide/I18N.md)
+- [Watch Mode](docs/user-guide/WATCH_MODE.md)
 
 ### 技術ドキュメント
 - [パフォーマンス](docs/technical/PERFORMANCE.md)

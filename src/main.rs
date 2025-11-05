@@ -109,6 +109,28 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_show(config_path).await?;
             }
         },
+        Commands::Watch {
+            command,
+            args,
+            paths,
+            patterns,
+            exclude,
+            debounce,
+            ignore_gitignore,
+            no_recursive,
+        } => {
+            cmdrun::commands::handle_watch(
+                command,
+                args,
+                paths,
+                patterns,
+                exclude,
+                debounce,
+                ignore_gitignore,
+                no_recursive,
+            )
+            .await?;
+        }
     }
 
     Ok(())

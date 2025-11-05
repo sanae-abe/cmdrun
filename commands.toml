@@ -6,6 +6,11 @@ working_dir = "."
 timeout = 60
 strict_mode = false
 
+[commands]
+weather = { description = "東京の天気を表示", cmd = "curl wttr.in/Tokyo?format=3" }
+gitsave = { description = "変更を保存してプッシュ", cmd = "git add . && git commit -m 'save changes' && git push" }
+hello = { description = "挨拶メッセージ", cmd = '''echo 'Hello from cmdrun\!'''' }
+
 # 複雑な依存関係グラフのテスト
 [commands.deploy]
 description = "Deploy to production"

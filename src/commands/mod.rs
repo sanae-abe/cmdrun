@@ -10,6 +10,7 @@ pub mod open;
 pub mod remove;
 pub mod search;
 pub mod validate;
+pub mod watch;
 
 // Re-export command handlers
 pub use add::handle_add;
@@ -22,3 +23,4 @@ pub use open::handle_open;
 pub use remove::handle_remove;
 pub use search::handle_search;
 pub use validate::handle_validate;
+pub use watch::handle_watch;

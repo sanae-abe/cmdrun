@@ -41,6 +41,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Colored output for better readability
   - Verbose and quiet modes
 
+- **Watch Mode** (New Feature)
+  - `cmdrun watch <command>` - Watch files and auto-execute commands
+  - File pattern matching with glob support (`**/*.rs`, `**/*.ts`, etc.)
+  - Exclude patterns to ignore specific files/directories
+  - Configurable debounce delay (default 500ms)
+  - `.gitignore` integration (automatic exclusion of common directories)
+  - Recursive and non-recursive watching modes
+  - Support for multiple watch paths
+  - Real-time file change detection
+  - Graceful shutdown with Ctrl+C
+
 - **Graph Visualization**
   - Tree format with colorful output and Unicode box drawing
   - DOT format for Graphviz (export as PNG/SVG)
@@ -107,16 +118,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Error handling and error chains
   - Graph visualization (tree, dot, mermaid)
   - Template initialization
+  - Watch mode configuration and pattern matching
 
 ### Documentation
 
-- Comprehensive README with examples
+- Comprehensive README with examples (Japanese and English)
 - Installation instructions for multiple platforms
 - Configuration reference
 - Usage examples for common scenarios
 - Performance benchmarks vs npm/make
 - Migration guides from npm scripts and Makefiles
 - Updated CLI reference with new commands
+- **New**: Watch Mode user guide with detailed examples
 
 ### Technical Stack
 
@@ -128,6 +141,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - serde 1.0 (serialization)
   - colored 2.1 (colorful output)
   - dialoguer 0.11 (interactive prompts)
+  - notify 6.1 (file system watching)
+  - globset 0.4 (glob pattern matching)
 - **Platform Support**: Linux, macOS, Windows, FreeBSD
 - **Shell Support**: bash, zsh, fish, pwsh
 
@@ -148,7 +163,8 @@ cmdrun/
 │   │   ├── search.rs        # Search commands
 │   │   ├── open.rs          # Open config file
 │   │   ├── completion.rs    # Shell completion
-│   │   └── validate.rs      # Config validation
+│   │   ├── validate.rs      # Config validation
+│   │   └── watch.rs         # Watch mode (NEW)
 │   ├── command/             # Command execution
 │   │   ├── executor.rs      # Command runner
 │   │   ├── interpolation.rs # Variable expansion
@@ -158,6 +174,10 @@ cmdrun/
 │   │   ├── loader.rs        # Config loading
 │   │   ├── schema.rs        # TOML schema
 │   │   └── validation.rs    # Config validation
+│   ├── watch/               # Watch mode implementation (NEW)
+│   │   ├── mod.rs           # Watch module
+│   │   ├── config.rs        # Watch configuration
+│   │   └── runner.rs        # Watch runner
 │   ├── error.rs             # Error types
 │   └── i18n.rs              # Internationalization
 ├── templates/               # Project templates
@@ -168,6 +188,12 @@ cmdrun/
 │   └── python.toml         # Python project
 ├── tests/                   # Integration tests
 ├── docs/                    # Documentation
+│   ├── user-guide/
+│   │   ├── CLI.md
+│   │   ├── CONFIGURATION.md
+│   │   ├── I18N.md
+│   │   └── WATCH_MODE.md   # Watch mode guide (NEW)
+│   └── technical/
 └── Cargo.toml              # Project manifest
 ```
 
@@ -183,8 +209,8 @@ cmdrun/
 
 ### Future Roadmap
 
-- [ ] Watch mode for automatic command re-execution
-- [ ] Built-in file watching capabilities
+- [x] Watch mode for automatic command re-execution (Completed in v1.0.0)
+- [x] Built-in file watching capabilities (Completed in v1.0.0)
 - [ ] Remote command execution
 - [ ] Plugin system for extensibility
 - [ ] Interactive mode for command selection
@@ -231,6 +257,9 @@ cmd = ["npm run type-check", "npm run lint", "npm run build"]
 cmdrun run dev
 cmdrun list
 cmdrun graph build --show-groups
+
+# Use Watch Mode (NEW)
+cmdrun watch dev --pattern "**/*.rs"
 ```
 
 ### Performance Comparison
@@ -267,14 +296,37 @@ cmd = ["tsc", "webpack"]
 
 ### New Features Highlights
 
-#### 1. Project Initialization
+#### 1. Watch Mode (NEW in v1.0.0)
+```bash
+# Watch for file changes and auto-execute
+cmdrun watch dev
+
+# Watch specific patterns
+cmdrun watch build --pattern "**/*.rs" --pattern "**/*.toml"
+
+# Exclude directories
+cmdrun watch dev --exclude "**/test/**"
+
+# Adjust debounce time
+cmdrun watch dev --debounce 1000
+```
+
+**Watch Mode Features:**
+- Glob pattern matching (`**/*.rs`, `**/*.ts`, etc.)
+- Configurable debounce delay (default 500ms)
+- `.gitignore` integration
+- Exclude patterns
+- Multiple watch paths
+- Graceful shutdown
+
+#### 2. Project Initialization
 ```bash
 # Quick start with templates
 cmdrun init --template rust
 cmdrun init --interactive
 ```
 
-#### 2. Dependency Graph Visualization
+#### 3. Dependency Graph Visualization
 ```bash
 # Colorful tree format
 cmdrun graph build
@@ -289,7 +341,7 @@ cmdrun graph build --format mermaid --output deps.mmd
 cmdrun graph build --show-groups
 ```
 
-#### 3. Parallel Execution
+#### 4. Parallel Execution
 ```bash
 # Run dependencies in parallel
 cmdrun run build --parallel
