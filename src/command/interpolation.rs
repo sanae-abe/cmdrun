@@ -3,6 +3,7 @@
 //! セキュアで高性能な変数展開を提供（eval完全排除）
 //! 対応構文:
 //! - ${VAR} - 基本展開
+//! - ${1}, ${2} - 位置引数展開
 //! - ${VAR:-default} - デフォルト値
 //! - ${VAR:?error_message} - 必須変数
 //! - ${VAR:+value_if_set} - 設定時置換
@@ -14,8 +15,9 @@ use std::env;
 use std::sync::LazyLock;
 
 /// 変数展開パターン（コンパイル時最適化）
+/// 位置引数（${1}, ${2}等）と通常変数（${VAR}）の両方に対応
 static VAR_PATTERN: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(:[?+\-])?([^}]*)?\}").unwrap());
+    LazyLock::new(|| Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(:[?+\-])?([^}]*)?\}").unwrap());
 
 /// 変数コンテキスト
 #[derive(Debug, Clone)]
@@ -273,6 +275,40 @@ mod tests {
         let ctx = InterpolationContext::new(false).with_env_map(env);
         let result = ctx.interpolate("${A}");
         assert!(result.is_err()); // 深度超過
+    }
+
+    #[test]
+    fn test_positional_arguments() {
+        let mut env = AHashMap::new();
+        env.insert("1".to_string(), "first".to_string());
+        env.insert("2".to_string(), "second".to_string());
+        env.insert("3".to_string(), "third".to_string());
+        let ctx = InterpolationContext::new(false).with_env_map(env);
+
+        let result = ctx.interpolate("${1} ${2} ${3}").unwrap();
+        assert_eq!(result, "first second third");
+    }
+
+    #[test]
+    fn test_positional_arguments_with_defaults() {
+        let mut env = AHashMap::new();
+        env.insert("1".to_string(), "input.png".to_string());
+        let ctx = InterpolationContext::new(false).with_env_map(env);
+
+        // 1は定義済み、2は未定義でデフォルト値使用
+        let result = ctx.interpolate("sharp -i ${1} -o ${2:-output.webp}").unwrap();
+        assert_eq!(result, "sharp -i input.png -o output.webp");
+    }
+
+    #[test]
+    fn test_positional_and_named_variables() {
+        let mut env = AHashMap::new();
+        env.insert("1".to_string(), "file.txt".to_string());
+        env.insert("USER".to_string(), "alice".to_string());
+        let ctx = InterpolationContext::new(false).with_env_map(env);
+
+        let result = ctx.interpolate("${USER} processes ${1}").unwrap();
+        assert_eq!(result, "alice processes file.txt");
     }
 
     #[test]

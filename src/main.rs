@@ -95,7 +95,7 @@ async fn run(cli: Cli) -> Result<()> {
 }
 
 /// Run a command
-async fn run_command(name: &str, _args: Vec<String>, parallel: bool) -> Result<()> {
+async fn run_command(name: &str, args: Vec<String>, parallel: bool) -> Result<()> {
     // Load configuration
     let config_loader = ConfigLoader::new();
     let config = config_loader.load().await?;
@@ -106,10 +106,17 @@ async fn run_command(name: &str, _args: Vec<String>, parallel: bool) -> Result<(
         .get(name)
         .ok_or_else(|| anyhow::anyhow!("Command not found: {}", name))?;
 
-    // Create execution context
+    // Create execution context with positional arguments
+    let mut env = config.config.env.clone();
+
+    // Add positional arguments as environment variables: 1, 2, 3, ...
+    for (idx, arg) in args.iter().enumerate() {
+        env.insert((idx + 1).to_string(), arg.clone());
+    }
+
     let ctx = ExecutionContext {
         working_dir: config.config.working_dir.clone(),
-        env: config.config.env.clone(),
+        env,
         shell: detect_shell()
             .map(|s| s.name)
             .unwrap_or_else(|_| config.config.shell.clone()),
