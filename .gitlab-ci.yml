@@ -32,7 +32,7 @@ stages:
 # 🧪 テスト・品質チェックステージ
 test:cargo-test:
   stage: test
-  image: rust:1.75
+  image: rust:1.81
   before_script:
     - rustc --version
     - cargo --version
@@ -45,7 +45,7 @@ test:cargo-test:
 
 test:security-audit:
   stage: test
-  image: rust:1.75
+  image: rust:1.81
   before_script:
     - cargo install cargo-audit
   script:
@@ -59,7 +59,7 @@ test:security-audit:
 
 test:format-check:
   stage: test
-  image: rust:1.75
+  image: rust:1.81
   script:
     - rustup component add rustfmt
     - cargo fmt -- --check
@@ -67,7 +67,7 @@ test:format-check:
 # 🔨 ビルドステージ
 build:linux-x64:
   stage: build
-  image: rust:1.75
+  image: rust:1.81
   script:
     - cargo build --release --target x86_64-unknown-linux-gnu
     - strip target/x86_64-unknown-linux-gnu/release/cmdrun
@@ -85,7 +85,7 @@ build:linux-x64:
 
 build:linux-arm64:
   stage: build
-  image: rust:1.75
+  image: rust:1.81
   before_script:
     - rustup target add aarch64-unknown-linux-gnu
     - apt-get update && apt-get install -y gcc-aarch64-linux-gnu
@@ -106,7 +106,7 @@ build:linux-arm64:
 
 build:macos-x64:
   stage: build
-  image: rust:1.75
+  image: rust:1.81
   before_script:
     - rustup target add x86_64-apple-darwin
     # macOSクロスコンパイル設定（企業環境では要調整）
@@ -130,7 +130,7 @@ build:macos-x64:
 # 📦 Package Registry公開
 publish:package-registry:
   stage: publish
-  image: rust:1.75
+  image: rust:1.81
   dependencies:
     - build:linux-x64
   before_script:
@@ -220,7 +220,7 @@ release:create-release:
 # 🔍 セキュリティ・コンプライアンス
 security:dependency-scanning:
   stage: test
-  image: rust:1.75
+  image: rust:1.81
   before_script:
     - cargo install cargo-audit
   script:
@@ -235,7 +235,7 @@ security:dependency-scanning:
 # 📊 メトリクス・分析
 metrics:code-coverage:
   stage: test
-  image: rust:1.75
+  image: rust:1.81
   before_script:
     - cargo install cargo-tarpaulin
   script:
