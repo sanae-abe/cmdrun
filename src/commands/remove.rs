@@ -237,6 +237,7 @@ cmd = "cargo build"
 
         let mut file = tokio::fs::File::create(&config_path).await.unwrap();
         file.write_all(toml_content.as_bytes()).await.unwrap();
+        file.sync_all().await.unwrap(); // Ensure data is written to disk
 
         // Remove the "test" command with force flag
         let result = handle_remove("test".to_string(), true, Some(config_path.clone())).await;
@@ -267,6 +268,7 @@ cmd = "cargo test"
 
         let mut file = tokio::fs::File::create(&config_path).await.unwrap();
         file.write_all(toml_content.as_bytes()).await.unwrap();
+        file.sync_all().await.unwrap(); // Ensure data is written to disk
 
         // Try to remove a command that doesn't exist
         let result = handle_remove("nonexistent".to_string(), true, Some(config_path)).await;
@@ -291,6 +293,7 @@ cmd = "cargo test"
 
         let mut file = tokio::fs::File::create(&config_path).await.unwrap();
         file.write_all(toml_content.as_bytes()).await.unwrap();
+        file.sync_all().await.unwrap(); // Ensure data is written to disk
 
         // Create backup
         let backup_path = create_backup(&config_path).await.unwrap();
