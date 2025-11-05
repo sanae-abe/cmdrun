@@ -57,11 +57,8 @@ impl WatchRunner {
         })
     }
 
-    /// Start watching and executing commands with shutdown signal
-    pub async fn run_with_shutdown(
-        &mut self,
-        running: std::sync::Arc<std::sync::atomic::AtomicBool>,
-    ) -> Result<()> {
+    /// Start watching and executing commands
+    pub async fn run(&mut self) -> Result<()> {
         info!(
             paths = ?self.config.paths,
             command = %self.command,
@@ -120,55 +117,30 @@ impl WatchRunner {
 
         info!("Watch mode started. Press Ctrl+C to stop.");
 
-        // Process events with shutdown check
-        loop {
-            // Check shutdown signal
-            if !running.load(std::sync::atomic::Ordering::SeqCst) {
-                info!("Watch mode stopped by user");
-                break;
-            }
+        // Process events
+        while let Some(event) = rx.recv().await {
+            if self.debouncer.should_process(&event.path) {
+                debug!(
+                    path = %event.path.display(),
+                    kind = ?event.kind,
+                    "File changed, executing command"
+                );
 
-            // Use timeout to check shutdown signal periodically
-            match tokio::time::timeout(std::time::Duration::from_millis(100), rx.recv()).await {
-                Ok(Some(event)) => {
-                    if self.debouncer.should_process(&event.path) {
-                        debug!(
-                            path = %event.path.display(),
-                            kind = ?event.kind,
-                            "File changed, executing command"
-                        );
-
-                        if let Err(e) = self.executor.execute(&self.command, &event.path).await {
-                            error!(
-                                error = %e,
-                                path = %event.path.display(),
-                                "Failed to execute command"
-                            );
-                        } else {
-                            info!(path = %event.path.display(), "Command executed successfully");
-                        }
-                    } else {
-                        debug!(path = %event.path.display(), "Event debounced");
-                    }
+                if let Err(e) = self.executor.execute(&self.command, &event.path).await {
+                    error!(
+                        error = %e,
+                        path = %event.path.display(),
+                        "Failed to execute command"
+                    );
+                } else {
+                    info!(path = %event.path.display(), "Command executed successfully");
                 }
-                Ok(None) => {
-                    // Channel closed
-                    break;
-                }
-                Err(_) => {
-                    // Timeout - continue loop to check shutdown signal
-                    continue;
-                }
+            } else {
+                debug!(path = %event.path.display(), "Event debounced");
             }
         }
 
         Ok(())
-    }
-
-    /// Start watching and executing commands
-    pub async fn run(&mut self) -> Result<()> {
-        let running = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(true));
-        self.run_with_shutdown(running).await
     }
 
     /// Get a reference to the matcher

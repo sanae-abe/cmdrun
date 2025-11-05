@@ -46,9 +46,8 @@ pub async fn handle_watch(
     let mut runner = WatchRunner::new(config, full_command, &base_path)
         .context("Failed to create watch runner")?;
 
-    // Set up Ctrl+C handler
-    let running = setup_ctrl_c_handler()?;
-    let running_clone = running.clone();
+    // Set up signal handler
+    let mut shutdown_rx = setup_signal_handler().await?;
 
     // Run the watcher
     info!(
@@ -58,7 +57,15 @@ pub async fn handle_watch(
     println!();
 
     // Run with shutdown signal
-    runner.run_with_shutdown(running_clone).await
+    tokio::select! {
+        result = runner.run() => {
+            result
+        }
+        _ = shutdown_rx.recv() => {
+            info!("Watch mode stopped by user");
+            Ok(())
+        }
+    }
 }
 
 /// Display watch configuration information
@@ -219,20 +226,39 @@ fn build_watch_config(
 }
 
 /// Set up Ctrl+C handler for graceful shutdown
-fn setup_ctrl_c_handler() -> Result<std::sync::Arc<std::sync::atomic::AtomicBool>> {
-    use std::sync::atomic::AtomicBool;
-    use std::sync::Arc;
+async fn setup_signal_handler() -> Result<tokio::sync::mpsc::Receiver<()>> {
+    use tokio::signal;
+    use tokio::sync::mpsc;
 
-    let running = Arc::new(AtomicBool::new(true));
-    let r = running.clone();
+    let (tx, rx) = mpsc::channel(1);
 
-    ctrlc::set_handler(move || {
-        warn!("Received Ctrl+C, stopping watch mode...");
-        r.store(false, std::sync::atomic::Ordering::SeqCst);
-    })
-    .context("Failed to set Ctrl+C handler")?;
+    tokio::spawn(async move {
+        #[cfg(unix)]
+        {
+            use signal::unix::{signal, SignalKind};
+            let mut sigint = signal(SignalKind::interrupt()).expect("Failed to setup SIGINT");
+            let mut sigterm = signal(SignalKind::terminate()).expect("Failed to setup SIGTERM");
 
-    Ok(running)
+            tokio::select! {
+                _ = sigint.recv() => {
+                    warn!("Received SIGINT (Ctrl+C), stopping watch mode...");
+                }
+                _ = sigterm.recv() => {
+                    warn!("Received SIGTERM, stopping watch mode...");
+                }
+            }
+        }
+
+        #[cfg(windows)]
+        {
+            signal::ctrl_c().await.expect("Failed to listen for Ctrl+C");
+            warn!("Received Ctrl+C, stopping watch mode...");
+        }
+
+        let _ = tx.send(()).await;
+    });
+
+    Ok(rx)
 }
 
 #[cfg(test)]
