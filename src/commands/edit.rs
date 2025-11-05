@@ -169,7 +169,11 @@ fn format_command_spec(spec: &CommandSpec) -> String {
 }
 
 /// Save edited command to configuration file
-async fn save_edited_command(id: &str, command: Command, config_path: Option<PathBuf>) -> Result<()> {
+async fn save_edited_command(
+    id: &str,
+    command: Command,
+    config_path: Option<PathBuf>,
+) -> Result<()> {
     let config_loader = if let Some(ref path) = config_path {
         ConfigLoader::with_path(path)
     } else {
