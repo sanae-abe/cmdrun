@@ -1,0 +1,82 @@
+# cmdrun グローバル設定ファイル
+# 場所: ~/.config/cmdrun/config.toml
+
+[general]
+# デフォルトシェル（プラットフォーム別自動検出を上書き）
+default_shell = "bash"  # bash, zsh, fish, pwsh, cmd等
+# 厳格モード（未定義変数でエラー）
+strict_mode = true
+# カラー出力
+color = "auto"  # auto, always, never
+# 詳細出力レベル
+verbosity = "info"  # trace, debug, info, warn, error
+
+[execution]
+# タイムアウト（秒、0で無制限）
+default_timeout = 300
+# 並列実行デフォルト
+parallel = false
+# 失敗時の挙動
+fail_fast = true  # 最初のエラーで停止
+# コマンド確認
+confirm_destructive = true  # 破壊的コマンドの確認
+
+[paths]
+# commands.toml の検索パス（優先順位順）
+config_paths = [
+    ".cmdrun.toml",
+    "cmdrun.toml",
+    ".config/cmdrun/commands.toml",
+]
+# グローバルコマンド定義
+global_commands = "~/.config/cmdrun/commands.toml"
+
+[output]
+# 出力フォーマット
+format = "pretty"  # pretty, json, compact
+# タイムスタンプ表示
+show_timestamps = false
+# コマンド実行時間表示
+show_duration = true
+# 実行コマンドのエコー
+echo_commands = true
+
+[logging]
+# ログレベル
+level = "info"
+# ログファイル
+file = "~/.local/share/cmdrun/cmdrun.log"
+# ログローテーション
+max_size = "10MB"
+max_files = 5
+
+[security]
+# 実行許可するシェルコマンド文字（ホワイトリスト方式）
+# 空の場合はすべて許可（デフォルト）
+allowed_shell_chars = ""
+# 環境変数の上書き許可
+allow_env_override = true
+# 作業ディレクトリ変更の許可
+allow_working_dir_change = true
+
+[aliases]
+# グローバルエイリアス
+d = "dev"
+b = "build"
+t = "test"
+c = "check"
+
+[platform.unix]
+# Unix系プラットフォーム固有設定
+preferred_shells = ["bash", "zsh", "fish"]
+shell_flags = ["-c"]
+
+[platform.windows]
+# Windows プラットフォーム固有設定
+preferred_shells = ["pwsh", "powershell", "cmd"]
+shell_flags = ["/C"]
+
+[env]
+# グローバル環境変数（すべてのコマンドで利用可能）
+# プロジェクト固有の .env ファイルとマージされる
+CMDRUN_VERSION = "2.0.0"

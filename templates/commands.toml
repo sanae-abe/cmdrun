@@ -1,0 +1,43 @@
+# cmdrun configuration file
+# https://github.com/yourusername/cmdrun
+
+[config]
+# Default shell to use
+shell = "bash"
+
+# Enable strict mode (fail on error)
+strict_mode = true
+
+# Default timeout in seconds
+timeout = 300
+
+# Working directory
+working_dir = "."
+
+# Global environment variables
+[config.env]
+# NODE_ENV = "development"
+
+# Command definitions
+[commands.hello]
+description = "Example command"
+cmd = "echo 'Hello from cmdrun!'"
+
+[commands.build]
+description = "Build the project"
+cmd = "echo 'Building...'"
+
+[commands.test]
+description = "Run tests"
+cmd = "echo 'Running tests...'"
+deps = ["build"]
+
+# Aliases
+[aliases]
+b = "build"
+t = "test"
+
+# Hooks
+[hooks]
+# pre_run = "echo 'Starting...'"
+# post_run = "echo 'Done!'"

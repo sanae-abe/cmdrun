@@ -1,0 +1,139 @@
+[package]
+name = "cmdrun"
+version = "2.0.0"
+edition = "2021"
+rust-version = "1.75"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT OR Apache-2.0"
+description = "A fast, secure, and cross-platform command runner with TOML configuration"
+repository = "https://github.com/yourusername/cmdrun"
+homepage = "https://github.com/yourusername/cmdrun"
+documentation = "https://docs.rs/cmdrun"
+readme = "README.md"
+keywords = ["cli", "command", "runner", "toml", "task"]
+categories = ["command-line-utilities", "development-tools"]
+exclude = [
+    "tests/fixtures/*",
+    ".github/*",
+    "scripts/*",
+]
+
+[dependencies]
+# コマンドライン引数パース（高性能・derive マクロ対応）
+clap = { version = "4.5", features = ["derive", "cargo", "env", "wrap_help"] }
+clap_complete = "4.5"
+
+# TOML パース（高速・エラー詳細）
+toml = { version = "0.8", features = ["preserve_order"] }
+
+# 非同期ランタイム（高性能・生産性）
+tokio = { version = "1.39", features = ["full"] }
+
+# エラーハンドリング（詳細なエラー情報）
+anyhow = "1.0"
+thiserror = "1.0"
+
+# シリアライゼーション
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", optional = true }
+
+# ファイルシステム操作
+walkdir = "2.5"
+globset = "0.4"
+ignore = "0.4"  # .gitignore 対応
+
+# プロセス実行（クロスプラットフォーム）
+tokio-process = "0.2"
+shell-words = "1.1"  # シェルコマンド解析
+
+# 環境変数・パス操作
+dirs = "5.0"
+shellexpand = "3.1"
+
+# カラー出力
+colored = "2.1"
+console = "0.15"
+
+# ロギング
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# 正規表現
+regex = { version = "1.10", default-features = false, features = ["std", "perf"] }
+
+# 日時操作
+chrono = "0.4"
+
+# プラットフォーム検出
+which = "6.0"  # 実行可能ファイル検索
+os_info = "3.8"  # OS情報取得
+
+# セキュリティ
+secrecy = "0.8"  # 機密情報保護
+
+# パフォーマンス最適化
+ahash = { version = "0.8", features = ["serde"] }  # 高速ハッシュマップ
+smallvec = "1.13"  # スタック最適化ベクター
+
+[dev-dependencies]
+# テスト
+proptest = "1.5"  # プロパティベーステスト
+quickcheck = "1.0"
+mockall = "0.13"  # モック
+pretty_assertions = "1.4"  # アサーション表示改善
+tempfile = "3.12"  # 一時ファイル
+
+# ベンチマーク
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[build-dependencies]
+# ビルド時コード生成
+vergen = { version = "8.3", features = ["build", "cargo", "git", "gitcl"] }
+
+[profile.release]
+# 本番最適化
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[profile.release-with-debug]
+# デバッグシンボル付きリリース（プロファイリング用）
+inherits = "release"
+strip = false
+debug = true
+
+[profile.dev]
+# 開発時の高速コンパイル
+opt-level = 0
+debug = true
+split-debuginfo = "unpacked"
+
+[profile.test]
+# テスト最適化
+opt-level = 2
+
+[[bin]]
+name = "cmdrun"
+path = "src/main.rs"
+
+[lib]
+name = "cmdrun"
+path = "src/lib.rs"
+
+# [[bench]]
+# name = "performance"
+# harness = false
+
+[features]
+# デフォルト機能
+default = ["color", "json-output"]
+
+# オプション機能
+color = []
+json-output = ["serde_json"]
+trace = ["tracing/max_level_trace"]
+
+# 実験的機能
+experimental = []

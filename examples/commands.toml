@@ -1,0 +1,199 @@
+# cmdrun コマンド定義ファイル
+# セキュアで高速な実行を保証する設定例
+
+[config]
+# グローバル設定
+shell = "bash"           # デフォルトシェル（bash, zsh, fish, pwsh等）
+strict_mode = true       # 厳格モード（未定義変数でエラー）
+parallel = false         # 並列実行デフォルト
+timeout = 300            # タイムアウト（秒、0で無制限）
+working_dir = "."        # 作業ディレクトリ
+
+[config.env]
+# グローバル環境変数（全コマンドで利用可能）
+NODE_ENV = "development"
+RUST_BACKTRACE = "1"
+
+# ===================================================================
+# 開発コマンド群
+# ===================================================================
+
+[commands.dev]
+description = "開発サーバー起動"
+cmd = "npm run dev"
+env = { PORT = "3000" }
+platform = ["unix", "windows"]  # 対応プラットフォーム
+tags = ["development", "server"]
+
+[commands."dev:api"]
+description = "API開発サーバー起動"
+cmd = "cargo run --bin api-server"
+working_dir = "./backend"
+env = { RUST_LOG = "debug" }
+platform = ["unix", "windows"]
+
+[commands."dev:watch"]
+description = "ファイル監視＋再起動"
+cmd = "cargo watch -x run"
+deps = ["check"]  # 依存コマンド（事前実行）
+platform = ["unix", "windows"]
+
+# ===================================================================
+# ビルド・テストコマンド群
+# ===================================================================
+
+[commands.build]
+description = "プロダクションビルド"
+# 複数コマンドの逐次実行（配列形式）
+cmd = [
+    "npm run type-check",
+    "npm run lint",
+    "npm run build",
+]
+env = { NODE_ENV = "production" }
+timeout = 600
+
+[commands.test]
+description = "全テスト実行"
+cmd = "cargo test --all-features"
+env = { RUST_BACKTRACE = "1" }
+
+[commands."test:unit"]
+description = "単体テスト"
+cmd = "cargo test --lib"
+
+[commands."test:integration"]
+description = "統合テスト"
+cmd = "cargo test --test integration"
+deps = ["build"]  # ビルド後に実行
+
+[commands."test:coverage"]
+description = "カバレッジ測定"
+cmd = "cargo tarpaulin --out Html --output-dir coverage"
+platform = ["unix"]  # Unix系のみ
+
+# ===================================================================
+# コード品質コマンド群
+# ===================================================================
+
+[commands.check]
+description = "コード品質チェック"
+parallel = true  # このコマンドは並列実行可能
+cmd = [
+    "cargo fmt -- --check",
+    "cargo clippy -- -D warnings",
+]
+
+[commands.lint]
+description = "リンター実行"
+cmd = "cargo clippy --all-targets --all-features -- -D warnings"
+
+[commands."lint:fix"]
+description = "リンター自動修正"
+cmd = [
+    "cargo fmt",
+    "cargo clippy --fix --allow-dirty --allow-staged",
+]
+
+# ===================================================================
+# 変数展開・条件分岐の例
+# ===================================================================
+
+[commands.deploy]
+description = "デプロイ実行"
+# 変数展開: ${VAR}, ${VAR:-default}, ${VAR:?error_message}
+cmd = "scp -r dist/ ${DEPLOY_USER:?DEPLOY_USER not set}@${DEPLOY_HOST:?DEPLOY_HOST not set}:${DEPLOY_PATH:-/var/www}"
+confirm = true  # 実行前確認
+env = { DEPLOY_ENV = "${ENV:-staging}" }
+
+[commands."docker:build"]
+description = "Dockerイメージビルド"
+cmd = "docker build -t ${IMAGE_NAME:-myapp}:${VERSION:-latest} ."
+working_dir = "."
+
+[commands."docker:run"]
+description = "Dockerコンテナ起動"
+cmd = "docker run -p ${PORT:-8080}:8080 ${IMAGE_NAME:-myapp}:${VERSION:-latest}"
+deps = ["docker:build"]
+
+# ===================================================================
+# プラットフォーム別コマンド
+# ===================================================================
+
+[commands."open:browser"]
+description = "ブラウザでプレビュー"
+# プラットフォーム別コマンド定義
+cmd.unix = "open http://localhost:3000"
+cmd.windows = "start http://localhost:3000"
+cmd.linux = "xdg-open http://localhost:3000"
+
+[commands.install]
+description = "依存関係インストール"
+cmd.unix = "npm install && cargo build"
+cmd.windows = "npm install; cargo build"
+
+# ===================================================================
+# 複雑なワークフロー例
+# ===================================================================
+
+[commands.ci]
+description = "CI/CD パイプライン"
+cmd = [
+    "cargo fmt -- --check",
+    "cargo clippy -- -D warnings",
+    "cargo test --all-features",
+    "cargo build --release",
+]
+parallel = false
+timeout = 1800
+env = { CI = "true" }
+
+[commands."release:prepare"]
+description = "リリース準備"
+cmd = [
+    "git fetch --tags",
+    "cargo test --all-features",
+    "cargo build --release",
+    "cargo package --allow-dirty",
+]
+confirm = true
+
+# ===================================================================
+# セキュリティ・監査コマンド
+# ===================================================================
+
+[commands."security:audit"]
+description = "依存関係セキュリティ監査"
+cmd = "cargo audit"
+platform = ["unix", "windows"]
+
+[commands."security:outdated"]
+description = "古い依存関係チェック"
+cmd = "cargo outdated"
+
+# ===================================================================
+# エイリアス・ショートカット
+# ===================================================================
+
+[aliases]
+# 短縮コマンド定義
+d = "dev"
+b = "build"
+t = "test"
+c = "check"
+l = "lint"
+
+# ===================================================================
+# フック定義（実行前後の処理）
+# ===================================================================
+
+[hooks]
+# 全コマンド実行前に実行
+pre_run = "echo 'Starting command...'"
+# 全コマンド実行後に実行
+post_run = "echo 'Command completed'"
+
+[hooks.commands.deploy]
+# 特定コマンドのフック
+pre_run = "git diff --exit-code || (echo 'Uncommitted changes' && exit 1)"
+post_run = "echo 'Deployment completed at $(date)' >> deploy.log"
