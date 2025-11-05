@@ -7,7 +7,7 @@ use colored::*;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 use std::fs;
 use std::path::PathBuf;
-use toml_edit::{value, Array, DocumentMut, InlineTable, Item, Table, Value};
+use toml_edit::{value, Array, DocumentMut, InlineTable, Item, Table};
 
 use crate::config::{ConfigLoader, Language};
 use crate::i18n::{get_message, MessageKey};
@@ -19,9 +19,14 @@ pub async fn handle_add(
     description: Option<String>,
     category: Option<String>,
     tags: Option<Vec<String>>,
+    config_path: Option<PathBuf>,
 ) -> Result<()> {
     // Load config to get language setting
-    let config_loader = ConfigLoader::new();
+    let config_loader = if let Some(path) = &config_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
     let config = config_loader.load().await.unwrap_or_default();
     let lang = config.config.language;
 
@@ -44,7 +49,7 @@ pub async fn handle_add(
             bail!("{}", get_message(MessageKey::ErrorEmptyDescription, lang));
         }
 
-        return add_command_to_config(id, command, description, category, tags, lang).await;
+        return add_command_to_config(id, command, description, category, tags, lang, config_path).await;
     }
 
     // Interactive mode with back navigation
@@ -124,7 +129,7 @@ pub async fn handle_add(
         match selection {
             0 => {
                 // Add command
-                return add_command_to_config(input_id, input_command, input_description, category, tags, lang).await;
+                return add_command_to_config(input_id, input_command, input_description, category, tags, lang, config_path).await;
             }
             1 => {
                 // Edit again - loop continues with current values
@@ -148,9 +153,14 @@ async fn add_command_to_config(
     category: Option<String>,
     tags: Option<Vec<String>>,
     lang: Language,
+    config_file_path: Option<PathBuf>,
 ) -> Result<()> {
     // Determine config file path
-    let config_path = get_config_path()?;
+    let config_path = if let Some(path) = config_file_path {
+        path
+    } else {
+        get_config_path()?
+    };
 
     println!(
         "{} {} '{}' {}",
