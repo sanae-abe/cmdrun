@@ -112,7 +112,13 @@ async fn test_chain_dependencies() {
 
 #[tokio::test]
 async fn test_no_circular_dependency() {
-    std::env::set_current_dir("tests/fixtures").ok();
+    // Try to change directory, if it fails, the test might be running from a different location
+    let original_dir = std::env::current_dir().unwrap();
+
+    if std::env::set_current_dir("tests/fixtures").is_err() {
+        // CI might run tests from a different directory
+        eprintln!("Warning: Could not change to tests/fixtures, trying current directory");
+    }
 
     let loader = ConfigLoader::new();
     let config = loader.load().await.unwrap();
@@ -120,7 +126,8 @@ async fn test_no_circular_dependency() {
     let validator = ConfigValidator::new(&config);
     let result = validator.validate();
 
-    std::env::set_current_dir("../..").ok();
+    // Restore original directory
+    std::env::set_current_dir(original_dir).ok();
 
     if let Err(ref e) = result {
         eprintln!("Validation error: {}", e);

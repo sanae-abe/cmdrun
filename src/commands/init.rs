@@ -391,6 +391,31 @@ mod tests {
 
     #[tokio::test]
     async fn test_handle_init_readonly_directory() {
+        // Skip this test if running as root (e.g., in Docker CI)
+        // Root user can write to read-only directories
+        #[cfg(unix)]
+        {
+            // Check if we can write to a read-only directory (indicates root)
+            let test_dir = std::env::temp_dir().join("root_check_test");
+            let _ = std::fs::create_dir(&test_dir);
+
+            #[cfg(unix)]
+            {
+                use std::fs::Permissions;
+                use std::os::unix::fs::PermissionsExt;
+                let _ = std::fs::set_permissions(&test_dir, Permissions::from_mode(0o555));
+            }
+
+            let test_file = test_dir.join("test.txt");
+            if std::fs::write(&test_file, "test").is_ok() {
+                // Running as root, skip test
+                let _ = std::fs::remove_dir_all(&test_dir);
+                eprintln!("Skipping test_handle_init_readonly_directory: running as root");
+                return;
+            }
+            let _ = std::fs::remove_dir_all(&test_dir);
+        }
+
         // Create a temporary directory
         let temp_dir = TempDir::new().unwrap();
         let readonly_dir = temp_dir.path().join("readonly");
