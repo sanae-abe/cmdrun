@@ -1,16 +1,30 @@
 # cmdrun - Fast, Secure, and Cross-platform Command Runner
 
+[English](README.md) | [日本語](README.ja.md)
+
 > A modern replacement for `package.json` scripts and Makefiles, written in Rust.
 
 [![Crates.io](https://img.shields.io/crates/v/cmdrun.svg)](https://crates.io/crates/cmdrun)
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
-[![Build Status](https://github.com/yourusername/cmdrun/workflows/CI/badge.svg)](https://github.com/yourusername/cmdrun/actions)
+[![Build Status](https://github.com/sanae-abe/cmdrun/workflows/CI/badge.svg)](https://github.com/sanae-abe/cmdrun/actions)
+
+## Table of Contents
+
+- [Why cmdrun?](#why-cmdrun)
+- [Quick Start](#quick-start)
+- [Features](#features)
+- [Documentation](#documentation)
+- [Comparison](#comparison)
+- [Performance Benchmarks](#performance-benchmarks)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Why cmdrun?
 
 ### 🚀 Performance
-- **10x faster startup** than Node.js-based task runners
-- **50ms startup time** vs 500ms+ for npm/yarn
+- **~29x faster startup** than Node.js-based task runners
+- **4ms startup time** vs 115ms+ for npm/yarn
 - **10MB memory footprint** vs 200MB+ for Node.js
 
 ### 🔒 Security
@@ -30,6 +44,11 @@
 
 ## Quick Start
 
+### System Requirements
+
+- **Operating System**: Linux, macOS, Windows, FreeBSD
+- **For building from source**: Rust 1.70+ (MSRV)
+
 ### Installation
 
 #### Cargo (Recommended)
@@ -37,25 +56,48 @@
 cargo install cmdrun
 ```
 
+#### Manual Installation
+Download the latest binary from [Releases](https://github.com/sanae-abe/cmdrun/releases).
+
+<!-- Future installation methods (commented out until available)
 #### Homebrew (macOS/Linux)
 ```bash
-brew install yourusername/tap/cmdrun
+brew install sanae-abe/tap/cmdrun
 ```
 
 #### Scoop (Windows)
 ```bash
-scoop bucket add cmdrun https://github.com/yourusername/scoop-bucket
+scoop bucket add cmdrun https://github.com/sanae-abe/scoop-bucket
 scoop install cmdrun
 ```
-
-#### Manual Installation
-Download the latest binary from [Releases](https://github.com/yourusername/cmdrun/releases).
+-->
 
 ### Basic Usage
 
-1. Create a `commands.toml` in your project:
+#### 1. Initialize a new project
+
+```bash
+# Create commands.toml with a template
+cmdrun init
+
+# Or use a specific template
+cmdrun init --template rust  # For Rust projects
+cmdrun init --template node  # For Node.js projects
+cmdrun init --template web   # For web development
+cmdrun init --template python # For Python projects
+
+# Interactive template selection
+cmdrun init --interactive
+```
+
+#### 2. Or create manually
+
+Create a `commands.toml` in your project:
 
 ```toml
+[config]
+language = "english"  # Optional: "english" (default) or "japanese"
+
 [commands.dev]
 description = "Start development server"
 cmd = "npm run dev"
@@ -73,7 +115,7 @@ description = "Run tests"
 cmd = "cargo test --all-features"
 ```
 
-2. Run commands:
+#### 3. Run commands
 
 ```bash
 # Run a command
@@ -81,6 +123,9 @@ cmdrun run dev
 
 # List available commands
 cmdrun list
+
+# Visualize dependency graph
+cmdrun graph
 
 # Show help
 cmdrun --help
@@ -123,6 +168,30 @@ cmd = [
 ]
 ```
 
+Run dependencies in parallel:
+```bash
+cmdrun run build --parallel
+```
+
+### Dependency Graph Visualization
+
+Visualize command dependencies in multiple formats:
+
+```bash
+# Tree format (default, colorful)
+cmdrun graph build
+
+# Show execution groups for parallel execution
+cmdrun graph build --show-groups
+
+# Export as DOT format (Graphviz)
+cmdrun graph build --format dot --output deps.dot
+dot -Tpng deps.dot -o deps.png
+
+# Export as Mermaid diagram
+cmdrun graph build --format mermaid --output deps.mmd
+```
+
 ### Platform-specific Commands
 
 ```toml
@@ -156,25 +225,60 @@ cmd = "npm run dev"
 env = { PORT = "3000" }  # Command-specific env
 ```
 
+### Language Settings (i18n)
+
+cmdrun supports internationalization with English and Japanese languages. Configure the language in your `commands.toml`:
+
+```toml
+[config]
+language = "japanese"  # or "english" (default)
+```
+
+**Supported Messages:**
+- Command execution (Running, Completed, Error)
+- Interactive prompts (Command ID, Description, etc.)
+- Success/error messages (Command added, Command not found, etc.)
+- Validation errors (Empty input, duplicate commands, etc.)
+
+**Example (Japanese):**
+```bash
+$ cmdrun add test-ja "echo テスト" "日本語テストコマンド"
+📝 コマンドを追加中 'test-ja' ...
+✓ コマンドを追加しました 'test-ja'
+  説明: 日本語テストコマンド
+  コマンド: echo テスト
+```
+
+**Example (English):**
+```bash
+$ cmdrun add test-en "echo test" "English test command"
+📝 Adding command 'test-en' ...
+✓ Command added successfully 'test-en'
+  Description: English test command
+  Command: echo test
+```
+
+**Currently Supported Commands:**
+- `cmdrun add` - Fully localized (prompts, messages, errors)
+- More commands will be localized in future releases
+
 ## Documentation
 
-### Core Documentation
-- [Installation Guide](docs/INSTALLATION.md)
-- [Configuration Reference](docs/CONFIGURATION.md)
-- [CLI Reference](docs/CLI.md)
-- [Migration Guide](docs/MIGRATION.md)
+### User Guide
+- [Installation Guide](docs/user-guide/INSTALLATION.md)
+- [CLI Reference](docs/user-guide/CLI.md)
+- [Configuration Reference](docs/user-guide/CONFIGURATION.md)
+- [Internationalization (i18n)](docs/user-guide/I18N.md)
 
 ### Technical Documentation
-- [Architecture](docs/ARCHITECTURE.md)
-- [Performance](docs/PERFORMANCE.md)
-- [Security](docs/SECURITY.md)
-- [Cross-platform Support](docs/CROSS_PLATFORM.md)
-- [Distribution](docs/DISTRIBUTION.md)
+- [Performance](docs/technical/PERFORMANCE.md)
+- [Security](docs/technical/SECURITY.md)
+- [Cross-platform Support](docs/technical/CROSS_PLATFORM.md)
+- [Distribution](docs/technical/DISTRIBUTION.md)
 
 ### Development
 - [Contributing](CONTRIBUTING.md)
-- [Development Guide](docs/DEVELOPMENT.md)
-- [Roadmap](docs/ROADMAP.md)
+- [Roadmap](docs/development/ROADMAP.md)
 
 ## Comparison
 
@@ -207,7 +311,7 @@ deps = ["build"]
 ```
 
 **Benefits**:
-- ✅ 10x faster startup
+- ✅ ~29x faster startup
 - ✅ Type-safe configuration
 - ✅ Dependency management
 - ✅ Variable expansion
@@ -249,22 +353,31 @@ deps = ["build"]
 
 ```bash
 # Startup time comparison (measured with hyperfine)
-$ hyperfine 'cmdrun --version' 'npm --version'
+$ hyperfine --shell=none './target/release/cmdrun --version' 'npm --version' --warmup 5
 
-Benchmark: cmdrun --version
-  Time (mean ± σ):      45.2 ms ±   2.3 ms
-  Range (min … max):    42.1 ms …  51.3 ms
+Benchmark 1: ./target/release/cmdrun --version
+  Time (mean ± σ):       4.0 ms ±   0.3 ms    [User: 1.3 ms, System: 1.3 ms]
+  Range (min … max):     3.5 ms …   4.6 ms    30 runs
 
-Benchmark: npm --version
-  Time (mean ± σ):     523.1 ms ±  12.3 ms
-  Range (min … max):   508.2 ms … 547.8 ms
+Benchmark 2: npm --version
+  Time (mean ± σ):     115.4 ms ±  13.0 ms    [User: 59.7 ms, System: 18.9 ms]
+  Range (min … max):   104.5 ms … 158.4 ms    30 runs
 
-Result: cmdrun is 11.6x faster
+Summary
+  ./target/release/cmdrun --version ran
+    28.88 ± 3.79 times faster than npm --version
 ```
+
+**Key Performance Metrics:**
+- **Startup time**: 4ms average (well below 100ms target)
+- **Speed improvement**: ~29x faster than npm (28.88 ± 3.79x measured)
+- **Memory footprint**: ~10MB vs 200MB+ for Node.js
+- **Binary size**: Optimized with LTO and strip
 
 ## Examples
 
-### Web Development
+<details>
+<summary>📱 Web Development</summary>
 
 ```toml
 [config]
@@ -290,7 +403,24 @@ deps = ["build"]
 confirm = true
 ```
 
-### Rust Project
+**Usage:**
+```bash
+# Start development server
+cmdrun run dev
+
+# Build for production (runs type-check, lint, build in sequence)
+cmdrun run build
+
+# Deploy (asks for confirmation, runs build first)
+cmdrun run deploy
+
+# Visualize build dependencies
+cmdrun graph build --show-groups
+```
+</details>
+
+<details>
+<summary>🦀 Rust Project</summary>
 
 ```toml
 [commands.dev]
@@ -311,6 +441,79 @@ cmd = [
 confirm = true
 ```
 
+**Usage:**
+```bash
+# Watch mode for development
+cmdrun run dev
+
+# Run all tests
+cmdrun run test
+
+# Create release (with confirmation)
+cmdrun run release
+
+# Show dependency graph
+cmdrun graph release
+```
+</details>
+
+<details>
+<summary>⚡ Advanced Features</summary>
+
+#### Dependency Management
+```toml
+[commands.e2e]
+description = "Run end-to-end tests"
+cmd = "playwright test"
+deps = ["build"]  # Automatically runs 'build' before 'e2e'
+
+[commands.ci]
+description = "Full CI pipeline"
+deps = ["test", "lint", "build"]  # Runs all checks
+```
+
+#### Platform-Specific Commands
+```toml
+[commands.open-browser]
+description = "Open browser"
+cmd.unix = "open http://localhost:3000"
+cmd.windows = "start http://localhost:3000"
+cmd.linux = "xdg-open http://localhost:3000"
+```
+
+#### Parallel Execution
+```toml
+[commands.lint-all]
+description = "Run all linters in parallel"
+parallel = true
+cmd = [
+    "eslint src/",
+    "stylelint src/**/*.css",
+    "tsc --noEmit",
+]
+```
+
+#### Visualize Execution Plan
+```bash
+# See how commands will be executed
+cmdrun graph ci --show-groups
+
+# Output:
+# Execution Plan: 3 groups
+#
+# ▶ Group 1 / 3
+#   • lint
+#   • test
+#   ⚡ Can run in parallel
+#
+# ▶ Group 2 / 3
+#   • build
+#
+# ▶ Group 3 / 3
+#   • ci
+```
+</details>
+
 ## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
@@ -319,7 +522,7 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/cmdrun
+git clone https://github.com/sanae-abe/cmdrun
 cd cmdrun
 
 # Build
@@ -351,14 +554,17 @@ at your option.
 
 - Inspired by [npm scripts](https://docs.npmjs.com/cli/v9/using-npm/scripts), [make](https://www.gnu.org/software/make/), and [just](https://github.com/casey/just)
 - Built with amazing Rust crates: [clap](https://github.com/clap-rs/clap), [tokio](https://github.com/tokio-rs/tokio), [serde](https://github.com/serde-rs/serde)
-- Thanks to all [contributors](https://github.com/yourusername/cmdrun/graphs/contributors)
+- Thanks to all [contributors](https://github.com/sanae-abe/cmdrun/graphs/contributors)
 
 ## Support
 
-- 📖 [Documentation](https://yourusername.github.io/cmdrun)
-- 💬 [Discussions](https://github.com/yourusername/cmdrun/discussions)
-- 🐛 [Issue Tracker](https://github.com/yourusername/cmdrun/issues)
-- 🐦 [Twitter](https://twitter.com/yourusername)
+- 📖 [Documentation](https://sanae-abe.github.io/cmdrun)
+- 💬 [Discussions](https://github.com/sanae-abe/cmdrun/discussions)
+- 🐛 [Issue Tracker](https://github.com/sanae-abe/cmdrun/issues)
+
+<!-- Future support channels (commented out until available)
+- 🐦 [Twitter](https://twitter.com/sanae_abe)
+-->
 
 ---
 

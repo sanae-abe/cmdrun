@@ -1,0 +1,102 @@
+# cmdrun configuration for Python projects
+# Optimized for Python development
+
+[config]
+shell = "bash"
+strict_mode = true
+timeout = 300
+working_dir = "."
+
+[config.env]
+PYTHONPATH = "."
+PYTHONDONTWRITEBYTECODE = "1"
+
+# Development commands
+[commands.run]
+description = "Run the main application"
+cmd = "python main.py"
+
+[commands.shell]
+description = "Start Python REPL"
+cmd = "python"
+
+# Virtual environment
+[commands.venv]
+description = "Create virtual environment"
+cmd = "python -m venv venv"
+
+[commands.install]
+description = "Install dependencies"
+cmd = "pip install -r requirements.txt"
+
+[commands.install-dev]
+description = "Install development dependencies"
+cmd = "pip install -r requirements-dev.txt"
+
+# Testing commands
+[commands.test]
+description = "Run tests with pytest"
+cmd = "pytest"
+
+[commands.test-verbose]
+description = "Run tests with verbose output"
+cmd = "pytest -v"
+
+[commands.test-coverage]
+description = "Run tests with coverage"
+cmd = "pytest --cov=. --cov-report=html"
+
+# Code quality
+[commands.lint]
+description = "Run flake8 linter"
+cmd = "flake8 ."
+
+[commands.format]
+description = "Format code with black"
+cmd = "black ."
+
+[commands.format-check]
+description = "Check code formatting"
+cmd = "black --check ."
+
+[commands.type-check]
+description = "Check types with mypy"
+cmd = "mypy ."
+
+# Security
+[commands.security]
+description = "Check for security vulnerabilities"
+cmd = "bandit -r ."
+
+# Quality checks
+[commands.check]
+description = "Run all quality checks"
+cmd = ["black --check .", "flake8 .", "mypy .", "pytest"]
+
+# Cleanup
+[commands.clean]
+description = "Clean Python cache files"
+cmd = "find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true"
+
+# Documentation
+[commands.docs]
+description = "Generate documentation with Sphinx"
+cmd = "cd docs && make html"
+
+[commands.docs-serve]
+description = "Serve documentation locally"
+cmd = "python -m http.server -d docs/_build/html 8000"
+deps = ["docs"]
+
+# Aliases
+[aliases]
+t = "test"
+l = "lint"
+f = "format"
+c = "check"
+i = "install"
+
+# Hooks
+[hooks]
+pre_run = "echo '🐍 Running Python command...'"
+post_run = "echo '✓ Done!'"

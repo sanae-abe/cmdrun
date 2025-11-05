@@ -26,6 +26,33 @@ pub struct CommandsConfig {
     pub hooks: Hooks,
 }
 
+impl Default for CommandsConfig {
+    fn default() -> Self {
+        Self {
+            config: GlobalConfig::default(),
+            commands: AHashMap::new(),
+            aliases: AHashMap::new(),
+            hooks: Hooks::default(),
+        }
+    }
+}
+
+/// 言語設定
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Language {
+    /// 英語
+    English,
+    /// 日本語
+    Japanese,
+}
+
+impl Default for Language {
+    fn default() -> Self {
+        Language::English
+    }
+}
+
 /// グローバル設定
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct GlobalConfig {
@@ -49,6 +76,10 @@ pub struct GlobalConfig {
     #[serde(default = "default_working_dir")]
     pub working_dir: PathBuf,
 
+    /// 言語設定
+    #[serde(default)]
+    pub language: Language,
+
     /// グローバル環境変数
     #[serde(default)]
     pub env: AHashMap<String, String>,
@@ -62,6 +93,7 @@ impl Default for GlobalConfig {
             parallel: false,
             timeout: default_timeout(),
             working_dir: default_working_dir(),
+            language: Language::default(),
             env: AHashMap::new(),
         }
     }

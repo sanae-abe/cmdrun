@@ -1,6 +1,7 @@
 //! CLI argument definitions
 
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -29,6 +30,10 @@ pub enum Commands {
         /// Additional arguments to pass to the command
         #[arg(trailing_var_arg = true)]
         args: Vec<String>,
+
+        /// Execute dependencies in parallel when possible
+        #[arg(short, long)]
+        parallel: bool,
     },
 
     /// List available commands
@@ -39,15 +44,51 @@ pub enum Commands {
     },
 
     /// Initialize a new commands.toml file
-    Init,
+    Init {
+        /// Template to use (web, rust, node, python)
+        #[arg(short, long)]
+        template: Option<String>,
+
+        /// Use interactive mode
+        #[arg(short, long)]
+        interactive: bool,
+
+        /// Output path (default: commands.toml)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
 
     /// Validate configuration file
-    Validate,
+    Validate {
+        /// Path to configuration file
+        #[arg(short, long)]
+        path: Option<PathBuf>,
+
+        /// Show detailed validation report
+        #[arg(short, long)]
+        verbose: bool,
+
+        /// Check for circular dependencies
+        #[arg(long)]
+        check_cycles: bool,
+    },
 
     /// Show dependency graph
     Graph {
         /// Specific command to show dependencies for
         command: Option<String>,
+
+        /// Output format
+        #[arg(short, long, value_enum, default_value = "tree")]
+        format: GraphFormat,
+
+        /// Output file path (prints to stdout if not specified)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+
+        /// Show execution groups (parallel execution plan)
+        #[arg(short = 'g', long)]
+        show_groups: bool,
     },
 
     /// Generate shell completion scripts
@@ -56,4 +97,74 @@ pub enum Commands {
         #[arg(value_enum)]
         shell: clap_complete::Shell,
     },
+
+    /// Remove a command from the configuration
+    Remove {
+        /// Command ID to remove
+        id: String,
+
+        /// Skip confirmation prompt
+        #[arg(short, long)]
+        force: bool,
+
+        /// Path to configuration file
+        #[arg(short = 'c', long)]
+        config: Option<PathBuf>,
+    },
+
+    /// Add a new command to the configuration
+    Add {
+        /// Command ID (unique identifier)
+        id: Option<String>,
+
+        /// Command to execute
+        command: Option<String>,
+
+        /// Description of the command
+        description: Option<String>,
+
+        /// Category for the command
+        #[arg(short, long)]
+        category: Option<String>,
+
+        /// Tags (comma-separated)
+        #[arg(short, long, value_delimiter = ',')]
+        tags: Option<Vec<String>>,
+    },
+
+    /// Open commands.toml in the default editor
+    Open,
+
+    /// Edit an existing command interactively
+    Edit {
+        /// Command ID to edit (optional - will prompt if not provided)
+        id: Option<String>,
+    },
+
+    /// Show detailed information about a command
+    Info {
+        /// Command ID to show info for (optional - will prompt if not provided)
+        id: Option<String>,
+    },
+
+    /// Search commands by keyword
+    Search {
+        /// Keyword to search for
+        keyword: String,
+    },
+
+    /// List command names for completion (internal use)
+    #[command(hide = true)]
+    CompletionList,
+}
+
+/// Graph output format
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum GraphFormat {
+    /// Tree-like text output (default)
+    Tree,
+    /// DOT format (Graphviz)
+    Dot,
+    /// Mermaid diagram format
+    Mermaid,
 }

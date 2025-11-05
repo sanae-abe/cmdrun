@@ -5,6 +5,7 @@
 use crate::command::interpolation::InterpolationContext;
 use crate::config::schema::{Command, Platform};
 use crate::error::{ExecutionError, Result};
+use crate::security::{CommandValidator, SensitiveEnv};
 use ahash::AHashMap;
 use colored::*;
 use std::path::PathBuf;
@@ -12,7 +13,9 @@ use std::process::Stdio;
 use std::time::{Duration, Instant};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::Command as TokioCommand;
+use tokio::task::JoinSet;
 use tokio::time::timeout;
+use tracing::{debug, warn};
 
 /// コマンド実行コンテキスト
 #[derive(Debug, Clone)]
@@ -65,12 +68,31 @@ pub struct ExecutionResult {
 /// コマンドエグゼキューター
 pub struct CommandExecutor {
     context: ExecutionContext,
+    validator: CommandValidator,
+    sensitive_env: SensitiveEnv,
 }
 
 impl CommandExecutor {
     /// 新規エグゼキューター作成
     pub fn new(context: ExecutionContext) -> Self {
-        Self { context }
+        // バリデーターを設定（strictモードに応じて）
+        let validator = if context.strict {
+            // strictモードでも変数展開は許可する（安全な展開のみ）
+            CommandValidator::new()
+                .allow_variable_expansion()
+        } else {
+            CommandValidator::new()
+                .with_strict_mode(false)
+                .allow_variable_expansion()
+                .allow_pipe()
+                .allow_redirect()
+        };
+
+        Self {
+            context,
+            validator,
+            sensitive_env: SensitiveEnv::new(),
+        }
     }
 
     /// コマンド実行
@@ -83,13 +105,17 @@ impl CommandExecutor {
         // コマンド文字列取得
         let commands = self.resolve_commands(command)?;
 
+        // 環境変数マージ（コマンド固有の環境変数を追加）
+        let mut merged_env = self.context.env.clone();
+        merged_env.extend(command.env.clone());
+
         // 変数展開
         let interpolated_commands = self.interpolate_commands(&commands, command)?;
 
         // 実行
         let mut last_result = None;
         for cmd in interpolated_commands {
-            let result = self.execute_single(&cmd).await?;
+            let result = self.execute_single(&cmd, &merged_env).await?;
             if !result.success {
                 return Err(ExecutionError::CommandFailed {
                     command: cmd,
@@ -159,8 +185,21 @@ impl CommandExecutor {
     }
 
     /// 単一コマンド実行
-    async fn execute_single(&self, command: &str) -> Result<ExecutionResult> {
+    async fn execute_single(&self, command: &str, env: &AHashMap<String, String>) -> Result<ExecutionResult> {
         let start = Instant::now();
+
+        // セキュリティ検証
+        let validation_result = self.validator.validate(command);
+        if !validation_result.is_safe() {
+            if let Some(err) = validation_result.error() {
+                warn!("Command validation failed: {}", err);
+                return Err(ExecutionError::CommandFailed {
+                    command: command.to_string(),
+                    code: 1,
+                }
+                .into());
+            }
+        }
 
         // コマンドエコー
         if self.context.echo {
@@ -170,11 +209,17 @@ impl CommandExecutor {
         // シェルコマンド構築
         let (shell, args) = self.build_shell_command(command);
 
+        // 環境変数のログ出力（機密情報マスキング）
+        if self.context.echo && !env.is_empty() {
+            let masked_env = self.sensitive_env.mask_ahash_map(env);
+            debug!("Environment variables: {:?}", masked_env);
+        }
+
         // プロセス起動
         let mut child = TokioCommand::new(&shell)
             .args(&args)
             .current_dir(&self.context.working_dir)
-            .envs(&self.context.env)
+            .envs(env)
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
             .spawn()
@@ -286,6 +331,61 @@ impl CommandExecutor {
             eprintln!("→ {}", command);
         }
     }
+
+    /// 複数コマンドを並列実行
+    pub async fn execute_parallel(
+        &self,
+        commands: &[&Command],
+    ) -> Result<Vec<ExecutionResult>> {
+        if commands.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        if self.context.color {
+            eprintln!(
+                "{} {} commands in parallel",
+                "⚡".yellow().bold(),
+                commands.len()
+            );
+        }
+
+        let mut set = JoinSet::new();
+
+        // 各コマンドを並列タスクとして起動
+        for command in commands {
+            let executor = self.clone_for_task();
+            let cmd = (*command).clone();
+
+            set.spawn(async move { executor.execute(&cmd).await });
+        }
+
+        // 全タスクの完了を待機
+        let mut results = Vec::new();
+        while let Some(result) = set.join_next().await {
+            match result {
+                Ok(Ok(exec_result)) => results.push(exec_result),
+                Ok(Err(e)) => return Err(e),
+                Err(e) => {
+                    return Err(ExecutionError::CommandFailed {
+                        command: format!("Parallel task failed: {}", e),
+                        code: 1,
+                    }
+                    .into())
+                }
+            }
+        }
+
+        Ok(results)
+    }
+
+    /// タスク用のクローンを作成
+    fn clone_for_task(&self) -> Self {
+        Self {
+            context: self.context.clone(),
+            validator: CommandValidator::new(),
+            sensitive_env: SensitiveEnv::new(),
+        }
+    }
 }
 
 /// デフォルトシェル検出
@@ -311,13 +411,14 @@ pub fn detect_shell() -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::config::CommandSpec;
 
     #[tokio::test]
     async fn test_simple_command() {
         let ctx = ExecutionContext::default();
         let executor = CommandExecutor::new(ctx);
 
-        let mut command = Command {
+        let command = Command {
             description: "test".to_string(),
             cmd: CommandSpec::Single("echo hello".to_string()),
             env: AHashMap::new(),

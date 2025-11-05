@@ -232,7 +232,7 @@ panic = "abort"
 
 3. **Homebrew**
    ```bash
-   brew install yourusername/tap/cmdrun
+   brew install sanae-abe/tap/cmdrun
    ```
 
 ### Tier 2（高優先）

@@ -32,7 +32,7 @@ rust-version = "1.75"
 authors = ["Your Name <email@example.com>"]
 license = "MIT OR Apache-2.0"
 description = "A fast, secure, and cross-platform command runner"
-repository = "https://github.com/yourusername/cmdrun"
+repository = "https://github.com/sanae-abe/cmdrun"
 readme = "README.md"
 keywords = ["cli", "command", "runner", "toml", "task"]
 categories = ["command-line-utilities"]
@@ -67,7 +67,7 @@ cargo install cmdrun
 cargo install cmdrun --version 2.0.0
 
 # Git から直接
-cargo install --git https://github.com/yourusername/cmdrun
+cargo install --git https://github.com/sanae-abe/cmdrun
 ```
 
 ## 2. GitHub Releases
@@ -217,8 +217,8 @@ git push origin v2.0.0
 # Formula/cmdrun.rb
 class Cmdrun < Formula
   desc "Fast, secure, and cross-platform command runner"
-  homepage "https://github.com/yourusername/cmdrun"
-  url "https://github.com/yourusername/cmdrun/archive/v2.0.0.tar.gz"
+  homepage "https://github.com/sanae-abe/cmdrun"
+  url "https://github.com/sanae-abe/cmdrun/archive/v2.0.0.tar.gz"
   sha256 "0123456789abcdef..." # tar.gz の SHA256
   license "MIT"
 
@@ -237,40 +237,40 @@ end
 ### Tap リポジトリ
 ```bash
 # homebrew-cmdrun リポジトリ作成
-# https://github.com/yourusername/homebrew-cmdrun
+# https://github.com/sanae-abe/homebrew-cmdrun
 
 # インストール
-brew tap yourusername/cmdrun
+brew tap sanae-abe/cmdrun
 brew install cmdrun
 
 # または直接
-brew install yourusername/cmdrun/cmdrun
+brew install sanae-abe/cmdrun/cmdrun
 ```
 
 ### バイナリ配布版（高速）
 ```ruby
 class Cmdrun < Formula
   desc "Fast, secure, and cross-platform command runner"
-  homepage "https://github.com/yourusername/cmdrun"
+  homepage "https://github.com/sanae-abe/cmdrun"
   version "2.0.0"
   license "MIT"
 
   on_macos do
     if Hardware::CPU.intel?
-      url "https://github.com/yourusername/cmdrun/releases/download/v2.0.0/cmdrun-macos-amd64.tar.gz"
+      url "https://github.com/sanae-abe/cmdrun/releases/download/v2.0.0/cmdrun-macos-amd64.tar.gz"
       sha256 "..."
     else
-      url "https://github.com/yourusername/cmdrun/releases/download/v2.0.0/cmdrun-macos-arm64.tar.gz"
+      url "https://github.com/sanae-abe/cmdrun/releases/download/v2.0.0/cmdrun-macos-arm64.tar.gz"
       sha256 "..."
     end
   end
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/yourusername/cmdrun/releases/download/v2.0.0/cmdrun-linux-amd64.tar.gz"
+      url "https://github.com/sanae-abe/cmdrun/releases/download/v2.0.0/cmdrun-linux-amd64.tar.gz"
       sha256 "..."
     else
-      url "https://github.com/yourusername/cmdrun/releases/download/v2.0.0/cmdrun-linux-arm64.tar.gz"
+      url "https://github.com/sanae-abe/cmdrun/releases/download/v2.0.0/cmdrun-linux-arm64.tar.gz"
       sha256 "..."
     end
   end
@@ -292,22 +292,22 @@ end
 {
   "version": "2.0.0",
   "description": "Fast, secure, and cross-platform command runner",
-  "homepage": "https://github.com/yourusername/cmdrun",
+  "homepage": "https://github.com/sanae-abe/cmdrun",
   "license": "MIT",
   "architecture": {
     "64bit": {
-      "url": "https://github.com/yourusername/cmdrun/releases/download/v2.0.0/cmdrun-windows-amd64.exe.zip",
+      "url": "https://github.com/sanae-abe/cmdrun/releases/download/v2.0.0/cmdrun-windows-amd64.exe.zip",
       "hash": "sha256:...",
       "bin": "cmdrun.exe"
     }
   },
   "checkver": {
-    "github": "https://github.com/yourusername/cmdrun"
+    "github": "https://github.com/sanae-abe/cmdrun"
   },
   "autoupdate": {
     "architecture": {
       "64bit": {
-        "url": "https://github.com/yourusername/cmdrun/releases/download/v$version/cmdrun-windows-amd64.exe.zip"
+        "url": "https://github.com/sanae-abe/cmdrun/releases/download/v$version/cmdrun-windows-amd64.exe.zip"
       }
     }
   }
@@ -317,10 +317,10 @@ end
 ### Bucket 公開
 ```bash
 # scoop-bucket リポジトリ作成
-# https://github.com/yourusername/scoop-bucket
+# https://github.com/sanae-abe/scoop-bucket
 
 # インストール
-scoop bucket add cmdrun https://github.com/yourusername/scoop-bucket
+scoop bucket add cmdrun https://github.com/sanae-abe/scoop-bucket
 scoop install cmdrun
 ```
 
@@ -359,7 +359,7 @@ Description: Fast, secure, and cross-platform command runner
  A modern replacement for package.json scripts and Makefiles
 Section: utils
 Priority: optional
-Homepage: https://github.com/yourusername/cmdrun
+Homepage: https://github.com/sanae-abe/cmdrun
 EOF
 
 # ドキュメント
@@ -410,16 +410,16 @@ CMD ["--help"]
 ### Docker Hub 公開
 ```bash
 # ビルド＆プッシュ
-docker build -t yourusername/cmdrun:2.0.0 .
-docker push yourusername/cmdrun:2.0.0
-docker tag yourusername/cmdrun:2.0.0 yourusername/cmdrun:latest
-docker push yourusername/cmdrun:latest
+docker build -t sanae-abe/cmdrun:2.0.0 .
+docker push sanae-abe/cmdrun:2.0.0
+docker tag sanae-abe/cmdrun:2.0.0 sanae-abe/cmdrun:latest
+docker push sanae-abe/cmdrun:latest
 ```
 
 ### 使用例
 ```bash
 # プロジェクトディレクトリで実行
-docker run --rm -v $(pwd):/workspace -w /workspace yourusername/cmdrun run build
+docker run --rm -v $(pwd):/workspace -w /workspace sanae-abe/cmdrun run build
 ```
 
 ## 7. インストールスクリプト
@@ -430,7 +430,7 @@ docker run --rm -v $(pwd):/workspace -w /workspace yourusername/cmdrun run build
 #!/bin/bash
 set -e
 
-REPO="yourusername/cmdrun"
+REPO="sanae-abe/cmdrun"
 BINARY="cmdrun"
 
 # プラットフォーム検出
@@ -477,7 +477,7 @@ cmdrun --version
 
 ### 使用方法
 ```bash
-curl -sSL https://raw.githubusercontent.com/yourusername/cmdrun/main/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/sanae-abe/cmdrun/main/scripts/install.sh | bash
 ```
 
 ## 8. バージョン管理戦略

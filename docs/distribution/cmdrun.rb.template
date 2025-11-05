@@ -1,0 +1,61 @@
+class Cmdrun < Formula
+  desc "Fast, secure, and cross-platform command runner with TOML configuration"
+  homepage "https://github.com/sanae-abe/cmdrun"
+  version "1.0.0"
+  license "MIT OR Apache-2.0"
+
+  # macOS用プラットフォーム別バイナリ
+  if Hardware::CPU.arm?
+    url "https://github.com/sanae-abe/cmdrun/releases/download/v1.0.0/cmdrun-v1.0.0-aarch64-apple-darwin.tar.gz"
+    sha256 "REPLACE_WITH_ARM64_SHA256_AFTER_RELEASE"
+  else
+    url "https://github.com/sanae-abe/cmdrun/releases/download/v1.0.0/cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz"
+    sha256 "REPLACE_WITH_X86_64_SHA256_AFTER_RELEASE"
+  end
+
+  def install
+    bin.install "cmdrun"
+
+    # シェル補完スクリプト生成（将来的に実装）
+    # generate_completions_from_executable(bin/"cmdrun", "completions")
+
+    # ドキュメントインストール
+    doc.install "README.md"
+    doc.install "CHANGELOG.md" if File.exist?("CHANGELOG.md")
+  end
+
+  def caveats
+    <<~EOS
+      🎉 cmdrunがインストールされました！
+
+      📋 初期設定:
+        1. 設定ディレクトリ作成: mkdir -p ~/.cmdrun
+        2. 初期化: cmdrun init
+        3. コマンド追加: cmdrun add <id> "<command>" "<description>"
+
+      💡 使い方:
+        - コマンド一覧: cmdrun list
+        - コマンド実行: cmdrun run <id>
+        - ヘルプ: cmdrun --help
+
+      📖 詳細: https://github.com/sanae-abe/cmdrun
+    EOS
+  end
+
+  test do
+    # バージョン確認
+    assert_match "cmdrun 1.0.0", shell_output("#{bin}/cmdrun --version")
+
+    # 基本的な動作確認
+    system "#{bin}/cmdrun", "list"
+
+    # 初期化テスト
+    ENV["HOME"] = testpath
+    system "#{bin}/cmdrun", "init"
+    assert_predicate testpath/".cmdrun/commands.toml", :exist?
+
+    # コマンド追加・実行テスト
+    system "#{bin}/cmdrun", "add", "test", "echo hello", "Test command"
+    assert_match "test", shell_output("#{bin}/cmdrun list")
+  end
+end

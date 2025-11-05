@@ -1,0 +1,98 @@
+# cmdrun configuration for Rust projects
+# Optimized for Rust development with Cargo
+
+[config]
+shell = "bash"
+strict_mode = true
+timeout = 600
+working_dir = "."
+
+[config.env]
+RUST_BACKTRACE = "1"
+
+# Build commands
+[commands.build]
+description = "Build in debug mode"
+cmd = "cargo build"
+
+[commands.build-release]
+description = "Build in release mode"
+cmd = "cargo build --release"
+
+[commands.check]
+description = "Check code without building"
+cmd = "cargo check"
+
+# Testing commands
+[commands.test]
+description = "Run tests"
+cmd = "cargo test"
+
+[commands.test-verbose]
+description = "Run tests with verbose output"
+cmd = "cargo test -- --nocapture"
+
+[commands.test-doc]
+description = "Run documentation tests"
+cmd = "cargo test --doc"
+
+# Benchmarking
+[commands.bench]
+description = "Run benchmarks"
+cmd = "cargo bench"
+
+# Code quality
+[commands.clippy]
+description = "Run Clippy linter"
+cmd = "cargo clippy -- -D warnings"
+
+[commands.fmt]
+description = "Format code with rustfmt"
+cmd = "cargo fmt"
+
+[commands.fmt-check]
+description = "Check code formatting"
+cmd = "cargo fmt -- --check"
+
+# Documentation
+[commands.doc]
+description = "Generate documentation"
+cmd = "cargo doc --no-deps"
+
+[commands.doc-open]
+description = "Generate and open documentation"
+cmd = "cargo doc --no-deps --open"
+
+# Running
+[commands.run]
+description = "Run the binary"
+cmd = "cargo run"
+
+[commands.run-release]
+description = "Run in release mode"
+cmd = "cargo run --release"
+
+# Quality checks
+[commands.quality]
+description = "Run all quality checks"
+cmd = ["cargo fmt -- --check", "cargo clippy -- -D warnings", "cargo test"]
+
+# Clean
+[commands.clean]
+description = "Clean build artifacts"
+cmd = "cargo clean"
+
+# Aliases
+[aliases]
+b = "build"
+br = "build-release"
+t = "test"
+r = "run"
+rr = "run-release"
+c = "check"
+q = "quality"
+
+# Hooks
+[hooks]
+pre_run = "echo '🦀 Running Rust command...'"
+post_run = "echo '✓ Done!'"

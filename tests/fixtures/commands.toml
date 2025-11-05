@@ -1,0 +1,47 @@
+[config]
+shell = "bash"
+
+[commands.test]
+description = "Test command"
+cmd = "echo test"
+
+[commands.build]
+description = "Build"
+cmd = ["echo compiling", "echo done"]
+
+[commands.deploy]
+description = "Deploy"
+cmd = "echo deploying"
+deps = ["build"]
+
+[commands.hello]
+description = "Hello world"
+cmd = "echo 'Hello, World!'"
+
+[commands.multi]
+description = "Multiple commands"
+cmd = [
+    "echo first",
+    "echo second",
+    "echo third"
+]
+
+[commands.with-env]
+description = "Command with env"
+cmd = "echo $MESSAGE"
+env = { MESSAGE = "test message" }
+
+[commands.platform-unix]
+description = "Unix only command"
+cmd.unix = "echo unix"
+cmd.linux = "echo linux"
+cmd.macos = "echo macos"
+
+[commands.platform-windows]
+description = "Windows only command"
+cmd.windows = "echo windows"
+
+[commands.chain]
+description = "Command with dependencies"
+cmd = "echo chain"
+deps = ["hello", "test"]

@@ -3,12 +3,15 @@
 //! A modern replacement for package.json scripts and Makefiles.
 
 use anyhow::Result;
-use clap::{CommandFactory, Parser};
-use cmdrun::cli::{Cli, Commands};
+use clap::Parser;
+use cmdrun::cli::{Cli, Commands, GraphFormat};
+use cmdrun::command::dependency::DependencyGraph;
 use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
+use cmdrun::command::graph_visualizer::GraphVisualizer;
 use cmdrun::config::loader::ConfigLoader;
 use cmdrun::platform::shell::detect_shell;
 use colored::*;
+use std::fs;
 use std::process;
 
 #[tokio::main]
@@ -29,23 +32,62 @@ async fn main() {
 /// Main execution flow
 async fn run(cli: Cli) -> Result<()> {
     match cli.command {
-        Commands::Run { name, args } => {
-            run_command(&name, args).await?;
+        Commands::Run {
+            name,
+            args,
+            parallel,
+        } => {
+            run_command(&name, args, parallel).await?;
         }
         Commands::List { verbose } => {
             list_commands(verbose).await?;
         }
-        Commands::Init => {
-            init_config().await?;
+        Commands::Init {
+            template,
+            interactive,
+            output,
+        } => {
+            cmdrun::commands::handle_init(template, interactive, output).await?;
         }
-        Commands::Validate => {
-            validate_config().await?;
+        Commands::Validate {
+            path,
+            verbose,
+            check_cycles,
+        } => {
+            cmdrun::commands::handle_validate(path, verbose, check_cycles).await?;
         }
-        Commands::Graph { command } => {
-            show_dependency_graph(command).await?;
+        Commands::Graph { command, format, output, show_groups } => {
+            show_dependency_graph(command, format, output, show_groups).await?;
         }
         Commands::Completion { shell } => {
-            generate_completion(shell);
+            cmdrun::commands::handle_completion(shell);
+        }
+        Commands::Remove { id, force, config } => {
+            cmdrun::commands::handle_remove(id, force, config).await?;
+        }
+        Commands::Add {
+            id,
+            command,
+            description,
+            category,
+            tags,
+        } => {
+            cmdrun::commands::handle_add(id, command, description, category, tags).await?;
+        }
+        Commands::Open => {
+            cmdrun::commands::handle_open().await?;
+        }
+        Commands::Edit { id } => {
+            cmdrun::commands::handle_edit(id).await?;
+        }
+        Commands::Info { id } => {
+            cmdrun::commands::handle_info(id).await?;
+        }
+        Commands::Search { keyword } => {
+            cmdrun::commands::handle_search(keyword).await?;
+        }
+        Commands::CompletionList => {
+            list_completion().await?;
         }
     }
 
@@ -53,7 +95,7 @@ async fn run(cli: Cli) -> Result<()> {
 }
 
 /// Run a command
-async fn run_command(name: &str, _args: Vec<String>) -> Result<()> {
+async fn run_command(name: &str, _args: Vec<String>, parallel: bool) -> Result<()> {
     // Load configuration
     let config_loader = ConfigLoader::new();
     let config = config_loader.load().await?;
@@ -68,32 +110,95 @@ async fn run_command(name: &str, _args: Vec<String>) -> Result<()> {
     let ctx = ExecutionContext {
         working_dir: config.config.working_dir.clone(),
         env: config.config.env.clone(),
-        shell: detect_shell().unwrap_or_else(|_| config.config.shell.clone()),
+        shell: detect_shell()
+            .map(|s| s.name)
+            .unwrap_or_else(|_| config.config.shell.clone()),
         timeout: command.timeout.or(Some(config.config.timeout)),
         strict: config.config.strict_mode,
         echo: true,
         color: true,
     };
 
-    // Execute command
     let executor = CommandExecutor::new(ctx);
 
-    println!(
-        "{} {}",
-        "Running:".cyan().bold(),
-        command.description.bright_white()
-    );
-
-    let result = executor.execute(command).await?;
-
-    if result.success {
+    // 並列実行が指定されている場合、依存関係を解決して並列実行
+    if parallel || command.parallel {
         println!(
-            "{} Completed in {:.2}s",
+            "{} {} (with parallel dependencies)",
+            "Running:".cyan().bold(),
+            command.description.bright_white()
+        );
+
+        let start = std::time::Instant::now();
+
+        // 依存関係グラフを構築
+        let dep_graph = DependencyGraph::new(&config);
+
+        // 循環依存チェック
+        dep_graph.check_cycles()?;
+
+        // 実行グループを解決
+        let groups = dep_graph.resolve(name)?;
+
+        println!(
+            "{} Execution plan: {} groups",
+            "📋".bright_white(),
+            groups.len()
+        );
+
+        // 各グループを順次実行（グループ内は並列）
+        for (idx, group) in groups.iter().enumerate() {
+            println!(
+                "{} Group {}/{} ({} commands)",
+                "▶".blue().bold(),
+                idx + 1,
+                groups.len(),
+                group.commands.len()
+            );
+
+            // グループ内のコマンドを取得
+            let commands: Vec<_> = group
+                .commands
+                .iter()
+                .filter_map(|cmd_name| config.commands.get(*cmd_name))
+                .collect();
+
+            // 並列実行
+            let results = executor.execute_parallel(&commands).await?;
+
+            // 結果チェック
+            for result in results {
+                if !result.success {
+                    anyhow::bail!("Command failed with exit code {}", result.exit_code);
+                }
+            }
+        }
+
+        let total_duration = start.elapsed();
+        println!(
+            "{} All commands completed in {:.2}s",
             "✓".green().bold(),
-            result.duration.as_secs_f64()
+            total_duration.as_secs_f64()
         );
     } else {
-        anyhow::bail!("Command failed with exit code {}", result.exit_code);
+        // 逐次実行（従来の動作）
+        println!(
+            "{} {}",
+            "Running:".cyan().bold(),
+            command.description.bright_white()
+        );
+
+        let result = executor.execute(command).await?;
+
+        if result.success {
+            println!(
+                "{} Completed in {:.2}s",
+                "✓".green().bold(),
+                result.duration.as_secs_f64()
+            );
+        } else {
+            anyhow::bail!("Command failed with exit code {}", result.exit_code);
+        }
     }
 
     Ok(())
@@ -144,92 +249,68 @@ async fn list_commands(verbose: bool) -> Result<()> {
     Ok(())
 }
 
-/// Initialize configuration file
-async fn init_config() -> Result<()> {
-    let path = std::path::Path::new("commands.toml");
-
-    if path.exists() {
-        anyhow::bail!("Configuration file already exists: commands.toml");
-    }
-
-    let template = include_str!("../templates/commands.toml");
-    std::fs::write(path, template)?;
-
-    println!(
-        "{} Created {}",
-        "✓".green().bold(),
-        "commands.toml".bright_white()
-    );
-
-    Ok(())
-}
-
-/// Validate configuration
-async fn validate_config() -> Result<()> {
+/// List command names for shell completion
+async fn list_completion() -> Result<()> {
     let config_loader = ConfigLoader::new();
     let config = config_loader.load().await?;
 
-    println!("{}", "Validating configuration...".cyan());
-
-    // Validate each command
-    for (name, _cmd) in &config.commands {
-        println!("  {} {}", "✓".green(), name);
+    // Output command names one per line for shell completion
+    for name in config.commands.keys() {
+        println!("{}", name);
     }
-
-    println!();
-    println!(
-        "{} Configuration is valid ({} commands)",
-        "✓".green().bold(),
-        config.commands.len()
-    );
 
     Ok(())
 }
 
 /// Show dependency graph
-async fn show_dependency_graph(command: Option<String>) -> Result<()> {
+async fn show_dependency_graph(
+    command: Option<String>,
+    format: GraphFormat,
+    output_path: Option<std::path::PathBuf>,
+    show_groups: bool,
+) -> Result<()> {
     let config_loader = ConfigLoader::new();
     let config = config_loader.load().await?;
 
-    if let Some(cmd_name) = command {
-        // Show specific command dependencies
-        let cmd = config
-            .commands
-            .get(&cmd_name)
-            .ok_or_else(|| anyhow::anyhow!("Command not found: {}", cmd_name))?;
+    // グラフ視覚化
+    let visualizer = GraphVisualizer::new(&config);
+    let graph_output = visualizer.visualize(command.as_deref(), format, show_groups)?;
 
-        println!("{} {}", "Dependencies for:".cyan().bold(), cmd_name.green());
-        if cmd.deps.is_empty() {
-            println!("  {}", "No dependencies".dimmed());
-        } else {
-            for dep in &cmd.deps {
-                println!("  {} {}", "→".blue(), dep);
+    // 出力
+    if let Some(path) = output_path {
+        fs::write(&path, &graph_output)?;
+        println!(
+            "{} Graph saved to: {}",
+            "✓".green().bold(),
+            path.display().to_string().bright_white()
+        );
+
+        // ファイル形式のヒント
+        match format {
+            GraphFormat::Dot => {
+                println!(
+                    "{} Render with: {}",
+                    "💡".bright_white(),
+                    format!("dot -Tpng {} -o graph.png", path.display()).dimmed()
+                );
             }
+            GraphFormat::Mermaid => {
+                println!(
+                    "{} View at: {}",
+                    "💡".bright_white(),
+                    "https://mermaid.live".dimmed()
+                );
+            }
+            _ => {}
         }
     } else {
-        // Show all dependencies
-        println!("{}", "Dependency graph:".cyan().bold());
-        println!();
-
-        for (name, cmd) in &config.commands {
-            if !cmd.deps.is_empty() {
-                println!("{}", name.green().bold());
-                for dep in &cmd.deps {
-                    println!("  {} {}", "→".blue(), dep);
-                }
-                println!();
-            }
-        }
+        // 標準出力
+        print!("{}", graph_output);
     }
 
     Ok(())
 }
 
-/// Generate shell completion
-fn generate_completion(shell: clap_complete::Shell) {
-    let mut cmd = Cli::command();
-    clap_complete::generate(shell, &mut cmd, "cmdrun", &mut std::io::stdout());
-}
 
 /// Initialize logging
 fn init_logging(verbose: u8) {

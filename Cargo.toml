@@ -1,13 +1,13 @@
 [package]
 name = "cmdrun"
-version = "2.0.0"
+version = "1.0.0"
 edition = "2021"
 rust-version = "1.75"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Sanae Abe <sanae-abe@m3.com>"]
 license = "MIT OR Apache-2.0"
 description = "A fast, secure, and cross-platform command runner with TOML configuration"
-repository = "https://github.com/yourusername/cmdrun"
-homepage = "https://github.com/yourusername/cmdrun"
+repository = "ssh://git@rendezvous.m3.com:3789/sanae-abe/cmdrun.git"
+homepage = "ssh://git@rendezvous.m3.com:3789/sanae-abe/cmdrun"
 documentation = "https://docs.rs/cmdrun"
 readme = "README.md"
 keywords = ["cli", "command", "runner", "toml", "task"]
@@ -25,13 +25,25 @@ clap_complete = "4.5"
 
 # TOML パース（高速・エラー詳細）
 toml = { version = "0.8", features = ["preserve_order"] }
+toml_edit = "0.22"  # TOML編集（フォーマット保持）
 
-# 非同期ランタイム（高性能・生産性）
-tokio = { version = "1.39", features = ["full"] }
+# 非同期ランタイム（最適化済み・必要機能のみ）
+tokio = { version = "1.39", features = [
+    "macros",          # async/await マクロ
+    "rt-multi-thread", # マルチスレッドランタイム
+    "process",         # プロセス実行
+    "io-util",         # I/O ユーティリティ
+    "fs",              # ファイルシステム操作
+    "time",            # タイマー機能
+    "signal",          # シグナルハンドリング
+] }
 
 # エラーハンドリング（詳細なエラー情報）
 anyhow = "1.0"
 thiserror = "1.0"
+
+# 対話的入力（readline機能付き）
+dialoguer = "0.11"
 
 # シリアライゼーション
 serde = { version = "1.0", features = ["derive"] }
@@ -42,8 +54,7 @@ walkdir = "2.5"
 globset = "0.4"
 ignore = "0.4"  # .gitignore 対応
 
-# プロセス実行（クロスプラットフォーム）
-tokio-process = "0.2"
+# プロセス実行（クロスプラットフォーム） - tokio::process使用
 shell-words = "1.1"  # シェルコマンド解析
 
 # 環境変数・パス操作
@@ -52,7 +63,6 @@ shellexpand = "3.1"
 
 # カラー出力
 colored = "2.1"
-console = "0.15"
 
 # ロギング
 tracing = "0.1"
@@ -122,8 +132,25 @@ path = "src/main.rs"
 name = "cmdrun"
 path = "src/lib.rs"
 
+# Integration tests
+[[test]]
+name = "basic"
+path = "tests/integration/basic.rs"
+
+[[test]]
+name = "dependencies"
+path = "tests/integration/dependencies.rs"
+
+[[test]]
+name = "security_injection"
+path = "tests/security/injection.rs"
+
 # [[bench]]
-# name = "performance"
+# name = "command_execution"
+# harness = false
+
+# [[bench]]
+# name = "toml_parsing"
 # harness = false
 
 [features]

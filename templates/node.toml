@@ -1,0 +1,103 @@
+# cmdrun configuration for Node.js projects
+# Optimized for Node.js/npm development
+
+[config]
+shell = "bash"
+strict_mode = true
+timeout = 300
+working_dir = "."
+
+[config.env]
+NODE_ENV = "development"
+
+# Development commands
+[commands.dev]
+description = "Start development server"
+cmd = "npm run dev"
+
+[commands.start]
+description = "Start production server"
+cmd = "npm start"
+
+# Build commands
+[commands.build]
+description = "Build for production"
+cmd = "npm run build"
+
+[commands.clean]
+description = "Clean build artifacts"
+cmd = "rm -rf dist build"
+
+# Testing commands
+[commands.test]
+description = "Run tests"
+cmd = "npm test"
+
+[commands.test-watch]
+description = "Run tests in watch mode"
+cmd = "npm test -- --watch"
+
+[commands.test-coverage]
+description = "Run tests with coverage"
+cmd = "npm test -- --coverage"
+
+# Linting and formatting
+[commands.lint]
+description = "Run ESLint"
+cmd = "npm run lint"
+
+[commands.lint-fix]
+description = "Fix ESLint issues"
+cmd = "npm run lint -- --fix"
+
+[commands.format]
+description = "Format code with Prettier"
+cmd = "npm run format"
+
+# Type checking (TypeScript)
+[commands.type-check]
+description = "Check TypeScript types"
+cmd = "npm run type-check"
+
+# Dependencies
+[commands.install]
+description = "Install dependencies"
+cmd = "npm install"
+
+[commands.update]
+description = "Update dependencies"
+cmd = "npm update"
+
+[commands.audit]
+description = "Audit dependencies for vulnerabilities"
+cmd = "npm audit"
+
+[commands.audit-fix]
+description = "Fix dependency vulnerabilities"
+cmd = "npm audit fix"
+
+# Quality checks
+[commands.check]
+description = "Run all quality checks"
+cmd = ["npm run lint", "npm run type-check", "npm test"]
+
+# Production
+[commands.deploy]
+description = "Deploy to production"
+cmd = "npm run deploy"
+deps = ["check", "build"]
+confirm = true
+
+# Aliases
+[aliases]
+d = "dev"
+b = "build"
+t = "test"
+l = "lint"
+c = "check"
+i = "install"
+
+# Hooks
+[hooks]
+pre_run = "echo '📦 Running Node.js command...'"
+post_run = "echo '✓ Done!'"

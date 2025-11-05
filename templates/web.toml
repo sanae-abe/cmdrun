@@ -1,0 +1,77 @@
+# cmdrun configuration for Web projects
+# Optimized for HTML/CSS/JavaScript development
+
+[config]
+shell = "bash"
+strict_mode = true
+timeout = 300
+working_dir = "."
+
+[config.env]
+NODE_ENV = "development"
+
+# Development commands
+[commands.dev]
+description = "Start development server"
+cmd = "npm run dev"
+
+[commands.build]
+description = "Build for production"
+cmd = "npm run build"
+
+[commands.preview]
+description = "Preview production build"
+cmd = "npm run preview"
+deps = ["build"]
+
+# Testing commands
+[commands.test]
+description = "Run tests"
+cmd = "npm test"
+
+[commands.test-watch]
+description = "Run tests in watch mode"
+cmd = "npm test -- --watch"
+
+# Linting and formatting
+[commands.lint]
+description = "Run ESLint"
+cmd = "npm run lint"
+
+[commands.lint-fix]
+description = "Fix ESLint issues"
+cmd = "npm run lint -- --fix"
+
+[commands.format]
+description = "Format code with Prettier"
+cmd = "npm run format"
+
+# Type checking (TypeScript)
+[commands.type-check]
+description = "Check TypeScript types"
+cmd = "npm run type-check"
+
+# Quality checks
+[commands.check]
+description = "Run all quality checks"
+cmd = ["npm run lint", "npm run type-check", "npm test"]
+
+# Deployment
+[commands.deploy]
+description = "Deploy to production"
+cmd = "npm run deploy"
+deps = ["check", "build"]
+confirm = true
+
+# Aliases
+[aliases]
+d = "dev"
+b = "build"
+t = "test"
+l = "lint"
+c = "check"
+
+# Hooks
+[hooks]
+pre_run = "echo 'Starting task...'"
+post_run = "echo 'Task completed!'"

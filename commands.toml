@@ -1,0 +1,53 @@
+# Test commands for graph visualization
+
+[config]
+shell = "bash"
+working_dir = "."
+timeout = 60
+strict_mode = false
+
+# 複雑な依存関係グラフのテスト
+[commands.deploy]
+description = "Deploy to production"
+cmd = "echo 'Deploying...'"
+deps = ["build", "test"]
+
+[commands.build]
+description = "Build the project"
+cmd = "echo 'Building...'"
+deps = ["lint", "compile"]
+
+[commands.test]
+description = "Run all tests"
+cmd = "echo 'Testing...'"
+deps = ["unit-test", "integration-test"]
+
+[commands.lint]
+description = "Run linter"
+cmd = "echo 'Linting...'"
+deps = []
+
+[commands.compile]
+description = "Compile source code"
+cmd = "echo 'Compiling...'"
+deps = ["install"]
+
+[commands.unit-test]
+description = "Run unit tests"
+cmd = "echo 'Unit testing...'"
+deps = ["compile"]
+
+[commands.integration-test]
+description = "Run integration tests"
+cmd = "echo 'Integration testing...'"
+deps = ["compile"]
+
+[commands.install]
+description = "Install dependencies"
+cmd = "echo 'Installing...'"
+deps = []
+
+[commands.clean]
+description = "Clean build artifacts"
+cmd = "echo 'Cleaning...'"
+deps = []

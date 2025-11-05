@@ -1,0 +1,30 @@
+# 並列実行テスト用の設定ファイル
+
+[config]
+shell = "bash"
+strict_mode = true
+timeout = 10
+
+[commands.base]
+description = "Base command"
+cmd = "echo Base_Starting"
+
+[commands.task_a]
+description = "Task A (depends on base)"
+cmd = "echo Task_A_Complete"
+deps = ["base"]
+
+[commands.task_b]
+description = "Task B (depends on base)"
+cmd = "echo Task_B_Complete"
+deps = ["base"]
+
+[commands.task_c]
+description = "Task C (depends on task_a and task_b)"
+cmd = "echo Task_C_Complete"
+deps = ["task_a", "task_b"]
+
+[commands.final]
+description = "Final task (depends on task_c)"
+cmd = "echo Final_All_Tasks_Completed"
+deps = ["task_c"]
