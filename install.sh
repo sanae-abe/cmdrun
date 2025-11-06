@@ -7,8 +7,8 @@ set -euo pipefail
 
 # 設定
 readonly SCRIPT_NAME="backup-suite-installer"
-readonly GITLAB_URL="https://rendezvous.m3.com:3789"
-readonly PROJECT_PATH="sanae-abe/backup-suite"
+readonly GITHUB_URL="https://github.com"
+readonly PROJECT_PATH="sanae-abe/cmdrun"
 readonly BINARY_NAME="backup-suite"
 readonly INSTALL_DIR_SYSTEM="/usr/local/bin"
 readonly INSTALL_DIR_USER="$HOME/.local/bin"
@@ -100,7 +100,7 @@ detect_platform() {
 get_latest_version() {
     log_info "最新バージョンを取得中..."
 
-    local releases_url="${GITLAB_URL}/api/v4/projects/${PROJECT_PATH//\//%2F}/releases"
+    local releases_url="${GITHUB_URL}/${PROJECT_PATH}/releases/latest"
 
     if command -v jq &> /dev/null; then
         # jqを使用
@@ -122,7 +122,7 @@ get_latest_version() {
 # ダウンロードURL構築
 build_download_url() {
     readonly ARCHIVE_NAME="${BINARY_NAME}-${PLATFORM}.tar.gz"
-    readonly DOWNLOAD_URL="${GITLAB_URL}/${PROJECT_PATH}/-/releases/${LATEST_VERSION}/downloads/${ARCHIVE_NAME}"
+    readonly DOWNLOAD_URL="${GITHUB_URL}/${PROJECT_PATH}/releases/download/${LATEST_VERSION}/${ARCHIVE_NAME}"
     log_info "ダウンロードURL: $DOWNLOAD_URL"
 }
 
@@ -211,7 +211,7 @@ install_binary() {
     if ! cp "$BINARY_PATH" "$target_path"; then
         log_error "インストールに失敗しました"
         log_error "権限不足の可能性があります。sudoで再実行してください："
-        log_error "    curl -sSL https://rendezvous.m3.com:3789/sanae-abe/backup-suite/-/raw/main/install.sh | sudo bash"
+        log_error "    curl -sSL https://raw.githubusercontent.com/sanae-abe/cmdrun/main/install.sh | sudo bash"
         cleanup
         exit 1
     fi
@@ -269,13 +269,13 @@ Backup Suite インストールスクリプト
 
 例:
     # 自動インストール
-    curl -sSL https://rendezvous.m3.com:3789/sanae-abe/backup-suite/-/raw/main/install.sh | bash
+    curl -sSL https://raw.githubusercontent.com/sanae-abe/cmdrun/main/install.sh | bash
 
     # システム全体にインストール
-    curl -sSL https://rendezvous.m3.com:3789/sanae-abe/backup-suite/-/raw/main/install.sh | sudo bash
+    curl -sSL https://raw.githubusercontent.com/sanae-abe/cmdrun/main/install.sh | sudo bash
 
     # ユーザーディレクトリに強制インストール
-    curl -sSL https://rendezvous.m3.com:3789/sanae-abe/backup-suite/-/raw/main/install.sh | bash -s -- --user
+    curl -sSL https://raw.githubusercontent.com/sanae-abe/cmdrun/main/install.sh | bash -s -- --user
 
 対応プラットフォーム:
     - Linux (x86_64, aarch64)
@@ -351,7 +351,7 @@ main() {
     echo "2. 設定確認: $BINARY_NAME config show"
     echo "3. ヘルプ:   $BINARY_NAME --help"
     echo ""
-    echo "詳細ドキュメント: ${GITLAB_URL}/${PROJECT_PATH}/-/blob/main/INSTALL.md"
+    echo "詳細ドキュメント: ${GITHUB_URL}/${PROJECT_PATH}/blob/main/docs/user-guide/INSTALLATION.md"
 }
 
 # スクリプト実行

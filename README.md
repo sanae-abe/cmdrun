@@ -63,7 +63,7 @@ cargo --version
 
 ```bash
 # 1. リポジトリをクローン
-git clone ssh://git@rendezvous.m3.com:3789/sanae-abe/cmdrun.git
+git clone git@github.com:sanae-abe/cmdrun.git
 cd cmdrun
 
 # 2. ビルド&インストール
