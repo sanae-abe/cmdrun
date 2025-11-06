@@ -451,5 +451,9 @@ cmd.linux = "xdg-open http://localhost:3000"
 - [クロスプラットフォームサポート](docs/technical/CROSS_PLATFORM.md)
 - [配布](docs/technical/DISTRIBUTION.md)
 
+## ライセンス
+
+このプロジェクトは[MIT License](LICENSE)の下でライセンスされています。
+
 ---
 **開発者**: sanae-abe@m3.com
