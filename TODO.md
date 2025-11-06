@@ -18,40 +18,48 @@
 
 #### 実装方法
 
-GitLab CI/CDパイプラインでクロスコンパイル:
+GitHub Actionsでクロスコンパイル:
 
 ```yaml
-# .gitlab-ci.yml に追加
-build:linux:
-  stage: build
-  image: rust:latest
-  script:
-    - rustup target add x86_64-unknown-linux-gnu
-    - cargo build --release --target x86_64-unknown-linux-gnu
-    - tar czf cmdrun-linux-x86_64.tar.gz -C target/x86_64-unknown-linux-gnu/release cmdrun
-
-build:windows:
-  stage: build
-  image: rust:latest
-  script:
-    - apt-get update && apt-get install -y mingw-w64
-    - rustup target add x86_64-pc-windows-gnu
-    - cargo build --release --target x86_64-pc-windows-gnu
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    tags:
+      - 'v*'
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: cargo build --release --target ${{ matrix.target }}
 ```
 
 #### 参考リソース
 
 - [cross](https://github.com/cross-rs/cross) - Rustクロスコンパイルツール
 - [cargo-zigbuild](https://github.com/rust-cross/cargo-zigbuild) - Zig使用のクロスコンパイル
-- [GitLab CI/CD Multi-platform builds](https://docs.gitlab.com/ee/ci/yaml/)
+- [GitHub Actions for Rust](https://github.com/actions-rs)
 
 #### 関連タスク
 
-- [ ] GitLab CI/CDパイプライン設定
+- [ ] GitHub Actionsワークフロー設定
 - [ ] クロスコンパイル環境の構築・テスト
 - [ ] 各プラットフォームでの動作確認
 - [ ] README更新（全プラットフォームのインストール手順追加）
-- [ ] GitLab Releasesへの自動アップロード
+- [ ] GitHub Releasesへの自動アップロード
 
 ---
 
