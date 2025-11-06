@@ -4,62 +4,21 @@
 
 ## 優先度: 高
 
-### マルチプラットフォームバイナリ対応
+### crates.io / Homebrew公開
 
-**状態**: 未実施
-**現状**: ビルド済みバイナリはmacOSのみ対応
+**状態**: 準備完了、公開待ち
 
-#### 対応が必要なプラットフォーム
+#### 公開前の最終確認
 
-- [ ] Linux (x86_64-unknown-linux-gnu)
-- [ ] Linux (x86_64-unknown-linux-musl) - Alpine Linux等
-- [ ] Windows (x86_64-pc-windows-msvc)
-- [ ] Windows (aarch64-pc-windows-msvc) - ARM64
-
-#### 実装方法
-
-GitHub Actionsでクロスコンパイル:
-
-```yaml
-# .github/workflows/release.yml
-name: Release
-on:
-  push:
-    tags:
-      - 'v*'
-jobs:
-  build:
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.target }}
-      - run: cargo build --release --target ${{ matrix.target }}
-```
-
-#### 参考リソース
-
-- [cross](https://github.com/cross-rs/cross) - Rustクロスコンパイルツール
-- [cargo-zigbuild](https://github.com/rust-cross/cargo-zigbuild) - Zig使用のクロスコンパイル
-- [GitHub Actions for Rust](https://github.com/actions-rs)
-
-#### 関連タスク
-
-- [ ] GitHub Actionsワークフロー設定
-- [ ] クロスコンパイル環境の構築・テスト
-- [ ] 各プラットフォームでの動作確認
-- [ ] README更新（全プラットフォームのインストール手順追加）
-- [ ] GitHub Releasesへの自動アップロード
+- [x] GitHub Actionsワークフロー設定完了
+- [x] マルチプラットフォームビルド対応
+- [x] Homebrew Formula作成
+- [x] PUBLISHING.mdドキュメント作成
+- [x] ライセンス互換性確認完了
+- [x] Windows CI テスト修正完了
+- [ ] crates.ioアカウント作成とCARGO_TOKEN設定
+- [ ] 初回タグプッシュとリリース実行
+- [ ] Homebrew tap リポジトリ作成（オプション）
 
 ---
 
@@ -92,8 +51,11 @@ jobs:
 ## ✅ 完了済み項目
 
 - [x] **統合テスト実装**: `tests/integration/`に実装済み
-- [x] **CI/CDでのテスト自動実行**: `.gitlab-ci.yml`で実装済み
+- [x] **CI/CDでのテスト自動実行**: GitHub Actionsで実装済み
 - [x] **コントリビューションガイド**: `CONTRIBUTING.md`作成済み
 - [x] **基本的なドキュメント**: README、ユーザーガイド、技術ドキュメント整備済み
 - [x] **セキュリティ検証**: 精密なコマンド検証実装済み
 - [x] **v1.0.0リリース**: 初回安定版リリース完了
+- [x] **GitHubリポジトリ移行**: GitLabからGitHubへ移行完了
+- [x] **マルチプラットフォームビルド**: Linux/macOS/Windows対応完了
+- [x] **依存ライブラリライセンス確認**: MIT互換性確認済み
