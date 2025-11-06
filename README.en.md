@@ -442,4 +442,4 @@ cmd.linux = "xdg-open http://localhost:3000"
 This project is licensed under the [MIT License](LICENSE).
 
 ---
-**Developer**: sanae-abe@m3.com
+**Developer**: sanae.a.sunny@gmail.com

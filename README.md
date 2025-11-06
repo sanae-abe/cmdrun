@@ -429,4 +429,4 @@ cmd.linux = "xdg-open http://localhost:3000"
 このプロジェクトは[MIT License](LICENSE)の下でライセンスされています。
 
 ---
-**開発者**: sanae-abe@m3.com
+**開発者**: sanae.a.sunny@gmail.com
