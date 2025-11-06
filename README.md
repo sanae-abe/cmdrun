@@ -30,7 +30,6 @@
 
 ### 🌍 クロスプラットフォーム
 - **対応OS**: Linux、macOS、Windows、FreeBSD
-- **ビルド済みバイナリ**: 現在macOSのみ（他のOSはソースからビルド）
 - **シェル検出**: bash/zsh/fish/pwshを自動検出
 - **ネイティブバイナリ**: ランタイム依存なし
 
@@ -40,32 +39,6 @@
 - **優れたエラー表示** - コンテキスト付き詳細エラーメッセージ
 
 ## インストール
-
-### 方法1: ビルド済みバイナリ
-
-最も簡単で高速な方法です。Rustのインストール不要。
-
-**現在の対応状況**: macOSのみ（Linux/Windows/FreeBSDは準備中）
-
-#### macOS (Intel/Apple Silicon) ✅
-
-```bash
-# 1. バイナリをダウンロード
-curl -LO "https://rendezvous.m3.com/api/v4/projects/sanae-abe%2Fcmdrun/packages/generic/cmdrun/1.0.0/cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz"
-
-# 2. 解凍
-tar -xzf cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz
-
-# 3. バイナリを適切な場所に移動
-sudo mv cmdrun /usr/local/bin/
-
-# 4. 動作確認
-cmdrun --version
-```
-
-または、[リリースページ](https://rendezvous.m3.com/sanae-abe/cmdrun/-/releases/v1.0.0)から直接ダウンロード。
-
-### 方法2: ソースからビルド
 
 #### システム要件
 

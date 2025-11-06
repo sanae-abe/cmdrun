@@ -30,7 +30,6 @@
 
 ### 🌍 Cross-platform
 - **Supported OS**: Linux, macOS, Windows, FreeBSD
-- **Pre-built binaries**: Currently macOS only (other OS: build from source)
 - **Shell detection**: Auto-detects bash/zsh/fish/pwsh
 - **Native binaries**: No runtime dependencies
 
@@ -40,32 +39,6 @@
 - **Great errors** - Detailed error messages with context
 
 ## Installation
-
-### Option 1: Pre-built Binary
-
-The easiest and fastest way. No Rust installation required.
-
-**Current availability**: macOS only (Linux/Windows/FreeBSD coming soon)
-
-#### macOS (Intel/Apple Silicon) ✅
-
-```bash
-# 1. Download the binary
-curl -LO "https://rendezvous.m3.com/api/v4/projects/sanae-abe%2Fcmdrun/packages/generic/cmdrun/1.0.0/cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz"
-
-# 2. Extract
-tar -xzf cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz
-
-# 3. Move to appropriate location
-sudo mv cmdrun /usr/local/bin/
-
-# 4. Verify installation
-cmdrun --version
-```
-
-Or download directly from the [releases page](https://rendezvous.m3.com/sanae-abe/cmdrun/-/releases/v1.0.0).
-
-### Option 2: Build from Source
 
 #### System Requirements
 
