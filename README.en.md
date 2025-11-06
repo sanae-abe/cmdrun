@@ -14,6 +14,7 @@
 - [Features](#features)
 - [Configuration Examples](#configuration-examples)
 - [Documentation](#documentation)
+- [License](#license)
 
 ## Why cmdrun?
 
