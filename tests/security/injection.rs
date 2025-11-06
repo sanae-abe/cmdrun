@@ -321,9 +321,15 @@ mod integration_tests {
         };
         let executor = CommandExecutor::new(ctx);
 
+        // プラットフォーム別のパイプコマンド
+        #[cfg(windows)]
+        let pipe_command = "echo hello | findstr hello";
+        #[cfg(not(windows))]
+        let pipe_command = "echo hello | cat";
+
         let pipe_cmd = Command {
             description: "pipe test".to_string(),
-            cmd: CommandSpec::Single("echo hello | cat".to_string()),
+            cmd: CommandSpec::Single(pipe_command.to_string()),
             env: AHashMap::new(),
             working_dir: None,
             deps: vec![],
