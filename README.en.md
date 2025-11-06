@@ -29,7 +29,8 @@
 - **Dependency audit** - Built-in security scanning
 
 ### 🌍 Cross-platform
-- **Works everywhere**: Linux, macOS, Windows, FreeBSD
+- **Supported OS**: Linux, macOS, Windows, FreeBSD
+- **Pre-built binaries**: Currently macOS only (other OS: build from source)
 - **Shell detection**: Auto-detects bash/zsh/fish/pwsh
 - **Native binaries**: No runtime dependencies
 
@@ -40,11 +41,13 @@
 
 ## Installation
 
-### Option 1: Pre-built Binary (Recommended)
+### Option 1: Pre-built Binary
 
 The easiest and fastest way. No Rust installation required.
 
-#### macOS (Intel/Apple Silicon)
+**Current availability**: macOS only (Linux/Windows/FreeBSD coming soon)
+
+#### macOS (Intel/Apple Silicon) ✅
 
 ```bash
 # 1. Download the binary

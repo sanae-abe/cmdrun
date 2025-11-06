@@ -29,7 +29,8 @@
 - **依存関係監査** - ビルトインセキュリティスキャン
 
 ### 🌍 クロスプラットフォーム
-- **あらゆる環境で動作**: Linux、macOS、Windows、FreeBSD
+- **対応OS**: Linux、macOS、Windows、FreeBSD
+- **ビルド済みバイナリ**: 現在macOSのみ（他のOSはソースからビルド）
 - **シェル検出**: bash/zsh/fish/pwshを自動検出
 - **ネイティブバイナリ**: ランタイム依存なし
 
@@ -40,11 +41,13 @@
 
 ## インストール
 
-### 方法1: ビルド済みバイナリ（推奨）
+### 方法1: ビルド済みバイナリ
 
 最も簡単で高速な方法です。Rustのインストール不要。
 
-#### macOS (Intel/Apple Silicon)
+**現在の対応状況**: macOSのみ（Linux/Windows/FreeBSDは準備中）
+
+#### macOS (Intel/Apple Silicon) ✅
 
 ```bash
 # 1. バイナリをダウンロード
