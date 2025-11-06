@@ -85,30 +85,34 @@ impl CommandValidator {
 
     /// 危険なパターン（正規表現）
     const DANGEROUS_PATTERNS: &'static [&'static str] = &[
-        r"\$\(.*\)",           // コマンド置換: $(...)
-        r"`.*`",               // コマンド置換: `...`
-        r"\$\{.*\}",           // 変数展開: ${...}（一部許可の場合もある）
-        r"[;&|]",              // コマンド連結
-        r">>\s*\/dev\/",       // デバイスファイル書き込み
-        r"[<>]\s*\/etc\/",     // システムファイル操作
-        r"\|\s*sh",            // シェルへのパイプ
-        r"\|\s*bash",          // bashへのパイプ
-        r"eval\s+",            // evalコマンド
-        r"exec\s+",            // execコマンド
-        r"^sh\s+-c\s+",        // sh -c 実行
-        r"\s+sh\s+-c\s+",      // sh -c 実行（スペース後）
-        r"chmod\s+[0-7]{3,4}", // chmod権限変更
-        r"chown\s+",           // chown所有者変更
-        r"sudo\s+",            // sudo実行
-        r"su\s+",              // suユーザー切り替え
+        r"\$\(.*\)",              // コマンド置換: $(...)
+        r"`.*`",                  // コマンド置換: `...`
+        r"\$\{.*\}",              // 変数展開: ${...}（一部許可の場合もある）
+        r"[;&|]",                 // コマンド連結
+        r">>\s*\/dev\/",          // デバイスファイル書き込み
+        r"[<>]\s*\/etc\/",        // システムファイル操作
+        r"\|\s*sh",               // シェルへのパイプ
+        r"\|\s*bash",             // bashへのパイプ
+        r"eval\s+",               // evalコマンド
+        r"exec\s+",               // execコマンド
+        r"^sh\s+-c\s+",           // sh -c 実行
+        r"\s+sh\s+-c\s+",         // sh -c 実行（スペース後）
+        r"chmod\s+[0-7]{3,4}",    // chmod権限変更
+        r"chown\s+",              // chown所有者変更
+        r"sudo\s+",               // sudo実行
+        r"su\s+",                 // suユーザー切り替え
+        r"mkfs\.\w+",             // ディスクフォーマット: mkfs.ext4等
+        r"mkfs\s+/dev/",          // ディスクフォーマット: mkfs /dev/sda等
+        r"^format\s+[a-zA-Z]:",   // Windowsディスクフォーマット: format c:等
+        r"\s+format\s+[a-zA-Z]:", // Windowsディスクフォーマット（スペース後）
     ];
 
     /// デフォルトの禁止ワード
     const DEFAULT_FORBIDDEN_WORDS: &'static [&'static str] = &[
         "rm -rf /",
         "dd if=",
-        "mkfs",
-        "format",
+        "mkfs.",       // mkfs.ext4等のディスクフォーマットコマンド
+        "mkfs ",       // mkfs /dev/sdaのようなコマンド
         ":(){:|:&};:", // フォークボム
     ];
 
