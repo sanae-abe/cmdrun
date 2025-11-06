@@ -40,12 +40,36 @@
 
 ## Installation
 
-### System Requirements
+### Option 1: Pre-built Binary (Recommended)
+
+The easiest and fastest way. No Rust installation required.
+
+#### macOS (Intel/Apple Silicon)
+
+```bash
+# 1. Download the binary
+curl -LO "https://rendezvous.m3.com/api/v4/projects/sanae-abe%2Fcmdrun/packages/generic/cmdrun/1.0.0/cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz"
+
+# 2. Extract
+tar -xzf cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz
+
+# 3. Move to appropriate location
+sudo mv cmdrun /usr/local/bin/
+
+# 4. Verify installation
+cmdrun --version
+```
+
+Or download directly from the [releases page](https://rendezvous.m3.com/sanae-abe/cmdrun/-/releases/v1.0.0).
+
+### Option 2: Build from Source
+
+#### System Requirements
 
 - **Operating System**: Linux, macOS, Windows, FreeBSD
-- **For building from source**: Rust 1.70+ (MSRV)
+- **Rust**: 1.70+ (MSRV)
 
-### Install Rust Toolchain (if not already installed)
+#### Install Rust Toolchain
 
 ```bash
 # 1. Download and run Rustup (Rust installer)
@@ -54,21 +78,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # 2. Load environment variables
 source ~/.cargo/env
 
-# Or open a new terminal, or run:
-# For bash
-source ~/.bashrc
-
-# For zsh (macOS default)
-source ~/.zshrc
-
 # 3. Verify installation
 rustc --version
 cargo --version
 ```
 
-### Install cmdrun
-
-**Option 1: From Source (Recommended for Development)**
+#### Build and Install cmdrun
 
 ```bash
 # 1. Clone the repository
@@ -81,12 +96,6 @@ cargo install --path .
 # 3. Verify installation
 cmdrun --version
 cmdrun --help
-```
-
-**Option 2: From crates.io**
-
-```bash
-cargo install cmdrun
 ```
 
 ### Update

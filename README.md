@@ -40,12 +40,36 @@
 
 ## インストール
 
-### システム要件
+### 方法1: ビルド済みバイナリ（推奨）
+
+最も簡単で高速な方法です。Rustのインストール不要。
+
+#### macOS (Intel/Apple Silicon)
+
+```bash
+# 1. バイナリをダウンロード
+curl -LO "https://rendezvous.m3.com/api/v4/projects/sanae-abe%2Fcmdrun/packages/generic/cmdrun/1.0.0/cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz"
+
+# 2. 解凍
+tar -xzf cmdrun-v1.0.0-x86_64-apple-darwin.tar.gz
+
+# 3. バイナリを適切な場所に移動
+sudo mv cmdrun /usr/local/bin/
+
+# 4. 動作確認
+cmdrun --version
+```
+
+または、[リリースページ](https://rendezvous.m3.com/sanae-abe/cmdrun/-/releases/v1.0.0)から直接ダウンロード。
+
+### 方法2: ソースからビルド
+
+#### システム要件
 
 - **オペレーティングシステム**: Linux、macOS、Windows、FreeBSD
-- **ソースからのビルド用**: Rust 1.70以上（MSRV）
+- **Rust**: 1.70以上（MSRV）
 
-### Rustツールチェーンのインストール
+#### Rustツールチェーンのインストール
 
 ```bash
 # 1. Rustup（Rustインストーラー）をダウンロード・実行
@@ -54,19 +78,12 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 # 2. 環境変数を読み込み
 source ~/.cargo/env
 
-# 新しいターミナルを開くか、以下を実行
-# bash使用時
-source ~/.bashrc
-
-# zsh使用時（macOS標準）
-source ~/.zshrc
-
 # 3. インストール確認
 rustc --version
 cargo --version
 ```
 
-### cmdrunのインストール
+#### cmdrunのビルド&インストール
 
 ```bash
 # 1. リポジトリをクローン
