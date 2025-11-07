@@ -89,6 +89,14 @@ secrecy = "0.8"  # 機密情報保護
 ahash = { version = "0.8", features = ["serde"] }  # 高速ハッシュマップ
 smallvec = "1.13"  # スタック最適化ベクター
 
+# 履歴管理（SQLite）
+rusqlite = { version = "0.31", features = ["bundled"] }  # SQLite データベース
+
+# プラグインシステム
+libloading = { version = "0.8", optional = true }  # 動的ライブラリロード
+abi_stable = { version = "0.11", optional = true }  # ABI安定性保証
+uuid = { version = "1.10", features = ["v4", "serde"], optional = true }  # プラグインID生成
+
 [dev-dependencies]
 # テスト
 proptest = "1.5"  # プロパティベーステスト
@@ -150,16 +158,24 @@ name = "watch"
 path = "tests/integration/watch.rs"
 
 [[test]]
+name = "environment"
+path = "tests/integration/environment.rs"
+
+[[test]]
+name = "history"
+path = "tests/integration/history.rs"
+
+[[test]]
 name = "security_injection"
 path = "tests/security/injection.rs"
 
-# [[bench]]
-# name = "command_execution"
-# harness = false
+[[bench]]
+name = "command_execution"
+harness = false
 
-# [[bench]]
-# name = "toml_parsing"
-# harness = false
+[[bench]]
+name = "toml_parsing"
+harness = false
 
 [features]
 # デフォルト機能
@@ -169,6 +185,8 @@ default = ["color", "json-output"]
 color = []
 json-output = ["serde_json"]
 trace = ["tracing/max_level_trace"]
+plugin-system = ["libloading", "uuid"]  # プラグインシステム有効化
+plugin-abi-stable = ["plugin-system", "abi_stable"]  # ABI安定性保証
 
 # 実験的機能
 experimental = []

@@ -24,6 +24,10 @@ pub struct CommandsConfig {
     /// フック定義
     #[serde(default)]
     pub hooks: Hooks,
+
+    /// プラグイン設定
+    #[serde(default)]
+    pub plugins: PluginsConfig,
 }
 
 impl Default for CommandsConfig {
@@ -33,6 +37,7 @@ impl Default for CommandsConfig {
             commands: AHashMap::new(),
             aliases: AHashMap::new(),
             hooks: Hooks::default(),
+            plugins: PluginsConfig::default(),
         }
     }
 }
@@ -201,6 +206,18 @@ pub struct CommandHooks {
 
     #[serde(default)]
     pub post_run: Option<String>,
+}
+
+/// プラグイン設定
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+pub struct PluginsConfig {
+    /// 有効なプラグイン一覧
+    #[serde(default)]
+    pub enabled: Vec<String>,
+
+    /// プラグイン別設定
+    #[serde(flatten)]
+    pub plugins: AHashMap<String, crate::plugin::PluginConfig>,
 }
 
 // ===================================================================

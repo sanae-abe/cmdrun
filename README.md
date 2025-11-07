@@ -259,6 +259,106 @@ cmd = "npm run dev"
 env = { PORT = "3000" }  # コマンド固有の環境変数
 ```
 
+### 環境管理
+
+開発・ステージング・本番など異なる環境を簡単に切り替えることができます。
+
+```bash
+# 環境を作成
+cmdrun env create dev --description "Development environment"
+cmdrun env create prod --description "Production environment"
+
+# 環境を切り替え
+cmdrun env use dev
+cmdrun run start  # 開発環境の設定で起動
+
+cmdrun env use prod
+cmdrun run deploy  # 本番環境の設定でデプロイ
+
+# 環境変数を設定
+cmdrun env set API_URL https://api.staging.com --env staging
+```
+
+詳細は[環境管理ガイド](docs/ENVIRONMENT_MANAGEMENT.md)を参照してください。
+
+### 履歴・ログ機能
+
+コマンド実行履歴の記録・検索・再実行が可能です。
+
+```bash
+# 履歴を表示
+cmdrun history list
+
+# コマンドを検索
+cmdrun history search build
+
+# 統計情報を表示
+cmdrun history stats
+
+# 最後に失敗したコマンドを再実行
+cmdrun retry
+
+# 履歴をエクスポート
+cmdrun history export --format json -o history.json
+```
+
+詳細は[履歴機能ガイド](docs/user-guide/HISTORY.md)を参照してください。
+
+### テンプレート機能
+
+プロジェクトテンプレートの使用・作成・共有ができます。
+
+```bash
+# 利用可能なテンプレートを表示
+cmdrun template list
+
+# テンプレートを使用
+cmdrun template use rust-cli
+
+# カスタムテンプレートを作成
+cmdrun template add my-template
+
+# テンプレートをエクスポート
+cmdrun template export rust-cli ./my-template.toml
+```
+
+**ビルトインテンプレート:**
+- `rust-cli` - Rust CLI開発（cargo build/test/clippy/fmt）
+- `nodejs-web` - Node.js Web開発（npm dev/build/test）
+- `python-data` - Python データサイエンス（pytest/jupyter）
+- `react-app` - React アプリケーション（dev/build/storybook）
+
+詳細は[テンプレート機能レポート](TEMPLATE_FEATURE_REPORT.md)を参照してください。
+
+### プラグインシステム
+
+外部プラグインによる機能拡張が可能です。
+
+```toml
+# commands.toml
+[plugins]
+enabled = ["hello", "logger"]
+
+[plugins.logger]
+path = "plugins/logger_plugin.so"
+log_file = "cmdrun.log"
+level = "info"
+```
+
+```bash
+# プラグインを一覧表示
+cmdrun plugin list
+
+# プラグインの詳細を表示
+cmdrun plugin info logger
+
+# プラグインを有効化/無効化
+cmdrun plugin enable logger
+cmdrun plugin disable logger
+```
+
+詳細は[プラグインシステムレポート](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)および[プラグインAPI](docs/plugins/API.md)を参照してください。
+
 ### Watch Mode - ファイル監視
 
 ```toml
@@ -417,9 +517,25 @@ cmd.linux = "xdg-open http://localhost:3000"
 - [設定リファレンス](docs/user-guide/CONFIGURATION.md)
 - [国際化（i18n）](docs/user-guide/I18N.md)
 - [Watch Mode](docs/user-guide/WATCH_MODE.md)
+- [履歴機能](docs/user-guide/HISTORY.md)
+- [FAQ](docs/user-guide/FAQ.md)
+- [レシピ集](docs/user-guide/RECIPES.md)
+- [トラブルシューティング](docs/user-guide/TROUBLESHOOTING.md)
+
+### 機能ガイド
+- [環境管理](docs/ENVIRONMENT_MANAGEMENT.md)
+- [テンプレート機能](TEMPLATE_FEATURE_REPORT.md)
+- [プラグインシステム](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)
+
+### プラグイン開発
+- [プラグインAPI仕様](docs/plugins/API.md)
+- [プラグイン開発ガイド](docs/plugins/DEVELOPMENT_GUIDE.md)
+- [サンプルプラグイン](examples/plugins/README.md)
 
 ### 技術ドキュメント
+- [アーキテクチャ](docs/technical/ARCHITECTURE.md)
 - [パフォーマンス](docs/technical/PERFORMANCE.md)
+- [パフォーマンスガイド](docs/technical/PERFORMANCE_GUIDE.md)
 - [セキュリティ](docs/technical/SECURITY.md)
 - [クロスプラットフォームサポート](docs/technical/CROSS_PLATFORM.md)
 - [配布](docs/technical/DISTRIBUTION.md)

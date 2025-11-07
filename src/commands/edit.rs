@@ -65,8 +65,20 @@ pub async fn handle_edit(command_id: Option<String>, config_path: Option<PathBuf
             .bold(),
         command.tags
     );
-    println!("  {} {}", "Parallel:".white().bold(), command.parallel);
-    println!("  {} {}", "Confirm:".white().bold(), command.confirm);
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::EditParallelExecution, lang))
+            .white()
+            .bold(),
+        command.parallel
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::EditConfirmBeforeExecution, lang))
+            .white()
+            .bold(),
+        command.confirm
+    );
     println!();
 
     // Interactive editing
@@ -82,8 +94,14 @@ pub async fn handle_edit(command_id: Option<String>, config_path: Option<PathBuf
         get_message(MessageKey::PromptTags, lang),
         &command.tags.join(","),
     )?;
-    let new_parallel = prompt_bool("Parallel execution", command.parallel)?;
-    let new_confirm = prompt_bool("Confirm before execution", command.confirm)?;
+    let new_parallel = prompt_bool(
+        get_message(MessageKey::EditParallelExecution, lang),
+        command.parallel,
+    )?;
+    let new_confirm = prompt_bool(
+        get_message(MessageKey::EditConfirmBeforeExecution, lang),
+        command.confirm,
+    )?;
 
     // Create updated command
     let updated_command = Command {

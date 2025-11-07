@@ -1,0 +1,53 @@
+[package]
+name = "cmdrun-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+ahash = { version = "0.8", features = ["serde"] }
+toml = { version = "0.8", features = ["preserve_order"] }
+toml_edit = "0.22"
+shell-words = "1.1"
+shellexpand = "3.1"
+regex = "1.10"
+globset = "0.4"
+
+[dependencies.cmdrun]
+path = ".."
+
+# Fuzz target 1: Variable interpolation (HIGH PRIORITY - Shell injection)
+[[bin]]
+name = "fuzz_interpolation"
+path = "fuzz_targets/fuzz_interpolation.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target 2: Input validation (HIGH PRIORITY - Command injection)
+[[bin]]
+name = "fuzz_validation"
+path = "fuzz_targets/fuzz_validation.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target 3: TOML config parsing (MEDIUM PRIORITY)
+[[bin]]
+name = "fuzz_toml_config"
+path = "fuzz_targets/fuzz_toml_config.rs"
+test = false
+doc = false
+bench = false
+
+# Fuzz target 4: Command parsing components (MEDIUM PRIORITY)
+[[bin]]
+name = "fuzz_command_parts"
+path = "fuzz_targets/fuzz_command_parts.rs"
+test = false
+doc = false
+bench = false

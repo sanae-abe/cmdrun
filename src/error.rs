@@ -20,6 +20,14 @@ pub enum CmdrunError {
     #[error("Variable interpolation error: {0}")]
     Interpolation(#[from] InterpolationError),
 
+    /// プラグイン関連エラー
+    #[error("Plugin error in '{plugin}': {message}")]
+    PluginError { plugin: String, message: String },
+
+    /// プラグインロードエラー
+    #[error("Failed to load plugin: {0}")]
+    PluginLoad(String),
+
     /// IO エラー
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),

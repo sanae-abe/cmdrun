@@ -2,6 +2,7 @@
 
 use crate::config::loader::ConfigLoader;
 use crate::config::schema::{CommandSpec, CommandsConfig};
+use crate::i18n::{get_message, MessageKey};
 use anyhow::Result;
 use colored::*;
 use std::io::{self, Write};
@@ -15,31 +16,49 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
         ConfigLoader::new()
     };
     let config = config_loader.load().await?;
+    let lang = config.config.language;
 
     // Get command ID (from argument or interactive selection)
     let id = if let Some(id) = command_id {
         id
     } else {
-        select_command_interactive(&config)?
+        select_command_interactive(&config, lang)?
     };
 
     // Find command
     let command = config
         .commands
         .get(&id)
-        .ok_or_else(|| anyhow::anyhow!("Command '{}' not found", id))?;
+        .ok_or_else(|| anyhow::anyhow!("{}", get_message(MessageKey::ErrorCommandNotFound, lang)))?;
 
     // Display detailed information
-    println!("{} {}", "Command details:".cyan().bold(), id.white().bold());
+    println!(
+        "{} {}",
+        get_message(MessageKey::LabelCommandDetails, lang)
+            .cyan()
+            .bold(),
+        id.white().bold()
+    );
     println!("{}", "━".repeat(50).cyan());
     println!();
 
     // Basic information
-    println!("{} {}", "Description:".white().bold(), command.description);
+    println!(
+        "{} {}",
+        format!("{}:", get_message(MessageKey::LabelDescription, lang))
+            .white()
+            .bold(),
+        command.description
+    );
     println!();
 
     // Command specification
-    println!("{}", "Command:".white().bold());
+    println!(
+        "{}",
+        format!("{}:", get_message(MessageKey::LabelCommand, lang))
+            .white()
+            .bold()
+    );
     match &command.cmd {
         CommandSpec::Single(cmd) => {
             println!("  {}", cmd.bright_white());
@@ -68,7 +87,12 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
 
     // Dependencies
     if !command.deps.is_empty() {
-        println!("{}", "Dependencies:".white().bold());
+        println!(
+            "{}",
+            format!("{}:", get_message(MessageKey::LabelDependencies, lang))
+                .white()
+                .bold()
+        );
         for dep in &command.deps {
             println!("  {} {}", "→".blue(), dep.bright_white());
         }
@@ -77,7 +101,13 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
 
     // Tags
     if !command.tags.is_empty() {
-        println!("{} {}", "Tags:".white().bold(), command.tags.join(", "));
+        println!(
+            "{} {}",
+            format!("{}:", get_message(MessageKey::LabelTags, lang))
+                .white()
+                .bold(),
+            command.tags.join(", ")
+        );
         println!();
     }
 
@@ -85,7 +115,9 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
     if let Some(working_dir) = &command.working_dir {
         println!(
             "{} {}",
-            "Working directory:".white().bold(),
+            format!("{}:", get_message(MessageKey::LabelWorkingDirectory, lang))
+                .white()
+                .bold(),
             working_dir.display()
         );
         println!();
@@ -93,7 +125,12 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
 
     // Environment variables
     if !command.env.is_empty() {
-        println!("{}", "Environment variables:".white().bold());
+        println!(
+            "{}",
+            format!("{}:", get_message(MessageKey::LabelEnvironmentVariables, lang))
+                .white()
+                .bold()
+        );
         for (key, value) in &command.env {
             println!("  {} = {}", key.yellow(), value.bright_white());
         }
@@ -101,15 +138,28 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
     }
 
     // Execution settings
-    println!("{}", "Execution settings:".white().bold());
+    println!(
+        "{}",
+        format!("{}:", get_message(MessageKey::LabelExecutionSettings, lang))
+            .white()
+            .bold()
+    );
     println!(
         "  {} {}",
-        "Parallel:".dimmed(),
-        format_bool(command.parallel)
+        format!("{}:", get_message(MessageKey::LabelParallel, lang)).dimmed(),
+        format_bool(command.parallel, lang)
     );
-    println!("  {} {}", "Confirm:".dimmed(), format_bool(command.confirm));
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelConfirm, lang)).dimmed(),
+        format_bool(command.confirm, lang)
+    );
     if let Some(timeout) = command.timeout {
-        println!("  {} {}s", "Timeout:".dimmed(), timeout);
+        println!(
+            "  {} {}s",
+            format!("{}:", get_message(MessageKey::LabelTimeout, lang)).dimmed(),
+            timeout
+        );
     }
     println!();
 
@@ -117,7 +167,9 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
     if !command.platform.is_empty() {
         println!(
             "{} {}",
-            "Platforms:".white().bold(),
+            format!("{}:", get_message(MessageKey::LabelPlatforms, lang))
+                .white()
+                .bold(),
             command
                 .platform
                 .iter()
@@ -132,12 +184,20 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
 }
 
 /// Select a command interactively from the list
-fn select_command_interactive(config: &CommandsConfig) -> Result<String> {
+fn select_command_interactive(
+    config: &CommandsConfig,
+    lang: crate::config::schema::Language,
+) -> Result<String> {
     if config.commands.is_empty() {
-        anyhow::bail!("No commands available");
+        anyhow::bail!("{}", get_message(MessageKey::ErrorNoCommandsAvailable, lang));
     }
 
-    println!("{}", "Select command to view details:".cyan().bold());
+    println!(
+        "{}",
+        get_message(MessageKey::InfoSelectCommandToView, lang)
+            .cyan()
+            .bold()
+    );
     println!();
 
     let mut commands: Vec<_> = config.commands.iter().collect();
@@ -153,7 +213,10 @@ fn select_command_interactive(config: &CommandsConfig) -> Result<String> {
     }
 
     println!();
-    print!("{} ", "Enter number:".bright_white());
+    print!(
+        "{} ",
+        format!("{}:", get_message(MessageKey::PromptEnterNumber, lang)).bright_white()
+    );
     io::stdout().flush()?;
 
     let mut input = String::new();
@@ -162,21 +225,21 @@ fn select_command_interactive(config: &CommandsConfig) -> Result<String> {
     let selection: usize = input
         .trim()
         .parse()
-        .map_err(|_| anyhow::anyhow!("Invalid selection"))?;
+        .map_err(|_| anyhow::anyhow!("{}", get_message(MessageKey::ErrorInvalidSelection, lang)))?;
 
     if selection < 1 || selection > commands.len() {
-        anyhow::bail!("Selection out of range");
+        anyhow::bail!("{}", get_message(MessageKey::ErrorSelectionOutOfRange, lang));
     }
 
     Ok(commands[selection - 1].0.clone())
 }
 
 /// Format boolean value with colored output
-fn format_bool(value: bool) -> ColoredString {
+fn format_bool(value: bool, lang: crate::config::schema::Language) -> ColoredString {
     if value {
-        "yes".green()
+        get_message(MessageKey::LabelYes, lang).green()
     } else {
-        "no".red()
+        get_message(MessageKey::LabelNo, lang).red()
     }
 }
 
@@ -186,10 +249,19 @@ mod tests {
 
     #[test]
     fn test_format_bool() {
-        let yes = format_bool(true);
+        use crate::config::schema::Language;
+
+        let yes = format_bool(true, Language::English);
         assert!(yes.to_string().contains("yes"));
 
-        let no = format_bool(false);
+        let no = format_bool(false, Language::English);
         assert!(no.to_string().contains("no"));
+
+        // Test Japanese
+        let yes_ja = format_bool(true, Language::Japanese);
+        assert!(yes_ja.to_string().contains("はい"));
+
+        let no_ja = format_bool(false, Language::Japanese);
+        assert!(no_ja.to_string().contains("いいえ"));
     }
 }

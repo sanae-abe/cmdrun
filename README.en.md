@@ -272,6 +272,106 @@ cmd = "npm run dev"
 env = { PORT = "3000" }  # Command-specific env
 ```
 
+### Environment Management
+
+Easily switch between development, staging, and production environments.
+
+```bash
+# Create environments
+cmdrun env create dev --description "Development environment"
+cmdrun env create prod --description "Production environment"
+
+# Switch environments
+cmdrun env use dev
+cmdrun run start  # Start with development settings
+
+cmdrun env use prod
+cmdrun run deploy  # Deploy with production settings
+
+# Set environment variables
+cmdrun env set API_URL https://api.staging.com --env staging
+```
+
+See [Environment Management Guide](docs/ENVIRONMENT_MANAGEMENT.md) for details.
+
+### History & Logging
+
+Record, search, and replay command execution history.
+
+```bash
+# Show history
+cmdrun history list
+
+# Search commands
+cmdrun history search build
+
+# Show statistics
+cmdrun history stats
+
+# Retry last failed command
+cmdrun retry
+
+# Export history
+cmdrun history export --format json -o history.json
+```
+
+See [History Guide](docs/user-guide/HISTORY.md) for details.
+
+### Template System
+
+Use, create, and share project templates.
+
+```bash
+# List available templates
+cmdrun template list
+
+# Use a template
+cmdrun template use rust-cli
+
+# Create custom template
+cmdrun template add my-template
+
+# Export template
+cmdrun template export rust-cli ./my-template.toml
+```
+
+**Built-in Templates:**
+- `rust-cli` - Rust CLI development (cargo build/test/clippy/fmt)
+- `nodejs-web` - Node.js web development (npm dev/build/test)
+- `python-data` - Python data science (pytest/jupyter)
+- `react-app` - React application (dev/build/storybook)
+
+See [Template Feature Report](TEMPLATE_FEATURE_REPORT.md) for details.
+
+### Plugin System
+
+Extend functionality with external plugins.
+
+```toml
+# commands.toml
+[plugins]
+enabled = ["hello", "logger"]
+
+[plugins.logger]
+path = "plugins/logger_plugin.so"
+log_file = "cmdrun.log"
+level = "info"
+```
+
+```bash
+# List plugins
+cmdrun plugin list
+
+# Show plugin details
+cmdrun plugin info logger
+
+# Enable/disable plugins
+cmdrun plugin enable logger
+cmdrun plugin disable logger
+```
+
+See [Plugin System Report](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md) and [Plugin API](docs/plugins/API.md) for details.
+
 ### Watch Mode - File Watching
 
 ```toml
@@ -430,9 +530,25 @@ cmd.linux = "xdg-open http://localhost:3000"
 - [Configuration Reference](docs/user-guide/CONFIGURATION.md)
 - [Internationalization (i18n)](docs/user-guide/I18N.md)
 - [Watch Mode](docs/user-guide/WATCH_MODE.md)
+- [History](docs/user-guide/HISTORY.md)
+- [FAQ](docs/user-guide/FAQ.md)
+- [Recipes](docs/user-guide/RECIPES.md)
+- [Troubleshooting](docs/user-guide/TROUBLESHOOTING.md)
+
+### Feature Guides
+- [Environment Management](docs/ENVIRONMENT_MANAGEMENT.md)
+- [Template System](TEMPLATE_FEATURE_REPORT.md)
+- [Plugin System](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)
+
+### Plugin Development
+- [Plugin API Specification](docs/plugins/API.md)
+- [Plugin Development Guide](docs/plugins/DEVELOPMENT_GUIDE.md)
+- [Sample Plugins](examples/plugins/README.md)
 
 ### Technical Documentation
+- [Architecture](docs/technical/ARCHITECTURE.md)
 - [Performance](docs/technical/PERFORMANCE.md)
+- [Performance Guide](docs/technical/PERFORMANCE_GUIDE.md)
 - [Security](docs/technical/SECURITY.md)
 - [Cross-platform Support](docs/technical/CROSS_PLATFORM.md)
 - [Distribution](docs/technical/DISTRIBUTION.md)

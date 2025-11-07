@@ -2,6 +2,7 @@
 
 use crate::config::loader::ConfigLoader;
 use crate::config::schema::CommandSpec;
+use crate::i18n::{get_message, MessageKey};
 use anyhow::Result;
 use colored::*;
 use std::path::PathBuf;
@@ -14,12 +15,15 @@ pub async fn handle_search(keyword: String, config_path: Option<PathBuf>) -> Res
         ConfigLoader::new()
     };
     let config = config_loader.load().await?;
+    let lang = config.config.language;
 
     let keyword_lower = keyword.to_lowercase();
 
     println!(
-        "{} '{}'",
-        "Searching for:".cyan().bold(),
+        "{}: '{}'",
+        get_message(MessageKey::SearchSearchingFor, lang)
+            .cyan()
+            .bold(),
         keyword.bright_white()
     );
     println!();
@@ -87,17 +91,20 @@ pub async fn handle_search(keyword: String, config_path: Option<PathBuf>) -> Res
     // Display results
     if results.is_empty() {
         println!(
-            "{} No commands matching '{}' found",
+            "{} {} '{}'",
             "⚠".yellow().bold(),
+            get_message(MessageKey::SearchNoCommandsMatching, lang),
             keyword.bright_white()
         );
         return Ok(());
     }
 
     println!(
-        "{} Found {} matching command(s):",
+        "{} {} {} {}:",
         "✓".green().bold(),
-        results.len()
+        get_message(MessageKey::SearchFound, lang),
+        results.len(),
+        get_message(MessageKey::MatchingCommands, lang)
     );
     println!();
 
@@ -108,16 +115,16 @@ pub async fn handle_search(keyword: String, config_path: Option<PathBuf>) -> Res
         println!("  {} {} - {}", "•".blue(), name.green().bold(), description);
         println!(
             "    {} {}",
-            "Matched in:".dimmed(),
+            get_message(MessageKey::SearchMatchedIn, lang).dimmed(),
             locations.join(", ").dimmed()
         );
         println!();
     }
 
     println!(
-        "{} Use {} to see details",
+        "{} {}",
         "💡".bright_white(),
-        "cmdrun info <command>".yellow()
+        get_message(MessageKey::SearchUseInfoToSeeDetails, lang).yellow()
     );
 
     Ok(())

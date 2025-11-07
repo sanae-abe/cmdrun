@@ -429,6 +429,7 @@ mod tests {
             commands,
             aliases: AHashMap::new(),
             hooks: Default::default(),
+            plugins: Default::default(),
         }
     }
 
@@ -490,6 +491,7 @@ mod tests {
             commands: AHashMap::new(),
             aliases: AHashMap::new(),
             hooks: Default::default(),
+            plugins: Default::default(),
         };
 
         let visualizer = GraphVisualizer::new(&config);
@@ -681,6 +683,7 @@ mod tests {
             commands,
             aliases: AHashMap::new(),
             hooks: Default::default(),
+            plugins: Default::default(),
         };
 
         let visualizer = GraphVisualizer::new(&config);
@@ -735,6 +738,7 @@ mod tests {
             commands,
             aliases: AHashMap::new(),
             hooks: Default::default(),
+            plugins: Default::default(),
         };
 
         let visualizer = GraphVisualizer::new(&config);
@@ -769,6 +773,7 @@ mod tests {
             commands,
             aliases: AHashMap::new(),
             hooks: Default::default(),
+            plugins: Default::default(),
         };
 
         let visualizer = GraphVisualizer::new(&config);

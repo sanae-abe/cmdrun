@@ -1,0 +1,71 @@
+[template]
+name = "nodejs-web"
+description = "Node.js Web development with npm scripts"
+version = "1.0"
+tags = ["nodejs", "web", "npm"]
+
+[config]
+shell = "bash"
+strict_mode = true
+language = "english"
+
+[commands.dev]
+description = "Start development server"
+cmd = "npm run dev"
+tags = ["dev"]
+
+[commands.build]
+description = "Build for production"
+cmd = "npm run build"
+tags = ["build"]
+
+[commands.start]
+description = "Start production server"
+cmd = "npm start"
+deps = ["build"]
+tags = ["production"]
+
+[commands.test]
+description = "Run tests"
+cmd = "npm test"
+tags = ["test"]
+
+[commands.test-watch]
+description = "Run tests in watch mode"
+cmd = "npm test -- --watch"
+tags = ["test", "watch"]
+
+[commands.lint]
+description = "Run ESLint"
+cmd = "npm run lint"
+tags = ["lint"]
+
+[commands.lint-fix]
+description = "Fix ESLint errors"
+cmd = "npm run lint -- --fix"
+tags = ["lint", "fix"]
+
+[commands.format]
+description = "Format code with Prettier"
+cmd = "npm run format"
+tags = ["format"]
+
+[commands.format-check]
+description = "Check code formatting"
+cmd = "npm run format -- --check"
+tags = ["format", "check"]
+
+[commands.install]
+description = "Install dependencies"
+cmd = "npm install"
+tags = ["setup"]
+
+[commands.clean]
+description = "Clean node_modules and build"
+cmd = ["rm -rf node_modules", "rm -rf dist", "rm -rf build"]
+tags = ["clean"]
+
+[commands.typecheck]
+description = "Run TypeScript type checking"
+cmd = "npm run typecheck"
+tags = ["typecheck"]

@@ -215,6 +215,7 @@ async fn test_missing_dependency() {
         commands: commands.into_iter().collect(),
         aliases: Default::default(),
         hooks: Default::default(),
+        plugins: Default::default(),
     };
 
     let validator = ConfigValidator::new(&config);

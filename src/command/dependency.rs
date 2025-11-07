@@ -306,6 +306,7 @@ mod tests {
             commands,
             aliases: AHashMap::new(),
             hooks: Default::default(),
+            plugins: Default::default(),
         }
     }
 

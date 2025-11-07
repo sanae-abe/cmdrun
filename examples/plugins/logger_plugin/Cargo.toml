@@ -1,0 +1,19 @@
+[package]
+name = "logger_plugin"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cmdrun = { path = "../../../", features = ["plugin-system"] }
+ahash = "0.8"
+chrono = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

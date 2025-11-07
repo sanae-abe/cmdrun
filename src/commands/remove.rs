@@ -29,7 +29,12 @@ pub async fn handle_remove(id: String, force: bool, config_path: Option<PathBuf>
     let command = config.commands.get(&id).unwrap();
 
     // Display command information
-    println!("{}", "Removal target:".cyan().bold());
+    println!(
+        "{}",
+        get_message(MessageKey::RemoveRemovalTarget, lang)
+            .cyan()
+            .bold()
+    );
     println!(
         "  {} {}",
         format!("{}:", get_message(MessageKey::LabelId, lang)).dimmed(),
@@ -61,13 +66,21 @@ pub async fn handle_remove(id: String, force: bool, config_path: Option<PathBuf>
             }
         }
         crate::config::schema::CommandSpec::Platform(_) => {
-            println!("  {} Platform-specific", "Type:".dimmed());
+            println!(
+                "  {} {}",
+                format!("{}:", get_message(MessageKey::RemoveType, lang)).dimmed(),
+                get_message(MessageKey::RemovePlatformSpecific, lang)
+            );
         }
     }
 
     // Show dependencies if any
     if !command.deps.is_empty() {
-        println!("  {} {:?}", "Dependencies:".dimmed(), command.deps);
+        println!(
+            "  {} {:?}",
+            format!("{}:", get_message(MessageKey::LabelDependencies, lang)).dimmed(),
+            command.deps
+        );
     }
 
     // Show tags if any
@@ -109,8 +122,9 @@ pub async fn handle_remove(id: String, force: bool, config_path: Option<PathBuf>
     // Create backup
     let backup_path = create_backup(&config_file_path).await?;
     println!(
-        "{} Backup created: {}",
+        "{} {}: {}",
         "✓".green().bold(),
+        get_message(MessageKey::LabelBackupCreated, lang),
         backup_path.display()
     );
 

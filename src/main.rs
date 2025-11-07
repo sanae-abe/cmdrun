@@ -4,7 +4,7 @@
 
 use anyhow::Result;
 use clap::Parser;
-use cmdrun::cli::{Cli, Commands, ConfigAction, GraphFormat};
+use cmdrun::cli::{Cli, Commands, ConfigAction, EnvAction, GraphFormat, HistoryAction, TemplateAction};
 use cmdrun::command::dependency::DependencyGraph;
 use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
 use cmdrun::command::graph_visualizer::GraphVisualizer;
@@ -131,6 +131,70 @@ async fn run(cli: Cli) -> Result<()> {
             )
             .await?;
         }
+        Commands::Env { action } => match action {
+            EnvAction::Use { name } => {
+                cmdrun::commands::handle_use(name).await?;
+            }
+            EnvAction::Current => {
+                cmdrun::commands::handle_current().await?;
+            }
+            EnvAction::List => {
+                cmdrun::commands::handle_env_list().await?;
+            }
+            EnvAction::Set { key, value, env } => {
+                cmdrun::commands::handle_env_set(key, value, env).await?;
+            }
+            EnvAction::Create { name, description } => {
+                cmdrun::commands::handle_create(name, description).await?;
+            }
+            EnvAction::Info { name } => {
+                cmdrun::commands::handle_env_info(name).await?;
+            }
+        },
+        Commands::History { action } => match action {
+            HistoryAction::List { limit, offset, failed, stats } => {
+                cmdrun::commands::handle_history(Some(limit), offset, failed, stats).await?;
+            }
+            HistoryAction::Search { query, limit } => {
+                cmdrun::commands::handle_history_search(&query, limit).await?;
+            }
+            HistoryAction::Clear { force } => {
+                cmdrun::commands::handle_history_clear(force).await?;
+            }
+            HistoryAction::Export { format, output, limit } => {
+                let export_format = match format {
+                    cmdrun::cli::ExportFormat::Json => cmdrun::commands::ExportFormat::Json,
+                    cmdrun::cli::ExportFormat::Csv => cmdrun::commands::ExportFormat::Csv,
+                };
+                cmdrun::commands::handle_history_export(export_format, output, limit).await?;
+            }
+            HistoryAction::Stats => {
+                cmdrun::commands::handle_history(None, None, false, true).await?;
+            }
+        },
+        Commands::Retry { id } => {
+            cmdrun::commands::handle_retry(id).await?;
+        }
+        Commands::Template { action } => match action {
+            TemplateAction::Add { name } => {
+                cmdrun::commands::handle_template_add(name, config_path).await?;
+            }
+            TemplateAction::Use { name, output } => {
+                cmdrun::commands::handle_template_use(name, output).await?;
+            }
+            TemplateAction::List { verbose } => {
+                cmdrun::commands::handle_template_list(verbose).await?;
+            }
+            TemplateAction::Remove { name, force } => {
+                cmdrun::commands::handle_template_remove(name, force).await?;
+            }
+            TemplateAction::Export { name, output } => {
+                cmdrun::commands::handle_template_export(name, output).await?;
+            }
+            TemplateAction::Import { file } => {
+                cmdrun::commands::handle_template_import(file).await?;
+            }
+        },
     }
 
     Ok(())

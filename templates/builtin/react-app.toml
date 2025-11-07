@@ -1,0 +1,76 @@
+[template]
+name = "react-app"
+description = "React application with modern tooling"
+version = "1.0"
+tags = ["react", "web", "frontend"]
+
+[config]
+shell = "bash"
+strict_mode = true
+language = "english"
+
+[commands.dev]
+description = "Start development server"
+cmd = "npm run dev"
+tags = ["dev"]
+
+[commands.build]
+description = "Build for production"
+cmd = "npm run build"
+tags = ["build"]
+
+[commands.preview]
+description = "Preview production build"
+cmd = "npm run preview"
+deps = ["build"]
+tags = ["preview"]
+
+[commands.test]
+description = "Run tests"
+cmd = "npm test"
+tags = ["test"]
+
+[commands.test-ui]
+description = "Run tests with UI"
+cmd = "npm test -- --ui"
+tags = ["test"]
+
+[commands.test-coverage]
+description = "Run tests with coverage"
+cmd = "npm test -- --coverage"
+tags = ["test", "coverage"]
+
+[commands.lint]
+description = "Run ESLint"
+cmd = "npm run lint"
+tags = ["lint"]
+
+[commands.lint-fix]
+description = "Fix ESLint errors"
+cmd = "npm run lint -- --fix"
+tags = ["lint", "fix"]
+
+[commands.format]
+description = "Format code with Prettier"
+cmd = "npm run format"
+tags = ["format"]
+
+[commands.typecheck]
+description = "Run TypeScript type checking"
+cmd = "npm run typecheck"
+tags = ["typecheck"]
+
+[commands.storybook]
+description = "Start Storybook"
+cmd = "npm run storybook"
+tags = ["storybook"]
+
+[commands.build-storybook]
+description = "Build Storybook for production"
+cmd = "npm run build-storybook"
+tags = ["storybook", "build"]
+
+[commands.clean]
+description = "Clean build artifacts"
+cmd = ["rm -rf dist", "rm -rf node_modules/.vite"]
+tags = ["clean"]

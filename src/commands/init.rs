@@ -5,6 +5,9 @@ use colored::Colorize;
 use dialoguer::{theme::ColorfulTheme, Select};
 use std::path::{Path, PathBuf};
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
+
 /// Template types
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Template {
@@ -90,9 +93,16 @@ pub async fn handle_init(
         );
     }
 
-    // Determine template
+    // Select language first (always in English for initial prompt)
+    let selected_language = if interactive {
+        select_language_interactive()?
+    } else {
+        Language::default()
+    };
+
+    // Determine template (using selected language for prompts)
     let template = if interactive {
-        select_template_interactive()?
+        select_template_interactive(selected_language)?
     } else if let Some(t) = template {
         Template::parse_template(&t).ok_or_else(|| {
             anyhow::anyhow!(
@@ -104,38 +114,79 @@ pub async fn handle_init(
         Template::Default
     };
 
-    // Get template content
-    let content = template.get_content();
+    // Get template content and inject language setting
+    let content = inject_language_setting(template.get_content(), selected_language);
 
     // Write file
     std::fs::write(&output_path, content)
         .with_context(|| format!("Failed to write to {}", output_path.display()))?;
 
-    // Success message
+    // Success message (in selected language)
     println!();
     println!(
         "{} {} {}",
         "✓".green().bold(),
-        "Created".green(),
+        get_message(MessageKey::InitCreated, selected_language).green(),
         output_path.display().to_string().bright_white().bold()
     );
     println!(
-        "  {} {} template",
-        "Using".dimmed(),
-        template.name().cyan().bold()
+        "  {} {} {}",
+        get_message(MessageKey::InitUsing, selected_language).dimmed(),
+        template.name().cyan().bold(),
+        get_message(MessageKey::InitTemplateDescription, selected_language).dimmed()
+    );
+
+    // Show language confirmation
+    let lang_display = match selected_language {
+        Language::English => "English",
+        Language::Japanese => "日本語",
+    };
+    println!(
+        "  {} {}",
+        get_message(MessageKey::InitLanguageSet, selected_language).dimmed(),
+        lang_display.cyan().bold()
     );
     println!();
 
-    // Next steps
-    print_next_steps(&output_path);
+    // Next steps (in selected language)
+    print_next_steps(&output_path, selected_language);
 
     Ok(())
 }
 
-/// Interactive template selection
-fn select_template_interactive() -> Result<Template> {
+/// Interactive language selection
+fn select_language_interactive() -> Result<Language> {
     println!();
-    println!("{}", "Select a template:".cyan().bold());
+    println!("{}", "Select your preferred language / 言語を選択してください".cyan().bold());
+    println!();
+
+    let items = vec![
+        "English",
+        "日本語 (Japanese)",
+    ];
+
+    let selection = Select::with_theme(&ColorfulTheme::default())
+        .items(&items)
+        .default(0)
+        .interact()
+        .context("Failed to read language selection")?;
+
+    Ok(match selection {
+        0 => Language::English,
+        1 => Language::Japanese,
+        _ => Language::English,
+    })
+}
+
+/// Interactive template selection
+fn select_template_interactive(language: Language) -> Result<Template> {
+    println!();
+    println!(
+        "{}",
+        get_message(MessageKey::PromptSelectTemplate, language)
+            .cyan()
+            .bold()
+    );
     println!();
 
     let templates = Template::all();
@@ -150,29 +201,89 @@ fn select_template_interactive() -> Result<Template> {
     Ok(templates[selection])
 }
 
+/// Inject language setting into TOML content
+fn inject_language_setting(content: &str, language: Language) -> String {
+    let language_str = match language {
+        Language::English => "english",
+        Language::Japanese => "japanese",
+    };
+
+    // Find the [config] section and add language setting
+    if let Some(config_pos) = content.find("[config]") {
+        // Find the end of the [config] section (next section or end of content)
+        let after_config = &content[config_pos..];
+        if let Some(next_section_pos) = after_config[8..].find('[') {
+            // Insert before next section
+            let insert_pos = config_pos + 8 + next_section_pos;
+            format!(
+                "{}language = \"{}\"\n\n{}",
+                &content[..insert_pos],
+                language_str,
+                &content[insert_pos..]
+            )
+        } else {
+            // No next section, append to the end of config
+            format!("{}\nlanguage = \"{}\"\n", content, language_str)
+        }
+    } else {
+        // No [config] section, add it at the beginning
+        format!(
+            "[config]\nlanguage = \"{}\"\n\n{}",
+            language_str,
+            content
+        )
+    }
+}
+
 /// Print next steps after initialization
-fn print_next_steps(output_path: &Path) {
-    println!("{}", "Next steps:".cyan().bold());
-    println!();
+fn print_next_steps(output_path: &Path, language: Language) {
     println!(
-        "  {} Edit {} to define your commands",
-        "1.".bright_white().bold(),
-        output_path.display().to_string().yellow()
-    );
-    println!(
-        "  {} Run {} to list available commands",
-        "2.".bright_white().bold(),
-        "cmdrun list".green().bold()
-    );
-    println!(
-        "  {} Run {} to execute a command",
-        "3.".bright_white().bold(),
-        "cmdrun run <name>".green().bold()
+        "{}",
+        format!("{}:", get_message(MessageKey::InitNextSteps, language))
+            .cyan()
+            .bold()
     );
     println!();
 
-    // Example commands based on templates
-    println!("{}", "Example commands:".dimmed());
+    let step1_msg = match language {
+        Language::English => format!("Edit {} to define your commands", output_path.display()),
+        Language::Japanese => format!("{} を編集してコマンドを定義", output_path.display()),
+    };
+
+    let step2_msg = match language {
+        Language::English => "Run cmdrun list to list available commands",
+        Language::Japanese => "cmdrun list で利用可能なコマンド一覧を表示",
+    };
+
+    let step3_msg = match language {
+        Language::English => "Run cmdrun run <name> to execute a command",
+        Language::Japanese => "cmdrun run <名前> でコマンドを実行",
+    };
+
+    println!(
+        "  {} {}",
+        "1.".bright_white().bold(),
+        step1_msg.yellow()
+    );
+    println!(
+        "  {} {}",
+        "2.".bright_white().bold(),
+        step2_msg
+    );
+    println!(
+        "  {} {}",
+        "3.".bright_white().bold(),
+        step3_msg
+    );
+    println!();
+
+    // Example commands
+    let example_label = match language {
+        Language::English => "Example commands:",
+        Language::Japanese => "コマンド例:",
+    };
+
+    println!("{}", example_label.dimmed());
     println!("  {} {}", "$".dimmed(), "cmdrun list --verbose".dimmed());
     println!("  {} {}", "$".dimmed(), "cmdrun run dev".dimmed());
     println!("  {} {}", "$".dimmed(), "cmdrun run build".dimmed());
@@ -238,6 +349,37 @@ mod tests {
         assert_eq!(format!("{}", Template::Rust), "rust - Rust project");
     }
 
+    #[test]
+    fn test_inject_language_setting() {
+        let content = r#"[config]
+shell = "bash"
+strict_mode = true
+
+[commands.test]
+cmd = "echo test"
+"#;
+
+        let result = inject_language_setting(content, Language::Japanese);
+        assert!(result.contains("language = \"japanese\""));
+        assert!(result.contains("[config]"));
+        assert!(result.contains("shell = \"bash\""));
+
+        let result_en = inject_language_setting(content, Language::English);
+        assert!(result_en.contains("language = \"english\""));
+    }
+
+    #[test]
+    fn test_inject_language_setting_no_config() {
+        let content = r#"[commands.test]
+cmd = "echo test"
+"#;
+
+        let result = inject_language_setting(content, Language::Japanese);
+        assert!(result.contains("[config]"));
+        assert!(result.contains("language = \"japanese\""));
+        assert!(result.contains("[commands.test]"));
+    }
+
     #[tokio::test]
     async fn test_handle_init_default() {
         let temp_dir = TempDir::new().unwrap();
@@ -253,6 +395,11 @@ mod tests {
         assert!(
             content.contains("[config]") || content.contains("[commands"),
             "File should contain TOML configuration"
+        );
+        // Default language should be English
+        assert!(
+            content.contains("language = \"english\""),
+            "Default language should be English"
         );
     }
 
@@ -274,6 +421,11 @@ mod tests {
 
             let content = std::fs::read_to_string(&output).unwrap();
             assert!(!content.is_empty(), "{} file should not be empty", template);
+            assert!(
+                content.contains("language = \"english\""),
+                "{} should have default language setting",
+                template
+            );
         }
     }
 

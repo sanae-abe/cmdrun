@@ -1,0 +1,70 @@
+[template]
+name = "rust-cli"
+description = "Rust CLI tool project with cargo commands"
+version = "1.0"
+tags = ["rust", "cli", "cargo"]
+
+[config]
+shell = "bash"
+strict_mode = true
+language = "english"
+
+[commands.build]
+description = "Build the project"
+cmd = "cargo build"
+tags = ["build"]
+
+[commands.build-release]
+description = "Build the project in release mode"
+cmd = "cargo build --release"
+tags = ["build", "release"]
+
+[commands.test]
+description = "Run tests"
+cmd = "cargo test"
+tags = ["test"]
+
+[commands.test-verbose]
+description = "Run tests with verbose output"
+cmd = "cargo test -- --nocapture"
+tags = ["test"]
+
+[commands.check]
+description = "Check code without building"
+cmd = "cargo check"
+tags = ["check"]
+
+[commands.clippy]
+description = "Run Clippy linter"
+cmd = "cargo clippy -- -D warnings"
+tags = ["lint"]
+
+[commands.fmt]
+description = "Format code"
+cmd = "cargo fmt"
+tags = ["format"]
+
+[commands.fmt-check]
+description = "Check code formatting"
+cmd = "cargo fmt -- --check"
+tags = ["format", "check"]
+
+[commands.run]
+description = "Run the application"
+cmd = "cargo run"
+tags = ["run"]
+
+[commands.clean]
+description = "Clean build artifacts"
+cmd = "cargo clean"
+tags = ["clean"]
+
+[commands.doc]
+description = "Build documentation"
+cmd = "cargo doc --no-deps --open"
+tags = ["docs"]
+
+[commands.bench]
+description = "Run benchmarks"
+cmd = "cargo bench"
+tags = ["benchmark"]

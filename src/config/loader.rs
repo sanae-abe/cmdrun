@@ -270,6 +270,7 @@ cmd = "cargo test"
             },
             aliases: Default::default(),
             hooks: Default::default(),
+            plugins: Default::default(),
         };
 
         let overlay = CommandsConfig {
@@ -299,6 +300,7 @@ cmd = "cargo test"
             },
             aliases: Default::default(),
             hooks: Default::default(),
+            plugins: Default::default(),
         };
 
         let merged = loader.merge_configs(base, overlay);

@@ -1,0 +1,218 @@
+name: Fuzzing
+
+on:
+  schedule:
+    # Run fuzzing weekly (every Sunday at 2:00 UTC)
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: 'Fuzzing duration in seconds'
+        required: false
+        default: '300'
+      target:
+        description: 'Specific fuzz target (or "all")'
+        required: false
+        default: 'all'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fuzz:
+    name: Fuzzing Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - fuzz_interpolation
+          - fuzz_validation
+          - fuzz_toml_config
+          - fuzz_command_parts
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          cache-on-failure: true
+
+      - name: Install cargo-fuzz
+        run: cargo install cargo-fuzz
+
+      - name: Determine fuzzing duration
+        id: duration
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "duration=${{ github.event.inputs.duration }}" >> $GITHUB_OUTPUT
+          else
+            # 5 minutes per target for scheduled runs
+            echo "duration=300" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run fuzzing - ${{ matrix.target }}
+        id: fuzz
+        continue-on-error: true
+        run: |
+          # Skip if specific target requested and doesn't match
+          if [ "${{ github.event.inputs.target }}" != "" ] && \
+             [ "${{ github.event.inputs.target }}" != "all" ] && \
+             [ "${{ github.event.inputs.target }}" != "${{ matrix.target }}" ]; then
+            echo "Skipping ${{ matrix.target }} (not requested)"
+            exit 0
+          fi
+
+          echo "Running fuzzing on ${{ matrix.target }} for ${{ steps.duration.outputs.duration }} seconds..."
+          timeout ${{ steps.duration.outputs.duration }}s \
+            cargo +nightly fuzz run ${{ matrix.target }} -- \
+              -max_total_time=${{ steps.duration.outputs.duration }} \
+              -print_final_stats=1 \
+              -max_len=4096 \
+              || EXIT_CODE=$?
+
+          # Exit code 124 means timeout (expected for fuzzing)
+          if [ "${EXIT_CODE:-0}" -eq 124 ]; then
+            echo "Fuzzing completed (timeout reached)"
+            exit 0
+          elif [ "${EXIT_CODE:-0}" -ne 0 ]; then
+            echo "Fuzzing found crashes!"
+            exit 1
+          fi
+
+      - name: Upload crash artifacts
+        if: failure() && steps.fuzz.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes-${{ matrix.target }}
+          path: |
+            fuzz/artifacts/${{ matrix.target }}/
+            fuzz/corpus/${{ matrix.target }}/
+          retention-days: 30
+
+      - name: Check for crashes
+        if: steps.fuzz.outcome == 'failure'
+        run: |
+          echo "::error::Fuzzing found crashes in ${{ matrix.target }}"
+          echo "Check artifacts for crash details"
+          ls -la fuzz/artifacts/${{ matrix.target }}/ || true
+
+      - name: Upload corpus
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-corpus-${{ matrix.target }}
+          path: fuzz/corpus/${{ matrix.target }}/
+          retention-days: 7
+
+  fuzz-summary:
+    name: Fuzzing Summary
+    runs-on: ubuntu-latest
+    needs: fuzz
+    if: always()
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: fuzz-artifacts
+
+      - name: Generate summary
+        run: |
+          echo "# Fuzzing Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Results" >> $GITHUB_STEP_SUMMARY
+
+          CRASH_COUNT=0
+          for target in fuzz_interpolation fuzz_validation fuzz_toml_config fuzz_command_parts; do
+            if [ -d "fuzz-artifacts/fuzz-crashes-$target" ]; then
+              CRASHES=$(find "fuzz-artifacts/fuzz-crashes-$target" -type f | wc -l)
+              CRASH_COUNT=$((CRASH_COUNT + CRASHES))
+              echo "- ❌ **$target**: Found $CRASHES crash(es)" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "- ✅ **$target**: No crashes found" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ $CRASH_COUNT -gt 0 ]; then
+            echo "**Total crashes found: $CRASH_COUNT**" >> $GITHUB_STEP_SUMMARY
+            echo "::warning::Fuzzing found $CRASH_COUNT crash(es). Check artifacts for details."
+          else
+            echo "**All fuzzing tests passed!** ✅" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Fuzzing Targets" >> $GITHUB_STEP_SUMMARY
+          echo "- **fuzz_interpolation**: Variable expansion security (shell injection)" >> $GITHUB_STEP_SUMMARY
+          echo "- **fuzz_validation**: Input validation (command injection)" >> $GITHUB_STEP_SUMMARY
+          echo "- **fuzz_toml_config**: TOML configuration parsing" >> $GITHUB_STEP_SUMMARY
+          echo "- **fuzz_command_parts**: Command parsing components" >> $GITHUB_STEP_SUMMARY
+
+  notify:
+    name: Notify on Crash
+    runs-on: ubuntu-latest
+    needs: fuzz
+    if: failure()
+    steps:
+      - name: Create issue for crashes
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🐛 Fuzzing found crashes';
+            const body = `
+            # Fuzzing Crash Report
+
+            Fuzzing tests found potential crashes or security vulnerabilities.
+
+            **Workflow Run**: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            ## Action Required
+            1. Download crash artifacts from the workflow run
+            2. Reproduce the crash locally:
+               \`\`\`bash
+               cargo +nightly fuzz run <target> fuzz/artifacts/<target>/<crash-file>
+               \`\`\`
+            3. Analyze the crash and fix the vulnerability
+            4. Add regression test to prevent future occurrences
+
+            ## Targets
+            - fuzz_interpolation: Variable expansion security
+            - fuzz_validation: Input validation
+            - fuzz_toml_config: TOML parsing
+            - fuzz_command_parts: Command parsing
+
+            ## Priority
+            🔴 **HIGH** - Security vulnerabilities should be addressed immediately.
+            `;
+
+            // Check if issue already exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: ['fuzzing', 'security']
+            });
+
+            const existingIssue = issues.data.find(issue => issue.title === title);
+
+            if (existingIssue) {
+              // Add comment to existing issue
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingIssue.number,
+                body: `New fuzzing crash found in run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`
+              });
+            } else {
+              // Create new issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['fuzzing', 'security', 'bug']
+              });
+            }

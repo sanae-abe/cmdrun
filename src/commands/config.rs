@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use toml_edit::DocumentMut;
 
 use crate::config::loader::ConfigLoader;
+use crate::i18n::{get_message, MessageKey};
 
 /// Get a configuration value
 pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
@@ -16,21 +17,22 @@ pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
         ConfigLoader::new()
     };
     let config = config_loader.load().await?;
+    let lang = config.config.language;
 
     match key {
         "language" => {
-            let lang = match config.config.language {
+            let lang_str = match config.config.language {
                 crate::config::schema::Language::English => "english",
                 crate::config::schema::Language::Japanese => "japanese",
             };
-            println!("{}", lang);
+            println!("{}", lang_str);
         }
         "shell" => println!("{}", config.config.shell),
         "timeout" => println!("{}", config.config.timeout),
         "strict_mode" => println!("{}", config.config.strict_mode),
         "parallel" => println!("{}", config.config.parallel),
         "working_dir" => println!("{}", config.config.working_dir.display()),
-        _ => anyhow::bail!("Unknown configuration key: {}", key),
+        _ => anyhow::bail!("{}: {}", get_message(MessageKey::ErrorUnknownConfigKey, lang), key),
     }
 
     Ok(())
@@ -38,6 +40,15 @@ pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
 
 /// Set a configuration value
 pub async fn handle_set(key: &str, value: &str, config_file_path: Option<PathBuf>) -> Result<()> {
+    // Load config first to get language setting
+    let temp_loader = if let Some(ref path) = config_file_path {
+        ConfigLoader::with_path(path)
+    } else {
+        ConfigLoader::new()
+    };
+    let temp_config = temp_loader.load().await.unwrap_or_default();
+    let lang = temp_config.config.language;
+
     let config_path = if let Some(path) = config_file_path {
         path
     } else {
@@ -68,14 +79,15 @@ pub async fn handle_set(key: &str, value: &str, config_file_path: Option<PathBuf
         "working_dir" => {
             doc["config"]["working_dir"] = toml_edit::value(value);
         }
-        _ => anyhow::bail!("Unknown configuration key: {}", key),
+        _ => anyhow::bail!("{}: {}", get_message(MessageKey::ErrorUnknownConfigKey, lang), key),
     }
 
     fs::write(&config_path, doc.to_string())?;
 
     println!(
-        "{} Set {} = {}",
+        "{} {} {} = {}",
         "✓".green().bold(),
+        get_message(MessageKey::ConfigSet, lang),
         key.cyan(),
         value.bright_white()
     );
@@ -91,32 +103,57 @@ pub async fn handle_show(config_path: Option<PathBuf>) -> Result<()> {
         ConfigLoader::new()
     };
     let config = config_loader.load().await?;
+    let lang = config.config.language;
 
-    let lang = match config.config.language {
+    let lang_str = match config.config.language {
         crate::config::schema::Language::English => "english",
         crate::config::schema::Language::Japanese => "japanese",
     };
 
-    println!("{}", "Configuration:".cyan().bold());
+    println!(
+        "{}",
+        format!("{}:", get_message(MessageKey::LabelConfiguration, lang))
+            .cyan()
+            .bold()
+    );
     println!();
-    println!("  {} {}", "language:".dimmed(), lang);
-    println!("  {} {}", "shell:".dimmed(), config.config.shell);
-    println!("  {} {}", "timeout:".dimmed(), config.config.timeout);
     println!(
         "  {} {}",
-        "strict_mode:".dimmed(),
+        format!("{}:", get_message(MessageKey::LabelLanguage, lang)).dimmed(),
+        lang_str
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelShell, lang)).dimmed(),
+        config.config.shell
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelTimeout, lang)).dimmed(),
+        config.config.timeout
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelStrictMode, lang)).dimmed(),
         config.config.strict_mode
     );
-    println!("  {} {}", "parallel:".dimmed(), config.config.parallel);
     println!(
         "  {} {}",
-        "working_dir:".dimmed(),
+        format!("{}:", get_message(MessageKey::LabelParallel, lang)).dimmed(),
+        config.config.parallel
+    );
+    println!(
+        "  {} {}",
+        format!("{}:", get_message(MessageKey::LabelWorkingDirectory, lang)).dimmed(),
         config.config.working_dir.display()
     );
 
     if !config.config.env.is_empty() {
         println!();
-        println!("  {}", "Environment variables:".dimmed());
+        println!(
+            "  {}",
+            format!("{}:", get_message(MessageKey::LabelEnvironmentVariables, lang)).dimmed()
+        );
         for (key, value) in &config.config.env {
             println!("    {} = {}", key.cyan(), value);
         }

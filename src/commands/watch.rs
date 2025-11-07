@@ -6,6 +6,8 @@ use std::env;
 use std::path::PathBuf;
 use tracing::{info, warn};
 
+use crate::config::loader::ConfigLoader;
+use crate::i18n::{get_message, MessageKey};
 use crate::watch::{WatchConfig, WatchPattern, WatchRunner};
 
 /// Handle the watch command
@@ -23,8 +25,13 @@ pub async fn handle_watch(
     ignore_gitignore: bool,
     no_recursive: bool,
 ) -> Result<()> {
+    // Load config to get language setting
+    let config_loader = ConfigLoader::new();
+    let config = config_loader.load().await.unwrap_or_default();
+    let lang = config.config.language;
+
     // Display watch configuration
-    display_watch_info(&command, &args, &paths, &patterns, &exclude, debounce_ms);
+    display_watch_info(&command, &args, &paths, &patterns, &exclude, debounce_ms, lang);
 
     // Build the full command with arguments
     let full_command = build_full_command(&command, &args);
@@ -50,10 +57,7 @@ pub async fn handle_watch(
     let mut shutdown_rx = setup_signal_handler().await?;
 
     // Run the watcher
-    info!(
-        "Watch mode started. Press {} to stop.",
-        "Ctrl+C".bright_cyan()
-    );
+    info!("{}", get_message(MessageKey::WatchModeStarted, lang));
     println!();
 
     // Run with shutdown signal
@@ -62,7 +66,7 @@ pub async fn handle_watch(
             result
         }
         _ = shutdown_rx.recv() => {
-            info!("Watch mode stopped by user");
+            info!("{}", get_message(MessageKey::WatchModeStoppedByUser, lang));
             Ok(())
         }
     }
@@ -76,12 +80,21 @@ fn display_watch_info(
     patterns: &[String],
     exclude: &[String],
     debounce_ms: u64,
+    lang: crate::config::schema::Language,
 ) {
-    println!("{}", "Watch Configuration".bright_green().bold());
+    println!(
+        "{}",
+        get_message(MessageKey::WatchConfiguration, lang)
+            .bright_green()
+            .bold()
+    );
     println!("{}", "═".repeat(60).bright_black());
 
     // Command
-    print!("  {} ", "Command:".bright_cyan());
+    print!(
+        "  {} ",
+        format!("{}:", get_message(MessageKey::WatchCommand, lang)).bright_cyan()
+    );
     if args.is_empty() {
         println!("{}", command.bright_white());
     } else {
@@ -93,7 +106,10 @@ fn display_watch_info(
     }
 
     // Paths
-    print!("  {} ", "Watching:".bright_cyan());
+    print!(
+        "  {} ",
+        format!("{}:", get_message(MessageKey::WatchWatching, lang)).bright_cyan()
+    );
     if paths.is_empty() {
         println!("{}", ".".bright_white());
     } else {
@@ -108,7 +124,10 @@ fn display_watch_info(
 
     // Patterns
     if !patterns.is_empty() {
-        print!("  {} ", "Patterns:".bright_cyan());
+        print!(
+            "  {} ",
+            format!("{}:", get_message(MessageKey::WatchPatterns, lang)).bright_cyan()
+        );
         for (i, pattern) in patterns.iter().enumerate() {
             if i == 0 {
                 println!("{}", pattern.bright_white());
@@ -120,7 +139,10 @@ fn display_watch_info(
 
     // Exclude patterns
     if !exclude.is_empty() {
-        print!("  {} ", "Exclude:".bright_cyan());
+        print!(
+            "  {} ",
+            format!("{}:", get_message(MessageKey::WatchExclude, lang)).bright_cyan()
+        );
         for (i, pattern) in exclude.iter().enumerate() {
             if i == 0 {
                 println!("{}", pattern.bright_yellow());
@@ -133,7 +155,7 @@ fn display_watch_info(
     // Debounce
     println!(
         "  {} {}ms",
-        "Debounce:".bright_cyan(),
+        format!("{}:", get_message(MessageKey::WatchDebounce, lang)).bright_cyan(),
         debounce_ms.to_string().bright_white()
     );
 

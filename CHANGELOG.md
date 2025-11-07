@@ -41,7 +41,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Colored output for better readability
   - Verbose and quiet modes
 
-- **Watch Mode** (New Feature)
+- **Environment Management**
+  - `cmdrun env use <env>` - Switch between environments (dev/staging/prod)
+  - `cmdrun env current` - Show current active environment
+  - `cmdrun env list` - List all available environments
+  - `cmdrun env set <key> <value>` - Set environment-specific variables
+  - `cmdrun env create <name>` - Create new environment
+  - `cmdrun env info <name>` - Show environment details
+  - Configuration merging (base + environment-specific settings)
+  - Environment variable profiles per environment
+  - Isolated command execution per environment
+
+- **History & Logging**
+  - `cmdrun history list` - Display command execution history
+  - `cmdrun history search <query>` - Search command history
+  - `cmdrun history clear` - Clear command history
+  - `cmdrun history export` - Export history to JSON/CSV
+  - `cmdrun history stats` - Show execution statistics
+  - `cmdrun retry` - Re-execute last failed command
+  - SQLite-based persistent storage (max 1000 entries)
+  - Execution time tracking and exit code recording
+  - Sensitive information filtering (passwords, tokens)
+  - Statistical analysis (success rate, average execution time)
+
+- **Template System**
+  - `cmdrun template list` - List available templates
+  - `cmdrun template use <name>` - Apply template to current project
+  - `cmdrun template add <name>` - Create custom template
+  - `cmdrun template remove <name>` - Remove template
+  - `cmdrun template export <name>` - Export template to file
+  - `cmdrun template import <path>` - Import template from file
+  - Built-in templates:
+    - `rust-cli` - Rust CLI development (cargo build/test/clippy/fmt)
+    - `nodejs-web` - Node.js web development (npm dev/build/test)
+    - `python-data` - Python data science (pytest/jupyter)
+    - `react-app` - React application (dev/build/storybook)
+  - Template validation and sharing capabilities
+  - Custom template creation from existing configurations
+
+- **Plugin System**
+  - `cmdrun plugin list` - List all plugins
+  - `cmdrun plugin info <name>` - Show plugin details
+  - `cmdrun plugin enable <name>` - Enable plugin
+  - `cmdrun plugin disable <name>` - Disable plugin
+  - Dynamic plugin loading with `libloading`
+  - Plugin API with hooks (pre_run, post_run, on_error)
+  - Custom command registration from plugins
+  - Plugin configuration in commands.toml
+  - Sample plugins:
+    - `hello_plugin` - Basic example plugin
+    - `logger_plugin` - Command execution logging
+  - Comprehensive plugin development documentation (850+ lines)
+
+- **Watch Mode**
   - `cmdrun watch <command>` - Watch files and auto-execute commands
   - File pattern matching with glob support (`**/*.rs`, `**/*.ts`, etc.)
   - Exclude patterns to ignore specific files/directories
@@ -108,7 +160,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Testing
 
-- 29 passing unit tests covering:
+- 303 passing tests (171 unit + 132 integration) covering:
   - Command execution and shell detection
   - Variable interpolation (basic, nested, conditional)
   - Configuration loading and merging
@@ -119,6 +171,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Graph visualization (tree, dot, mermaid)
   - Template initialization
   - Watch mode configuration and pattern matching
+  - Environment management (6 integration tests)
+  - Command history and logging (7 integration tests)
+  - Template system (45 tests)
+  - Plugin system (sample plugin tests)
+  - Property-based testing with proptest (20 tests)
+  - Security testing (fuzzing with cargo-fuzz, 4 targets)
 
 ### Documentation
 
@@ -129,20 +187,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Performance benchmarks vs npm/make
 - Migration guides from npm scripts and Makefiles
 - Updated CLI reference with new commands
-- **New**: Watch Mode user guide with detailed examples
+- **User Guides**:
+  - Watch Mode guide with detailed examples
+  - History & Logging guide (HISTORY.md)
+  - Environment Management guide (ENVIRONMENT_MANAGEMENT.md)
+  - FAQ (19KB)
+  - Recipes (23KB)
+  - Troubleshooting (17KB)
+- **Technical Documentation**:
+  - Architecture guide (40KB)
+  - Performance guide (15KB)
+  - Profiling guide (830 lines)
+  - Security guide (SECURITY.md)
+- **Plugin Development**:
+  - Plugin API specification (API.md)
+  - Plugin development guide (DEVELOPMENT_GUIDE.md, 850+ lines)
+  - Sample plugin documentation
+- **Feature Reports**:
+  - Template Feature Report (TEMPLATE_FEATURE_REPORT.md)
+  - Plugin System Implementation Report (PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)
+  - Environment Implementation Summary (ENVIRONMENT_IMPLEMENTATION_SUMMARY.md)
+  - History Implementation Summary (HISTORY_IMPLEMENTATION_SUMMARY.md)
 
 ### Technical Stack
 
 - **Language**: Rust 1.75+ (2021 edition)
 - **Core Dependencies**:
-  - clap 4.5 (CLI argument parsing)
+  - clap 4.5 (CLI argument parsing with derive macros)
   - tokio 1.39 (async runtime)
   - toml 0.8 (configuration parsing)
-  - serde 1.0 (serialization)
-  - colored 2.1 (colorful output)
+  - serde 1.0 (serialization/deserialization)
+  - colored 2.1 (colorful terminal output)
   - dialoguer 0.11 (interactive prompts)
   - notify 6.1 (file system watching)
   - globset 0.4 (glob pattern matching)
+  - rusqlite 0.32 (SQLite database for history)
+  - libloading 0.8 (dynamic plugin loading)
+  - shell-words 1.1 (safe shell argument parsing)
+  - chrono 0.4 (date/time handling)
+  - anyhow 1.0 (error handling)
+- **Testing Dependencies**:
+  - proptest 1.5 (property-based testing)
+  - cargo-fuzz (fuzzing framework)
+  - cargo-tarpaulin 0.31 (code coverage)
 - **Platform Support**: Linux, macOS, Windows, FreeBSD
 - **Shell Support**: bash, zsh, fish, pwsh
 
@@ -164,7 +251,11 @@ cmdrun/
 │   │   ├── open.rs          # Open config file
 │   │   ├── completion.rs    # Shell completion
 │   │   ├── validate.rs      # Config validation
-│   │   └── watch.rs         # Watch mode (NEW)
+│   │   ├── watch.rs         # Watch mode
+│   │   ├── env.rs           # Environment management (NEW)
+│   │   ├── history.rs       # Command history (NEW)
+│   │   ├── template.rs      # Template system (NEW)
+│   │   └── plugin.rs        # Plugin management (NEW)
 │   ├── command/             # Command execution
 │   │   ├── executor.rs      # Command runner
 │   │   ├── interpolation.rs # Variable expansion
@@ -173,11 +264,25 @@ cmdrun/
 │   ├── config/              # Configuration
 │   │   ├── loader.rs        # Config loading
 │   │   ├── schema.rs        # TOML schema
-│   │   └── validation.rs    # Config validation
-│   ├── watch/               # Watch mode implementation (NEW)
+│   │   ├── validation.rs    # Config validation
+│   │   └── environment.rs   # Environment config (NEW)
+│   ├── watch/               # Watch mode implementation
 │   │   ├── mod.rs           # Watch module
 │   │   ├── config.rs        # Watch configuration
 │   │   └── runner.rs        # Watch runner
+│   ├── history/             # History & logging (NEW)
+│   │   ├── mod.rs           # History module
+│   │   ├── storage.rs       # SQLite storage
+│   │   └── stats.rs         # Statistics
+│   ├── template/            # Template system (NEW)
+│   │   ├── mod.rs           # Template module
+│   │   ├── manager.rs       # Template manager
+│   │   └── builtin.rs       # Built-in templates
+│   ├── plugin/              # Plugin system (NEW)
+│   │   ├── mod.rs           # Plugin module
+│   │   ├── loader.rs        # Dynamic loader
+│   │   ├── registry.rs      # Plugin registry
+│   │   └── api.rs           # Plugin API
 │   ├── error.rs             # Error types
 │   └── i18n.rs              # Internationalization
 ├── templates/               # Project templates
@@ -186,14 +291,27 @@ cmdrun/
 │   ├── rust.toml           # Rust project
 │   ├── node.toml           # Node.js project
 │   └── python.toml         # Python project
+├── templates/builtin/       # Built-in templates (NEW)
+│   ├── rust-cli.toml       # Rust CLI template
+│   ├── nodejs-web.toml     # Node.js web template
+│   ├── python-data.toml    # Python data science
+│   └── react-app.toml      # React app template
+├── examples/plugins/        # Sample plugins (NEW)
+│   ├── hello_plugin/       # Basic example
+│   └── logger_plugin/      # Logging plugin
 ├── tests/                   # Integration tests
 ├── docs/                    # Documentation
 │   ├── user-guide/
 │   │   ├── CLI.md
 │   │   ├── CONFIGURATION.md
 │   │   ├── I18N.md
-│   │   └── WATCH_MODE.md   # Watch mode guide (NEW)
-│   └── technical/
+│   │   ├── WATCH_MODE.md
+│   │   └── HISTORY.md      # History guide (NEW)
+│   ├── technical/
+│   ├── plugins/            # Plugin documentation (NEW)
+│   │   ├── API.md          # Plugin API spec
+│   │   └── DEVELOPMENT_GUIDE.md # Plugin dev guide
+│   └── ENVIRONMENT_MANAGEMENT.md # Environment guide (NEW)
 └── Cargo.toml              # Project manifest
 ```
 
@@ -203,19 +321,24 @@ cmdrun/
 
 ### Known Limitations
 
-- Integration tests pending (unit tests fully implemented)
-- Documentation improvements in progress
-- Additional platform-specific features planned
+- Test coverage at 46% (target: 60%)
+  - Main entry point (main.rs) requires subprocess testing
+  - Interactive UI commands need automated testing solutions
+- Some commands not fully internationalized (90% coverage, 9/10 commands)
+- Plugin system is foundational (ecosystem to be built by community)
 
 ### Future Roadmap
 
 - [x] Watch mode for automatic command re-execution (Completed in v1.0.0)
 - [x] Built-in file watching capabilities (Completed in v1.0.0)
+- [x] Environment management for multi-environment workflows (Completed in v1.0.0)
+- [x] Command history and logging (Completed in v1.0.0)
+- [x] Template system for project initialization (Completed in v1.0.0)
+- [x] Plugin system for extensibility (Completed in v1.0.0)
 - [ ] Remote command execution
-- [ ] Plugin system for extensibility
-- [ ] Interactive mode for command selection
+- [ ] Interactive mode for command selection (fuzzy finder)
 - [ ] Performance profiling and optimization tools
-- [ ] Advanced logging and debugging features
+- [ ] Advanced debugging features
 
 ---
 
@@ -296,7 +419,91 @@ cmd = ["tsc", "webpack"]
 
 ### New Features Highlights
 
-#### 1. Watch Mode (NEW in v1.0.0)
+#### 1. Environment Management (NEW in v1.0.0)
+```bash
+# Create and switch between environments
+cmdrun env create dev --description "Development environment"
+cmdrun env create prod --description "Production environment"
+
+# Switch environments
+cmdrun env use dev
+cmdrun run start  # Runs with dev environment settings
+
+# Set environment-specific variables
+cmdrun env set API_URL https://api.dev.com --env dev
+cmdrun env set API_URL https://api.prod.com --env prod
+
+# View environment info
+cmdrun env current
+cmdrun env list
+```
+
+**Environment Management Features:**
+- Multi-environment support (dev/staging/prod)
+- Configuration merging (base + environment-specific)
+- Environment variable profiles
+- Isolated command execution
+
+#### 2. History & Logging (NEW in v1.0.0)
+```bash
+# View command history
+cmdrun history list
+cmdrun history search build
+
+# Show statistics
+cmdrun history stats
+
+# Retry last failed command
+cmdrun retry
+
+# Export history
+cmdrun history export --format json -o history.json
+cmdrun history export --format csv -o history.csv
+```
+
+**History Features:**
+- SQLite-based persistent storage
+- Execution time tracking
+- Success/failure statistics
+- Sensitive information filtering
+- JSON/CSV export
+
+#### 3. Template System (NEW in v1.0.0)
+```bash
+# Use built-in templates
+cmdrun template list
+cmdrun template use rust-cli
+
+# Create custom templates
+cmdrun template add my-template
+cmdrun template export my-template ./my-template.toml
+
+# Share templates
+cmdrun template import ./shared-template.toml
+```
+
+**Template System Features:**
+- 4 built-in templates (rust-cli, nodejs-web, python-data, react-app)
+- Custom template creation
+- Template validation
+- Import/export functionality
+
+#### 4. Plugin System (NEW in v1.0.0)
+```bash
+# Manage plugins
+cmdrun plugin list
+cmdrun plugin info logger
+cmdrun plugin enable logger
+cmdrun plugin disable logger
+```
+
+**Plugin System Features:**
+- Dynamic plugin loading
+- Plugin hooks (pre_run, post_run, on_error)
+- Custom command registration
+- Sample plugins included
+
+#### 5. Watch Mode (NEW in v1.0.0)
 ```bash
 # Watch for file changes and auto-execute
 cmdrun watch dev
@@ -319,7 +526,7 @@ cmdrun watch dev --debounce 1000
 - Multiple watch paths
 - Graceful shutdown
 
-#### 2. Project Initialization
+#### 6. Project Initialization
 ```bash
 # Quick start with templates
 cmdrun init --template rust

@@ -1,0 +1,16 @@
+[package]
+name = "hello_plugin"
+version = "1.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+cmdrun = { path = "../../../", features = ["plugin-system"] }
+ahash = "0.8"
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true

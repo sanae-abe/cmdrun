@@ -1,0 +1,70 @@
+[template]
+name = "python-data"
+description = "Python data science project with virtual environment"
+version = "1.0"
+tags = ["python", "data-science", "ml"]
+
+[config]
+shell = "bash"
+strict_mode = true
+language = "english"
+
+[commands.setup]
+description = "Create virtual environment and install dependencies"
+cmd = ["python -m venv venv", "source venv/bin/activate && pip install -r requirements.txt"]
+tags = ["setup"]
+
+[commands.activate]
+description = "Activate virtual environment"
+cmd = "source venv/bin/activate"
+tags = ["setup"]
+
+[commands.install]
+description = "Install dependencies"
+cmd = "pip install -r requirements.txt"
+tags = ["setup"]
+
+[commands.freeze]
+description = "Freeze dependencies to requirements.txt"
+cmd = "pip freeze > requirements.txt"
+tags = ["setup"]
+
+[commands.notebook]
+description = "Start Jupyter notebook"
+cmd = "jupyter notebook"
+tags = ["jupyter"]
+
+[commands.lab]
+description = "Start Jupyter lab"
+cmd = "jupyter lab"
+tags = ["jupyter"]
+
+[commands.test]
+description = "Run tests with pytest"
+cmd = "pytest"
+tags = ["test"]
+
+[commands.test-coverage]
+description = "Run tests with coverage report"
+cmd = "pytest --cov=. --cov-report=html"
+tags = ["test", "coverage"]
+
+[commands.lint]
+description = "Run linting with flake8"
+cmd = "flake8 ."
+tags = ["lint"]
+
+[commands.format]
+description = "Format code with black"
+cmd = "black ."
+tags = ["format"]
+
+[commands.format-check]
+description = "Check code formatting"
+cmd = "black --check ."
+tags = ["format", "check"]
+
+[commands.clean]
+description = "Clean cache and artifacts"
+cmd = ["find . -type d -name '__pycache__' -exec rm -rf {} +", "find . -type f -name '*.pyc' -delete", "rm -rf .pytest_cache"]
+tags = ["clean"]

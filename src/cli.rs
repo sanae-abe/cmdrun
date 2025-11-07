@@ -209,6 +209,44 @@ pub enum Commands {
         #[arg(long)]
         no_recursive: bool,
     },
+
+    /// Manage environments (switch between dev, staging, prod, etc.)
+    ///
+    /// Environment management allows you to maintain different configurations
+    /// for different deployment targets or development stages. Each environment
+    /// can have its own configuration file and environment variables.
+    Env {
+        #[command(subcommand)]
+        action: EnvAction,
+    },
+
+    /// View and manage command execution history
+    ///
+    /// Track command executions, view statistics, search history,
+    /// and re-execute previous commands.
+    History {
+        #[command(subcommand)]
+        action: HistoryAction,
+    },
+
+    /// Retry the last failed command or a specific command by ID
+    ///
+    /// Re-execute a previously failed command. If no ID is provided,
+    /// retries the most recently failed command.
+    Retry {
+        /// History entry ID to retry (optional)
+        id: Option<i64>,
+    },
+
+    /// Manage command templates
+    ///
+    /// Create, use, and manage reusable command configuration templates.
+    /// Templates allow you to quickly set up common project types with
+    /// predefined commands.
+    Template {
+        #[command(subcommand)]
+        action: TemplateAction,
+    },
 }
 
 /// Configuration management actions
@@ -241,6 +279,222 @@ pub enum ConfigAction {
     ///
     /// Displays all configuration values from the active configuration file
     Show,
+}
+
+/// Environment management actions
+#[derive(Subcommand, Debug)]
+pub enum EnvAction {
+    /// Switch to a different environment
+    ///
+    /// Examples:
+    ///   cmdrun env use dev
+    ///   cmdrun env use staging
+    Use {
+        /// Environment name to switch to
+        name: String,
+    },
+
+    /// Show the current active environment
+    Current,
+
+    /// List all available environments
+    List,
+
+    /// Set an environment variable for an environment
+    ///
+    /// Examples:
+    ///   cmdrun env set NODE_ENV development
+    ///   cmdrun env set API_URL https://api.example.com --env prod
+    Set {
+        /// Variable name
+        key: String,
+
+        /// Variable value
+        value: String,
+
+        /// Target environment (defaults to current)
+        #[arg(short, long)]
+        env: Option<String>,
+    },
+
+    /// Create a new environment
+    ///
+    /// Examples:
+    ///   cmdrun env create qa --description "QA environment"
+    Create {
+        /// Environment name
+        name: String,
+
+        /// Environment description
+        #[arg(short, long)]
+        description: Option<String>,
+    },
+
+    /// Show detailed information about an environment
+    ///
+    /// Examples:
+    ///   cmdrun env info
+    ///   cmdrun env info prod
+    Info {
+        /// Environment name (defaults to current)
+        name: Option<String>,
+    },
+}
+
+/// History management actions
+#[derive(Subcommand, Debug)]
+pub enum HistoryAction {
+    /// List command execution history
+    ///
+    /// Examples:
+    ///   cmdrun history list
+    ///   cmdrun history list --limit 20
+    ///   cmdrun history list --failed
+    List {
+        /// Maximum number of entries to display
+        #[arg(short, long, default_value = "50")]
+        limit: usize,
+
+        /// Offset for pagination
+        #[arg(short = 'o', long)]
+        offset: Option<usize>,
+
+        /// Show only failed commands
+        #[arg(short, long)]
+        failed: bool,
+
+        /// Show statistics summary
+        #[arg(short, long)]
+        stats: bool,
+    },
+
+    /// Search command history
+    ///
+    /// Examples:
+    ///   cmdrun history search build
+    ///   cmdrun history search test --limit 10
+    Search {
+        /// Search query (matches command name or arguments)
+        query: String,
+
+        /// Maximum number of results to display
+        #[arg(short, long)]
+        limit: Option<usize>,
+    },
+
+    /// Clear command history
+    ///
+    /// Examples:
+    ///   cmdrun history clear
+    ///   cmdrun history clear --force
+    Clear {
+        /// Skip confirmation prompt
+        #[arg(short, long)]
+        force: bool,
+    },
+
+    /// Export history to file
+    ///
+    /// Examples:
+    ///   cmdrun history export --format json -o history.json
+    ///   cmdrun history export --format csv --limit 100
+    Export {
+        /// Export format
+        #[arg(short, long, value_enum, default_value = "json")]
+        format: ExportFormat,
+
+        /// Output file path (prints to stdout if not specified)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+
+        /// Maximum number of entries to export
+        #[arg(short, long)]
+        limit: Option<usize>,
+    },
+
+    /// Show history statistics
+    Stats,
+}
+
+/// Export format for history
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum ExportFormat {
+    /// JSON format
+    Json,
+    /// CSV format
+    Csv,
+}
+
+/// Template management actions
+#[derive(Subcommand, Debug)]
+pub enum TemplateAction {
+    /// Add a new template from current configuration
+    ///
+    /// Create a new template based on your current commands.toml file.
+    /// The template will be saved to ~/.cmdrun/templates/ and can be
+    /// reused in other projects.
+    Add {
+        /// Template name (optional, will prompt if not provided)
+        name: Option<String>,
+    },
+
+    /// Use a template to create/update commands.toml
+    ///
+    /// Apply a template to create a new commands.toml file or update
+    /// an existing one. Available templates include built-in templates
+    /// (rust-cli, nodejs-web, python-data, react-app) and your custom
+    /// user templates.
+    Use {
+        /// Template name
+        name: String,
+
+        /// Output path (default: commands.toml)
+        #[arg(short, long)]
+        output: Option<PathBuf>,
+    },
+
+    /// List all available templates
+    ///
+    /// Show all available templates including built-in templates and
+    /// your custom user templates.
+    List {
+        /// Show detailed information
+        #[arg(short, long)]
+        verbose: bool,
+    },
+
+    /// Remove a user template
+    ///
+    /// Delete a custom user template. Built-in templates cannot be removed.
+    Remove {
+        /// Template name
+        name: String,
+
+        /// Skip confirmation prompt
+        #[arg(short, long)]
+        force: bool,
+    },
+
+    /// Export a template to a file
+    ///
+    /// Export a template (built-in or user) to a TOML file for sharing
+    /// or backup purposes.
+    Export {
+        /// Template name
+        name: String,
+
+        /// Output file path
+        output: PathBuf,
+    },
+
+    /// Import a template from a file
+    ///
+    /// Import a template from a TOML file. The template will be validated
+    /// and saved to ~/.cmdrun/templates/.
+    Import {
+        /// Template file path
+        file: PathBuf,
+    },
 }
 
 /// Graph output format

@@ -2,6 +2,7 @@
 
 use crate::config::loader::ConfigLoader;
 use crate::config::validation::{ConfigValidator, ValidationError};
+use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use colored::Colorize;
 use std::path::PathBuf;
@@ -39,10 +40,15 @@ impl ValidationReport {
         !self.errors.is_empty()
     }
 
-    pub fn print(&self, verbose: bool) {
+    pub fn print(&self, verbose: bool, lang: crate::config::schema::Language) {
         if !self.errors.is_empty() {
             println!();
-            println!("{}", "Errors:".red().bold());
+            println!(
+                "{}",
+                format!("{}:", get_message(MessageKey::ValidateErrors, lang))
+                    .red()
+                    .bold()
+            );
             for err in &self.errors {
                 println!("  {} {}", "✗".red(), err);
             }
@@ -50,7 +56,12 @@ impl ValidationReport {
 
         if !self.warnings.is_empty() {
             println!();
-            println!("{}", "Warnings:".yellow().bold());
+            println!(
+                "{}",
+                format!("{}:", get_message(MessageKey::ValidateWarnings, lang))
+                    .yellow()
+                    .bold()
+            );
             for warn in &self.warnings {
                 println!("  {} {}", "⚠".yellow(), warn);
             }
@@ -58,7 +69,12 @@ impl ValidationReport {
 
         if verbose && !self.info.is_empty() {
             println!();
-            println!("{}", "Information:".cyan().bold());
+            println!(
+                "{}",
+                format!("{}:", get_message(MessageKey::ValidateInformation, lang))
+                    .cyan()
+                    .bold()
+            );
             for info in &self.info {
                 println!("  {} {}", "ℹ".cyan(), info);
             }
@@ -78,10 +94,7 @@ pub async fn handle_validate(
     verbose: bool,
     check_cycles: bool,
 ) -> Result<()> {
-    println!("{}", "Validating configuration...".cyan().bold());
-    println!();
-
-    // Load configuration
+    // Load configuration first to get language setting
     let config_loader = if let Some(p) = &path {
         ConfigLoader::with_path(p.clone())
     } else {
@@ -93,10 +106,21 @@ pub async fn handle_validate(
         .await
         .context("Failed to load configuration")?;
 
+    let lang = config.config.language;
+
+    println!(
+        "{}",
+        format!("{}...", get_message(MessageKey::ValidatingConfiguration, lang))
+            .cyan()
+            .bold()
+    );
+    println!();
+
     let config_path = path.unwrap_or_else(|| PathBuf::from("commands.toml"));
     println!(
-        "{} Loaded configuration from {}",
+        "{} {} {}",
         "✓".green(),
+        get_message(MessageKey::ValidateLoadedConfigFrom, lang),
         config_path.display()
     );
 
@@ -124,13 +148,21 @@ pub async fn handle_validate(
     // Check circular dependencies if requested
     if check_cycles {
         println!();
-        println!("{}", "Checking for circular dependencies...".cyan());
+        println!(
+            "{}",
+            format!("{}...", get_message(MessageKey::ValidateCheckingCircularDependencies, lang))
+                .cyan()
+        );
 
         for (name, _) in &config.commands {
             if let Err(e) = validator.compute_execution_order(std::slice::from_ref(name)) {
                 report.add_error(format!("Circular dependency in '{}': {}", name, e));
             } else if verbose {
-                report.add_info(format!("✓ No circular dependencies for '{}'", name));
+                report.add_info(format!(
+                    "✓ {} '{}'",
+                    get_message(MessageKey::ValidateNoCircularDependenciesFor, lang),
+                    name
+                ));
             }
         }
     }
@@ -138,7 +170,10 @@ pub async fn handle_validate(
     // Validate each command
     if verbose {
         println!();
-        println!("{}", "Validating commands:".cyan());
+        println!(
+            "{}",
+            format!("{}:", get_message(MessageKey::ValidateValidatingCommands, lang)).cyan()
+        );
 
         for (name, cmd) in &config.commands {
             println!("  {} {}", "✓".green(), name);
@@ -160,15 +195,20 @@ pub async fn handle_validate(
     // Validate aliases
     if verbose && !config.aliases.is_empty() {
         println!();
-        println!("{}", "Validating aliases:".cyan());
+        println!(
+            "{}",
+            format!("{}:", get_message(MessageKey::ValidateValidatingAliases, lang)).cyan()
+        );
 
         for (alias, target) in &config.aliases {
             if config.commands.contains_key(target) {
                 println!("  {} {} -> {}", "✓".green(), alias, target);
             } else {
                 report.add_error(format!(
-                    "Alias '{}' points to non-existent command '{}'",
-                    alias, target
+                    "{} '{}' points to non-existent command '{}'",
+                    get_message(MessageKey::ErrorAliasTargetNotFound, lang),
+                    alias,
+                    target
                 ));
             }
         }
@@ -177,18 +217,26 @@ pub async fn handle_validate(
     // Build dependency graph
     if verbose {
         println!();
-        println!("{}", "Building dependency graph...".cyan());
+        println!(
+            "{}",
+            format!("{}...", get_message(MessageKey::ValidateBuildingDependencyGraph, lang)).cyan()
+        );
 
         match validator.build_dependency_graph() {
             Ok(_graph) => {
-                report.add_info("Dependency graph built successfully".to_string());
+                report.add_info(get_message(MessageKey::ValidateDependencyGraphBuilt, lang).to_string());
 
                 // Show execution order for some commands
                 for (name, _) in config.commands.iter().take(3) {
                     if let Ok(order) = validator.compute_execution_order(std::slice::from_ref(name))
                     {
                         if order.len() > 1 {
-                            println!("  {} Execution order: {}", "→".blue(), order.join(" → "));
+                            println!(
+                                "  {} {}: {}",
+                                "→".blue(),
+                                get_message(MessageKey::ValidateExecutionOrder, lang),
+                                order.join(" → ")
+                            );
                         }
                     }
                 }
@@ -200,23 +248,27 @@ pub async fn handle_validate(
     }
 
     // Print report
-    report.print(verbose);
+    report.print(verbose, lang);
 
     // Print summary
     println!();
     if report.has_errors() {
         println!(
-            "{} Configuration validation failed with {} error(s)",
+            "{} {} {} error(s)",
             "✗".red().bold(),
+            get_message(MessageKey::ValidateFailedWithErrors, lang),
             report.errors.len()
         );
-        anyhow::bail!("Validation failed");
+        anyhow::bail!("{}", get_message(MessageKey::ValidationFailed, lang));
     } else {
         println!(
-            "{} Configuration is valid ({} commands, {} aliases)",
+            "{} {} ({} {}, {} {})",
             "✓".green().bold(),
+            get_message(MessageKey::ConfigurationIsValid, lang),
             config.commands.len(),
-            config.aliases.len()
+            get_message(MessageKey::ValidateCommandsDefined, lang),
+            config.aliases.len(),
+            get_message(MessageKey::ValidateAliasesDefined, lang)
         );
 
         if !report.warnings.is_empty() {
