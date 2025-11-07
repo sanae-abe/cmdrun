@@ -1,221 +1,234 @@
 # cmdrun
 
-[日本語](README.md) | [English](README.en.md)
+[English](README.md) | [日本語](README.ja.md)
 
-> **頻繁に使うコマンドを管理する個人向けグローバルコマンド管理ツール**
+> **A personal global command manager for your frequently used commands**
 >
-> コマンドを一度登録すれば、どこからでも実行可能。高速・安全・クロスプラットフォーム対応。
+> Register your commands once, run them from anywhere. Fast, secure, and cross-platform.
 
-## 目次
+## Table of Contents
 
-- [cmdrunの特徴](#cmdrunの特徴)
-- [インストール](#インストール)
-- [基本的な使い方](#基本的な使い方)
-- [機能](#機能)
-- [設定例](#設定例)
-- [ドキュメント](#ドキュメント)
-- [ライセンス](#ライセンス)
+- [Why cmdrun?](#why-cmdrun)
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Features](#features)
+- [Configuration Examples](#configuration-examples)
+- [Documentation](#documentation)
+- [License](#license)
 
-## cmdrunの特徴
+## Why cmdrun?
 
-### 🚀 パフォーマンス
-- **起動時間が約29倍高速** - Node.jsベースのタスクランナーと比較
-- **起動時間4ms** - npm/yarnの115ms以上と比較
-- **メモリフットプリント10MB** - Node.jsの200MB以上と比較
+### 🚀 Performance
+- **~29x faster startup** than Node.js-based task runners
+- **4ms startup time** vs 115ms+ for npm/yarn
+- **10MB memory footprint** vs 200MB+ for Node.js
 
-### 🔒 セキュリティ
-- **`eval()`ゼロ** - 動的コード実行なし
-- **安全な変数展開** - シェルインジェクション脆弱性なし
-- **依存関係監査** - ビルトインセキュリティスキャン
+### 🔒 Security
+- **Zero `eval()`** - No dynamic code execution
+- **Safe variable expansion** - No shell injection vulnerabilities
+- **Dependency audit** - Built-in security scanning
 
-### 🌍 クロスプラットフォーム
-- **対応OS**: Linux、macOS、Windows、FreeBSD
-- **シェル検出**: bash/zsh/fish/pwshを自動検出
-- **ネイティブバイナリ**: ランタイム依存なし
+### 🌍 Cross-platform
+- **Supported OS**: Linux, macOS, Windows, FreeBSD
+- **Shell detection**: Auto-detects bash/zsh/fish/pwsh
+- **Native binaries**: No runtime dependencies
 
-### 💎 開発者体験
-- **TOML設定** - 型安全で読みやすい
-- **強力な機能** - 依存関係、並列実行、フック、Watch Mode
-- **優れたエラー表示** - コンテキスト付き詳細エラーメッセージ
+### 💎 Developer Experience
+- **TOML configuration** - Type-safe, easy to read
+- **Powerful features** - Dependencies, parallel execution, hooks, Watch Mode
+- **Great errors** - Detailed error messages with context
 
-## インストール
+## Installation
 
-#### システム要件
+#### System Requirements
 
-- **オペレーティングシステム**: Linux、macOS、Windows、FreeBSD
-- **Rust**: 1.70以上（MSRV）
+- **Operating System**: Linux, macOS, Windows, FreeBSD
+- **Rust**: 1.70+ (MSRV)
 
-#### Rustツールチェーンのインストール
+#### Install Rust Toolchain
 
 ```bash
-# 1. Rustup（Rustインストーラー）をダウンロード・実行
+# 1. Download and run Rustup (Rust installer)
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-# 2. 環境変数を読み込み
+# 2. Load environment variables
 source ~/.cargo/env
 
-# 3. インストール確認
+# 3. Verify installation
 rustc --version
 cargo --version
 ```
 
-#### cmdrunのビルド&インストール
+#### Build and Install cmdrun
 
 ```bash
-# 1. リポジトリをクローン
+# 1. Clone the repository
 git clone git@github.com:sanae-abe/cmdrun.git
 cd cmdrun
 
-# 2. ビルド&インストール
+# 2. Build and install
 cargo install --path .
 
-# 3. 動作確認
+# 3. Verify installation
 cmdrun --version
 cmdrun --help
 ```
 
-### アップデート
+### Update
 
 ```bash
-# ソースからインストールした場合
-cd cmdrun  # プロジェクトディレクトリ
+# If installed from source
+cd cmdrun  # Navigate to project directory
 git pull
 
-# 再ビルド&インストール
+# Rebuild and install
 cargo install --path . --force
 ```
 
-### アンインストール
+### Uninstall
 
 ```bash
-# 1. バイナリの削除
+# 1. Remove binary
 cargo uninstall cmdrun
 
-# 2. 設定ファイルの削除（任意）
+# 2. Remove configuration files (optional)
 # Linux/macOS
 rm -rf ~/.config/cmdrun
 
-# Windows（PowerShellで実行）
+# Windows (run in PowerShell)
 # Remove-Item -Recurse -Force "$env:APPDATA\cmdrun"
 
-# 3. プロジェクトディレクトリの削除（任意）
+# 3. Remove project directory (optional)
 # cd ..
 # rm -rf cmdrun
 ```
 
-**注意事項:**
-- `cargo uninstall cmdrun`は実行ファイルのみを削除します
-- 設定ファイル（commands.toml等）は手動で削除する必要があります
-- 設定を保持したい場合は、ステップ2をスキップしてください
+**Note:**
+- `cargo uninstall cmdrun` only removes the executable
+- Configuration files (commands.toml, etc.) need to be removed manually
+- Skip step 2 if you want to keep your settings
 
-## 基本的な使い方
-
-cmdrunは**個人向けグローバルコマンド管理ツール**です。頻繁に使うコマンドを登録し、システムのどこからでも実行できます。
-
-#### よく使うコマンドを登録
-
+<!-- Future installation methods (commented out until available)
+#### Homebrew (macOS/Linux)
 ```bash
-# 対話的にコマンドを追加
-cmdrun add
-
-# または、直接パラメータを指定して追加
-cmdrun add dev "npm run dev" "開発サーバーを起動"
-cmdrun add push "git add . && git commit && git push" "変更をコミット＆プッシュ"
-cmdrun add prod-ssh "ssh user@production-server.com" "本番サーバーに接続"
-cmdrun add docker-clean "docker system prune -af" "未使用のDockerリソースを削除"
-cmdrun add db-backup "pg_dump mydb > backup_$(date +%Y%m%d).sql" "データベースをバックアップ"
+brew install sanae-abe/tap/cmdrun
 ```
 
-<img src="docs/screenshots/add.webp" alt="コマンド追加" width="600">
+#### Scoop (Windows)
+```bash
+scoop bucket add cmdrun https://github.com/sanae-abe/scoop-bucket
+scoop install cmdrun
+```
+-->
 
-#### コマンドを実行・管理
+## Basic Usage
+
+cmdrun is a **personal global command manager** that allows you to register and run frequently used commands from anywhere on your system.
+
+#### Register your frequently used commands
 
 ```bash
-# 登録したコマンドを実行
+# Add a command interactively
+cmdrun add
+
+# Or add directly with parameters
+cmdrun add dev "npm run dev" "Start development server"
+cmdrun add push "git add . && git commit && git push" "Commit and push changes"
+cmdrun add prod-ssh "ssh user@production-server.com" "Connect to production server"
+cmdrun add docker-clean "docker system prune -af" "Clean up unused Docker resources"
+cmdrun add db-backup "pg_dump mydb > backup_$(date +%Y%m%d).sql" "Backup database"
+```
+
+<img src="docs/screenshots/add.webp" alt="Adding Commands" width="600">
+
+#### Run and manage your commands
+
+```bash
+# Run a registered command
 cmdrun run dev
 
-# 登録されている全コマンドを表示
+# List all registered commands
 cmdrun list
 
-# コマンドを検索
+# Search for commands
 cmdrun search docker
 
-# コマンドを削除
+# Remove a command
 cmdrun remove dev
 ```
 
-<img src="docs/screenshots/run.webp" alt="コマンド実行" width="600">
+<img src="docs/screenshots/run.webp" alt="Running Commands" width="600">
 
-<img src="docs/screenshots/list.webp" alt="コマンド一覧" width="600">
+<img src="docs/screenshots/list.webp" alt="Listing Commands" width="600">
 
-#### 設定管理
+#### Configuration management
 
 ```bash
-# 設定を表示
+# Show all settings
 cmdrun config show
 
-# 言語設定を変更
+# Change language
 cmdrun config set language japanese
 
-# カスタム設定ファイルを使用
+# Use custom configuration file
 cmdrun --config ~/work/commands.toml list
 cmdrun -c ~/.cmdrun/personal.toml run dev
 
-# ヘルプを表示
+# Show help
 cmdrun --help
 ```
 
-**設定ファイルの場所:**
+**Configuration file location:**
 - Linux/macOS: `~/.config/cmdrun/commands.toml`
 - Windows: `%APPDATA%\cmdrun\commands.toml`
-- カスタムパス: `--config/-c` オプションで任意のパスを指定可能
+- Custom path: Use `--config/-c` option to specify any path
 
-## 機能
+## Features
 
-### 変数展開
+### Variable Expansion
 
 ```toml
 [commands.deploy]
-cmd = "scp dist/ ${DEPLOY_USER:?DEPLOY_USERが設定されていません}@${DEPLOY_HOST:?DEPLOY_HOSTが設定されていません}:${DEPLOY_PATH:-/var/www}"
+cmd = "scp dist/ ${DEPLOY_USER:?DEPLOY_USER not set}@${DEPLOY_HOST:?DEPLOY_HOST not set}:${DEPLOY_PATH:-/var/www}"
 ```
 
-サポートされる構文：
-- `${VAR}` - 基本展開
-- `${1}`, `${2}`, ... - 位置引数
-- `${VAR:-default}` - デフォルト値
-- `${VAR:?error}` - 必須変数
-- `${VAR:+value}` - 条件付き置換
+Supported syntax:
+- `${VAR}` - Basic expansion
+- `${1}`, `${2}`, ... - Positional arguments
+- `${VAR:-default}` - Default value
+- `${VAR:?error}` - Required variable
+- `${VAR:+value}` - Conditional substitution
 
-**位置引数の例:**
+**Positional Arguments Example:**
 
 ```toml
 [commands.convert]
-description = "画像フォーマット変換"
+description = "Convert image format"
 cmd = "sharp -i ${1} -f ${2:-webp} -q ${3:-80} -o ${4:-output.webp}"
 ```
 
 ```bash
-# 引数を指定して実行
+# Usage with arguments
 cmdrun run convert input.png webp 90 output.webp
-# 展開結果: sharp -i input.png -f webp -q 90 -o output.webp
+# Expands to: sharp -i input.png -f webp -q 90 -o output.webp
 
-# デフォルト値を使用
+# Using default values
 cmdrun run convert input.png
-# 展開結果: sharp -i input.png -f webp -q 80 -o output.webp
+# Expands to: sharp -i input.png -f webp -q 80 -o output.webp
 ```
 
-### 依存関係
+### Dependencies
 
 ```toml
 [commands.test]
 cmd = "cargo test"
-deps = ["build"]  # 'test'の前に'build'を実行
+deps = ["build"]  # Run 'build' before 'test'
 
 [commands.build]
 cmd = "cargo build --release"
 ```
 
-### 並列実行
+### Parallel Execution
 
 ```toml
 [commands.check]
@@ -226,7 +239,7 @@ cmd = [
 ]
 ```
 
-### プラットフォーム固有のコマンド
+### Platform-specific Commands
 
 ```toml
 [commands."open:browser"]
@@ -235,19 +248,19 @@ cmd.windows = "start http://localhost:3000"
 cmd.linux = "xdg-open http://localhost:3000"
 ```
 
-### フック
+### Hooks
 
 ```toml
 [hooks]
-pre_run = "echo '開始中...'"
-post_run = "echo '完了!'"
+pre_run = "echo 'Starting...'"
+post_run = "echo 'Done!'"
 
 [hooks.commands.deploy]
-pre_run = "git diff --exit-code"  # コミットされていない変更がないことを確認
-post_run = "echo '$(date)にデプロイ' >> deploy.log"
+pre_run = "git diff --exit-code"  # Ensure no uncommitted changes
+post_run = "echo 'Deployed at $(date)' >> deploy.log"
 ```
 
-### 環境変数
+### Environment Variables
 
 ```toml
 [config.env]
@@ -256,83 +269,83 @@ RUST_BACKTRACE = "1"
 
 [commands.dev]
 cmd = "npm run dev"
-env = { PORT = "3000" }  # コマンド固有の環境変数
+env = { PORT = "3000" }  # Command-specific env
 ```
 
-### 環境管理
+### Environment Management
 
-開発・ステージング・本番など異なる環境を簡単に切り替えることができます。
+Easily switch between development, staging, and production environments.
 
 ```bash
-# 環境を作成
+# Create environments
 cmdrun env create dev --description "Development environment"
 cmdrun env create prod --description "Production environment"
 
-# 環境を切り替え
+# Switch environments
 cmdrun env use dev
-cmdrun run start  # 開発環境の設定で起動
+cmdrun run start  # Start with development settings
 
 cmdrun env use prod
-cmdrun run deploy  # 本番環境の設定でデプロイ
+cmdrun run deploy  # Deploy with production settings
 
-# 環境変数を設定
+# Set environment variables
 cmdrun env set API_URL https://api.staging.com --env staging
 ```
 
-詳細は[環境管理ガイド](docs/ENVIRONMENT_MANAGEMENT.md)を参照してください。
+See [Environment Management Guide](docs/ENVIRONMENT_MANAGEMENT.md) for details.
 
-### 履歴・ログ機能
+### History & Logging
 
-コマンド実行履歴の記録・検索・再実行が可能です。
+Record, search, and replay command execution history.
 
 ```bash
-# 履歴を表示
+# Show history
 cmdrun history list
 
-# コマンドを検索
+# Search commands
 cmdrun history search build
 
-# 統計情報を表示
+# Show statistics
 cmdrun history stats
 
-# 最後に失敗したコマンドを再実行
+# Retry last failed command
 cmdrun retry
 
-# 履歴をエクスポート
+# Export history
 cmdrun history export --format json -o history.json
 ```
 
-詳細は[履歴機能ガイド](docs/user-guide/HISTORY.md)を参照してください。
+See [History Guide](docs/user-guide/HISTORY.md) for details.
 
-### テンプレート機能
+### Template System
 
-プロジェクトテンプレートの使用・作成・共有ができます。
+Use, create, and share project templates.
 
 ```bash
-# 利用可能なテンプレートを表示
+# List available templates
 cmdrun template list
 
-# テンプレートを使用
+# Use a template
 cmdrun template use rust-cli
 
-# カスタムテンプレートを作成
+# Create custom template
 cmdrun template add my-template
 
-# テンプレートをエクスポート
+# Export template
 cmdrun template export rust-cli ./my-template.toml
 ```
 
-**ビルトインテンプレート:**
-- `rust-cli` - Rust CLI開発（cargo build/test/clippy/fmt）
-- `nodejs-web` - Node.js Web開発（npm dev/build/test）
-- `python-data` - Python データサイエンス（pytest/jupyter）
-- `react-app` - React アプリケーション（dev/build/storybook）
+**Built-in Templates:**
+- `rust-cli` - Rust CLI development (cargo build/test/clippy/fmt)
+- `nodejs-web` - Node.js web development (npm dev/build/test)
+- `python-data` - Python data science (pytest/jupyter)
+- `react-app` - React application (dev/build/storybook)
 
-詳細は[テンプレート機能レポート](TEMPLATE_FEATURE_REPORT.md)を参照してください。
+See [Template Feature Report](TEMPLATE_FEATURE_REPORT.md) for details.
 
-### プラグインシステム
+### Plugin System
 
-外部プラグインによる機能拡張が可能です。
+Extend functionality with external plugins.
 
 ```toml
 # commands.toml
@@ -346,23 +359,23 @@ level = "info"
 ```
 
 ```bash
-# プラグインを一覧表示
+# List plugins
 cmdrun plugin list
 
-# プラグインの詳細を表示
+# Show plugin details
 cmdrun plugin info logger
 
-# プラグインを有効化/無効化
+# Enable/disable plugins
 cmdrun plugin enable logger
 cmdrun plugin disable logger
 ```
 
-詳細は[プラグインシステムレポート](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)および[プラグインAPI](docs/plugins/API.md)を参照してください。
+See [Plugin System Report](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md) and [Plugin API](docs/plugins/API.md) for details.
 
-### Watch Mode - ファイル監視
+### Watch Mode - File Watching
 
 ```toml
-# commands.tomlで通常通りコマンドを定義
+# Define commands as usual in commands.toml
 [commands.dev]
 cmd = "cargo build"
 
@@ -371,42 +384,42 @@ cmd = "cargo test"
 ```
 
 ```bash
-# コマンドラインからWatch Modeで実行
-# Rustファイルの変更を監視してビルド
+# Run with Watch Mode from command line
+# Watch Rust files and build on changes
 cmdrun watch dev --pattern "**/*.rs"
 
-# テストの自動実行（デバウンス1秒）
+# Auto-run tests (with 1s debounce)
 cmdrun watch test --pattern "**/*.rs" --debounce 1000
 
-# 複数のディレクトリを監視
+# Watch multiple directories
 cmdrun watch dev --path src --path lib
 ```
 
-**Watch Modeの主な機能:**
-- **Globパターン**: ファイルフィルタリング（例: `**/*.rs`, `**/*.ts`）
-- **除外パターン**: 不要なファイル/ディレクトリを除外（デフォルトで`node_modules`, `target`等を除外）
-- **デバウンス**: 頻繁な変更時の不要な実行を防止（デフォルト500ms）
-- **再帰監視**: サブディレクトリも自動監視（`--no-recursive`で無効化可能）
-- **gitignore統合**: `.gitignore`のパターンを自動尊重
+**Watch Mode Key Features:**
+- **Glob Patterns**: File filtering (e.g., `**/*.rs`, `**/*.ts`)
+- **Exclude Patterns**: Exclude unwanted files/directories (defaults exclude `node_modules`, `target`, etc.)
+- **Debouncing**: Prevent unnecessary executions on frequent changes (default 500ms)
+- **Recursive Watching**: Automatically watch subdirectories (can disable with `--no-recursive`)
+- **gitignore Integration**: Automatically respect `.gitignore` patterns
 
-詳細は[Watch Modeガイド](docs/user-guide/WATCH_MODE.md)を参照してください。
+See [Watch Mode Guide](docs/user-guide/WATCH_MODE.md) for details.
 
-### 言語設定（i18n）
+### Language Settings (i18n)
 
-cmdrunは英語と日本語の国際化をサポートしています。`commands.toml`で言語を設定できます：
+cmdrun supports internationalization with English and Japanese languages. Configure the language in your `commands.toml`:
 
 ```toml
 [config]
-language = "japanese"  # または "english"（デフォルト）
+language = "japanese"  # or "english" (default)
 ```
 
-**サポートされるメッセージ：**
-- コマンド実行（実行中、完了、エラー）
-- 対話的プロンプト（コマンドID、説明など）
-- 成功/エラーメッセージ（コマンドが追加されました、コマンドが見つかりませんなど）
-- バリデーションエラー（空の入力、重複コマンドなど）
+**Supported Messages:**
+- Command execution (Running, Completed, Error)
+- Interactive prompts (Command ID, Description, etc.)
+- Success/error messages (Command added, Command not found, etc.)
+- Validation errors (Empty input, duplicate commands, etc.)
 
-**例（日本語）：**
+**Example (Japanese):**
 ```bash
 $ cmdrun add test-ja "echo テスト" "日本語テストコマンド"
 📝 コマンドを追加中 'test-ja' ...
@@ -415,7 +428,7 @@ $ cmdrun add test-ja "echo テスト" "日本語テストコマンド"
   コマンド: echo テスト
 ```
 
-**例（英語）：**
+**Example (English):**
 ```bash
 $ cmdrun add test-en "echo test" "English test command"
 📝 Adding command 'test-en' ...
@@ -424,125 +437,125 @@ $ cmdrun add test-en "echo test" "English test command"
   Command: echo test
 ```
 
-**現在サポートされているコマンド：**
-- `cmdrun add` - 完全にローカライズ済み（プロンプト、メッセージ、エラー）
-- より多くのコマンドが将来のリリースでローカライズされます
+**Currently Supported Commands:**
+- `cmdrun add` - Fully localized (prompts, messages, errors)
+- More commands will be localized in future releases
 
-### カスタム設定ファイル
+### Custom Configuration Files
 
-`--config/-c`オプションで複数の設定ファイルを使い分けることができます。
+You can use the `--config/-c` option to switch between multiple configuration files.
 
-**使用例：**
+**Usage Examples:**
 
 ```bash
-# 仕事用のコマンド
+# Work-related commands
 cmdrun --config ~/work/commands.toml list
 cmdrun -c ~/work/commands.toml run deploy
 
-# 個人用のコマンド
+# Personal commands
 cmdrun -c ~/personal/commands.toml run backup
 
-# プロジェクト固有のコマンド
+# Project-specific commands
 cd ~/projects/myapp
 cmdrun -c ./commands.toml run dev
 ```
 
-**ユースケース：**
+**Use Cases:**
 
-1. **環境別の設定**
+1. **Environment-specific configurations**
    ```bash
-   # 本番環境用
+   # Production environment
    cmdrun -c ~/.cmdrun/production.toml run deploy
 
-   # ステージング環境用
+   # Staging environment
    cmdrun -c ~/.cmdrun/staging.toml run deploy
 
-   # 開発環境用
+   # Development environment
    cmdrun -c ~/.cmdrun/development.toml run dev
    ```
 
-2. **複数のプロジェクト管理**
+2. **Multiple project management**
    ```bash
-   # プロジェクトA
+   # Project A
    cmdrun -c ~/projects/project-a/commands.toml run test
 
-   # プロジェクトB
+   # Project B
    cmdrun -c ~/projects/project-b/commands.toml run test
    ```
 
-3. **役割別のコマンド**
+3. **Role-based command sets**
    ```bash
-   # システム管理用
+   # System administration
    cmdrun -c ~/.cmdrun/admin.toml run server-check
 
-   # 開発用
+   # Development tasks
    cmdrun -c ~/.cmdrun/dev.toml run code-review
    ```
 
-**詳細は[設定リファレンス](docs/user-guide/CONFIGURATION.md#カスタム設定ファイルの指定)を参照してください。**
+**For more details, see [Configuration Reference](docs/user-guide/CONFIGURATION.md#custom-configuration-file-specification).**
 
-## 設定例
+## Configuration Examples
 
-設定ファイル（`~/.config/cmdrun/commands.toml`）を直接編集することで、より高度な機能を使用できます：
+You can edit the configuration file (`~/.config/cmdrun/commands.toml`) directly for advanced features:
 
 ```toml
-# 依存関係を持つコマンド
+# Commands with dependencies
 [commands.deploy]
-description = "本番環境へデプロイ"
+description = "Deploy to production"
 cmd = "ssh user@server 'cd /app && git pull && npm install && pm2 restart app'"
-deps = ["test"]  # テストが成功してからデプロイ
-confirm = true   # 実行前に確認
+deps = ["test"]  # Deploy only after tests pass
+confirm = true   # Ask for confirmation before running
 
 [commands.test]
-description = "テストを実行"
+description = "Run tests"
 cmd = "npm test"
 
-# 環境変数を使用
+# Using environment variables
 [commands.backup]
-description = "バックアップを作成"
+description = "Create backup"
 cmd = "rsync -avz ~/projects/ ${BACKUP_PATH:?BACKUP_PATH not set}"
 
-# プラットフォーム別のコマンド
+# Platform-specific commands
 [commands.open]
-description = "ブラウザを開く"
+description = "Open browser"
 cmd.unix = "open http://localhost:3000"
 cmd.windows = "start http://localhost:3000"
 cmd.linux = "xdg-open http://localhost:3000"
 ```
 
-## ドキュメント
+## Documentation
 
-### ユーザーガイド
-- [CLIリファレンス](docs/user-guide/CLI.md)
-- [設定リファレンス](docs/user-guide/CONFIGURATION.md)
-- [国際化（i18n）](docs/user-guide/I18N.md)
+### User Guide
+- [CLI Reference](docs/user-guide/CLI.md)
+- [Configuration Reference](docs/user-guide/CONFIGURATION.md)
+- [Internationalization (i18n)](docs/user-guide/I18N.md)
 - [Watch Mode](docs/user-guide/WATCH_MODE.md)
-- [履歴機能](docs/user-guide/HISTORY.md)
+- [History](docs/user-guide/HISTORY.md)
 - [FAQ](docs/user-guide/FAQ.md)
-- [レシピ集](docs/user-guide/RECIPES.md)
-- [トラブルシューティング](docs/user-guide/TROUBLESHOOTING.md)
+- [Recipes](docs/user-guide/RECIPES.md)
+- [Troubleshooting](docs/user-guide/TROUBLESHOOTING.md)
 
-### 機能ガイド
-- [環境管理](docs/ENVIRONMENT_MANAGEMENT.md)
-- [テンプレート機能](TEMPLATE_FEATURE_REPORT.md)
-- [プラグインシステム](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)
+### Feature Guides
+- [Environment Management](docs/ENVIRONMENT_MANAGEMENT.md)
+- [Template System](TEMPLATE_FEATURE_REPORT.md)
+- [Plugin System](PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)
 
-### プラグイン開発
-- [プラグインAPI仕様](docs/plugins/API.md)
-- [プラグイン開発ガイド](docs/plugins/DEVELOPMENT_GUIDE.md)
-- [サンプルプラグイン](examples/plugins/README.md)
+### Plugin Development
+- [Plugin API Specification](docs/plugins/API.md)
+- [Plugin Development Guide](docs/plugins/DEVELOPMENT_GUIDE.md)
+- [Sample Plugins](examples/plugins/README.md)
 
-### 技術ドキュメント
-- [アーキテクチャ](docs/technical/ARCHITECTURE.md)
-- [パフォーマンス](docs/technical/PERFORMANCE.md)
-- [パフォーマンスガイド](docs/technical/PERFORMANCE_GUIDE.md)
-- [セキュリティ](docs/technical/SECURITY.md)
-- [クロスプラットフォームサポート](docs/technical/CROSS_PLATFORM.md)
-- [配布](docs/technical/DISTRIBUTION.md)
+### Technical Documentation
+- [Architecture](docs/technical/ARCHITECTURE.md)
+- [Performance](docs/technical/PERFORMANCE.md)
+- [Performance Guide](docs/technical/PERFORMANCE_GUIDE.md)
+- [Security](docs/technical/SECURITY.md)
+- [Cross-platform Support](docs/technical/CROSS_PLATFORM.md)
+- [Distribution](docs/technical/DISTRIBUTION.md)
 
-## ライセンス
+## License
 
-このプロジェクトは[MIT License](LICENSE)の下でライセンスされています。
+This project is licensed under the [MIT License](LICENSE).
 
 ---
-**開発者**: sanae.a.sunny@gmail.com
+**Developer**: sanae.a.sunny@gmail.com
