@@ -175,11 +175,16 @@ impl Default for HistoryRecorder {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use tempfile::NamedTempFile;
+    use tempfile::TempDir;
 
     fn create_test_recorder() -> HistoryRecorder {
-        let temp_file = NamedTempFile::new().unwrap();
-        let storage = HistoryStorage::with_path(temp_file.path()).unwrap();
+        let temp_dir = TempDir::new().unwrap();
+        let db_path = temp_dir.path().join("test_history.db");
+        let storage = HistoryStorage::with_path(&db_path).unwrap();
+
+        // Keep temp_dir alive by leaking it (acceptable for tests)
+        std::mem::forget(temp_dir);
+
         HistoryRecorder::with_storage(storage)
     }
 

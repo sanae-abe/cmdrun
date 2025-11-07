@@ -99,13 +99,19 @@ impl EnvironmentManager {
             .await
             .with_context(|| format!("Failed to read config: {}", config_path.display()))?;
 
-        let _full_config: CommandsConfig = toml::from_str(&content)
+        let full_config: toml::Value = toml::from_str(&content)
             .with_context(|| format!("Failed to parse config: {}", config_path.display()))?;
 
         // environment セクションを抽出
-        // Note: CommandsConfig に environment フィールドを追加する必要があるが、
-        // 後方互換性のため、デフォルトで空の設定を返す
-        Ok(EnvironmentConfig::default())
+        if let Some(env_section) = full_config.get("environment") {
+            let env_config: EnvironmentConfig = env_section.clone().try_into()
+                .context("Failed to parse environment section")?;
+            Ok(env_config)
+        } else {
+            // 後方互換性のため、デフォルトで空の設定を返す
+            debug!("No environment section found in config");
+            Ok(EnvironmentConfig::default())
+        }
     }
 
     /// 環境設定を保存
