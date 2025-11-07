@@ -2,7 +2,7 @@
 
 use ahash::AHashMap;
 use cmdrun::command::dependency::DependencyGraph;
-use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig};
+use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig, PluginsConfig};
 
 fn create_test_config() -> CommandsConfig {
     let mut commands = AHashMap::new();
@@ -42,6 +42,7 @@ fn create_test_config() -> CommandsConfig {
         commands,
         aliases: AHashMap::new(),
         hooks: Default::default(),
+        plugins: PluginsConfig::default(),
     }
 }
 
@@ -107,6 +108,7 @@ fn test_circular_dependency_detection() {
         commands,
         aliases: AHashMap::new(),
         hooks: Default::default(),
+        plugins: PluginsConfig::default(),
     };
 
     let graph = DependencyGraph::new(&config);
@@ -138,6 +140,7 @@ fn test_missing_dependency() {
         commands,
         aliases: AHashMap::new(),
         hooks: Default::default(),
+        plugins: PluginsConfig::default(),
     };
 
     let graph = DependencyGraph::new(&config);

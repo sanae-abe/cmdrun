@@ -3,7 +3,7 @@
 use ahash::AHashMap;
 use cmdrun::command::dependency::DependencyGraph;
 use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
-use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig, GlobalConfig};
+use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig, GlobalConfig, PluginsConfig};
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -181,5 +181,6 @@ fn create_test_config() -> CommandsConfig {
         commands,
         aliases: AHashMap::new(),
         hooks: Default::default(),
+        plugins: PluginsConfig::default(),
     }
 }

@@ -1,7 +1,7 @@
 //! Edge case and error handling tests
 
 use ahash::AHashMap;
-use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig, GlobalConfig};
+use cmdrun::config::schema::{Command, CommandSpec, CommandsConfig, GlobalConfig, PluginsConfig};
 use cmdrun::security::validation::CommandValidator;
 
 #[cfg(test)]
@@ -204,6 +204,7 @@ mod edge_case_tests {
                 commands: AHashMap::new(),
                 aliases: AHashMap::new(),
                 hooks: Default::default(),
+                plugins: PluginsConfig::default(),
             };
 
             assert_eq!(config.commands.len(), 0);
@@ -234,6 +235,7 @@ mod edge_case_tests {
                 commands,
                 aliases: AHashMap::new(),
                 hooks: Default::default(),
+                plugins: PluginsConfig::default(),
             };
 
             let cmd = config.commands.get("test").unwrap();
@@ -269,6 +271,7 @@ mod edge_case_tests {
                 commands,
                 aliases: AHashMap::new(),
                 hooks: Default::default(),
+                plugins: PluginsConfig::default(),
             };
 
             let cmd = config.commands.get("deploy").unwrap();
@@ -300,6 +303,7 @@ mod edge_case_tests {
                 commands,
                 aliases: AHashMap::new(),
                 hooks: Default::default(),
+                plugins: PluginsConfig::default(),
             };
 
             let cmd = config.commands.get("test").unwrap();
@@ -334,6 +338,7 @@ mod edge_case_tests {
                     commands,
                     aliases: AHashMap::new(),
                     hooks: Default::default(),
+                    plugins: PluginsConfig::default(),
                 };
 
                 assert!(config.commands.contains_key(name));
@@ -399,6 +404,7 @@ mod edge_case_tests {
                 commands,
                 aliases: AHashMap::new(),
                 hooks: Default::default(),
+                plugins: PluginsConfig::default(),
             };
 
             // Should handle deep dependency chains
@@ -433,6 +439,7 @@ mod edge_case_tests {
                 commands,
                 aliases: AHashMap::new(),
                 hooks: Default::default(),
+                plugins: PluginsConfig::default(),
             };
 
             assert_eq!(config.commands.len(), 1000);
