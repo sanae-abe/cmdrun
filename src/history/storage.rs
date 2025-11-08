@@ -388,7 +388,7 @@ impl HistoryStorage {
                 "DELETE FROM command_history
                  WHERE id IN (
                      SELECT id FROM command_history
-                     ORDER BY start_time ASC
+                     ORDER BY start_time ASC, id ASC
                      LIMIT ?1
                  )",
                 [to_delete],
