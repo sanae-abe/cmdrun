@@ -1,5 +1,9 @@
 # cmdrun
 
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/sanae-abe/cmdrun)
+[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 [English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
 
 > **个人全局命令管理器，管理您的常用命令**
@@ -41,6 +45,34 @@
 - **TOML配置** - 类型安全，易于阅读
 - **强大功能** - 依赖关系、并行执行、钩子、监视模式
 - **优秀的错误提示** - 详细的上下文错误消息
+
+### 🎯 独特优势
+
+**vs just (24.5k stars):**
+- ✅ 交互式TUI模式（just: 仅CLI）
+- ✅ 执行历史和统计（just: 无）
+- ✅ 插件系统（just: 无）
+- ✅ 环境管理（just: 无）
+
+**vs task (13.2k stars):**
+- ✅ 高级安全性（无eval、fuzzing）
+- ✅ 多语言支持（task: 仅英语）
+- ✅ 模板系统（task: 无）
+- ✅ Rust构建（task: Go）
+
+**vs cargo-make (2.5k stars):**
+- ✅ 启动快2.3倍（6.5ms vs 15ms）
+- ✅ 语言无关（cargo-make: 专注Rust）
+- ✅ 现代化UX（TUI、拼写检测）
+- ✅ 交互模式
+
+**仅cmdrun拥有的全部功能:**
+- 🔒 零eval安全性与fuzzing（373,423测试，0漏洞）
+- 🌍 4语言支持（英/日/简体中/繁体中）
+- 🎨 带模糊搜索的交互式TUI
+- 📊 基于SQLite的执行历史
+- 🔌 动态插件系统
+- 🎯 智能拼写检测
 
 ## 安装
 
@@ -153,7 +185,7 @@ cmdrun remove dev
 cmdrun config show
 
 # 更改语言
-cmdrun config set language chinese_simplified
+cmdrun config set language chinese-simplified
 
 # 使用自定义配置文件
 cmdrun --config ~/work/commands.toml list
@@ -389,29 +421,100 @@ cmdrun watch dev --path src --path lib
 
 详见 [监视模式指南](docs/user-guide/WATCH_MODE.md)。
 
-### 语言设置（i18n）
+### 交互模式（TUI）
 
-cmdrun 支持英语、日语和中文的国际化。在 `commands.toml` 中配置语言：
+启动带模糊搜索的交互式终端UI。
 
-```toml
-[config]
-language = "chinese_simplified"  # 或 "english"（默认）、"japanese"、"chinese_traditional"
+```bash
+# 启动交互模式
+cmdrun interactive
+# 或
+cmdrun -i
 ```
 
-**支持的消息：**
-- 命令执行（运行中、已完成、错误）
-- 交互提示（命令ID、描述等）
-- 成功/错误消息（成功添加命令、找不到命令等）
-- 验证错误（空输入、重复命令等）
+**功能：**
+- 🔍 **模糊搜索**：对所有命令进行增量搜索
+- ⚡ **快速执行**：按Enter键执行命令
+- 📊 **实时预览**：查看命令详情、依赖关系和执行历史
+- ⌨️ **键盘导航**：
+  - `↑`/`↓` 或 `j`/`k`：导航命令
+  - `Enter`：执行选定命令
+  - `Ctrl+U`：清除搜索输入
+  - `Ctrl+W`：向后删除单词
+  - `Esc` 或 `q`：退出
+
+**预览面板：**
+- 命令描述和实际命令字符串
+- 环境变量展开预览
+- 执行统计（运行次数、最后执行时间）
+
+详见 [TUI实现摘要](docs/TUI_IMPLEMENTATION_SUMMARY.md)。
+
+### 拼写检测
+
+cmdrun 自动检测命令名称中的拼写错误并提供纠正建议。
+
+**示例：**
+```bash
+$ cmdrun seach docker
+Error: Unknown command 'seach'
+
+您是否想输入：
+  → search (distance: 1)
+  → watch (distance: 2)
+
+运行 'cmdrun --help' 查看可用命令。
+```
+
+**配置：**
+```toml
+[config]
+typo_detection = true
+typo_threshold = 2        # 最大Levenshtein距离
+auto_correct = false      # 设为true自动纠正
+```
+
+**多语言错误消息：**
+- 英语: "Did you mean 'X'?"
+- 日语: "もしかして: 'X' ですか？"
+- 简体中文: "您是否想输入 'X'？"
+- 繁体中文: "您是否想輸入 'X'？"
+
+### 语言设置（i18n）
+
+cmdrun 支持4种语言：**英语、日语、简体中文（简体中文）、繁体中文（繁體中文）**
+
+**自动语言检测：**
+- 读取 `LANG` 环境变量
+- 支持：`en`、`ja`、`zh_CN`、`zh_TW`、`zh_HK`
+
+**本地化命令（9个）：**
+- `cmdrun add`、`search`、`init`、`remove`、`info`
+- `cmdrun config`、`watch`、`validate`、`edit`
+- 拼写建议的多语言错误消息
+
+**配置：**
+```toml
+[config]
+language = "chinese-simplified"  # 或 "english"、"japanese"、"chinese-traditional"
+```
 
 **示例（简体中文）：**
 ```bash
-$ cmdrun add test-cn "echo 测试" "简体中文测试命令"
-📝 正在添加命令 'test-cn' ...
-✓ 成功添加命令 'test-cn'
-  描述：简体中文测试命令
-  命令：echo 测试
+$ cmdrun add test "echo 测试" "测试命令"
+📝 正在添加命令 'test' ...
+✓ 成功添加命令 'test'
+  说明: 测试命令
+  命令: echo 测试
 ```
+
+**文档：**
+- English: [README.md](README.md)
+- 日本語: [README.ja.md](README.ja.md)
+- 简体中文: [README.zh-CN.md](README.zh-CN.md)
+- 繁體中文: [README.zh-TW.md](README.zh-TW.md)
+
+详见 [I18N指南](docs/user-guide/I18N.md)。
 
 ### 自定义配置文件
 

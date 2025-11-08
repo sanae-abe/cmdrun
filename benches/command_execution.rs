@@ -29,7 +29,7 @@ fn bench_regex_matching(c: &mut Criterion) {
 
     let mut group = c.benchmark_group("regex_matching");
 
-    let test_cases = vec![
+    let test_cases = [
         "Hello, ${name}!",
         "${var1} and ${var2} and ${var3}",
         "Complex: ${VAR:-default} ${1} ${2}",

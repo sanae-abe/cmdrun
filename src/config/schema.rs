@@ -238,14 +238,12 @@ impl Command {
                     &platform_cmds.macos,
                     &platform_cmds.windows,
                 ];
-                for cmd_opt in commands.iter() {
-                    if let Some(cmd) = cmd_opt {
-                        if !validator.validate(cmd).is_safe() {
-                            return Err(format!(
-                                "Dangerous command detected in '{}': {}",
-                                self.description, cmd
-                            ));
-                        }
+                for cmd in commands.iter().filter_map(|&opt| opt.as_ref()) {
+                    if !validator.validate(cmd).is_safe() {
+                        return Err(format!(
+                            "Dangerous command detected in '{}': {}",
+                            self.description, cmd
+                        ));
                     }
                 }
             }

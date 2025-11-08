@@ -1,10 +1,14 @@
 # cmdrun
 
-[English](README.md) | [日本語](README.ja.md)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/sanae-abe/cmdrun)
+[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-> **頻繁に使うコマンドを管理する個人向けグローバルコマンド管理ツール**
+[English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
+
+> **よく使うコマンドを一元管理するパーソナルコマンドマネージャー**
 >
-> コマンドを一度登録すれば、どこからでも実行可能。高速・安全・クロスプラットフォーム対応。
+> 一度登録すれば、どこからでも実行可能。高速、安全、クロスプラットフォーム。
 
 ## 目次
 
@@ -37,6 +41,34 @@
 - **TOML設定** - 型安全で読みやすい
 - **強力な機能** - 依存関係、並列実行、フック、Watch Mode
 - **優れたエラー表示** - コンテキスト付き詳細エラーメッセージ
+
+### 🎯 独自の優位性
+
+**vs just (24.5k stars):**
+- ✅ インタラクティブTUIモード（just: CLIのみ）
+- ✅ 実行履歴・統計（just: なし）
+- ✅ プラグインシステム（just: なし）
+- ✅ 環境管理（just: なし）
+
+**vs task (13.2k stars):**
+- ✅ 高度なセキュリティ（eval不使用、fuzzing）
+- ✅ 多言語サポート（task: 英語のみ）
+- ✅ テンプレートシステム（task: なし）
+- ✅ Rust製（task: Go）
+
+**vs cargo-make (2.5k stars):**
+- ✅ 2.3倍高速な起動（6.5ms vs 15ms）
+- ✅ 言語非依存（cargo-make: Rust特化）
+- ✅ モダンなUX（TUI、typo検出）
+- ✅ インタラクティブモード
+
+**cmdrunだけが持つ全機能:**
+- 🔒 evalゼロのセキュリティとfuzzing（373,423テスト、0脆弱性）
+- 🌍 4言語サポート（英・日・簡体中・繁体中）
+- 🎨 Fuzzy finder付きインタラクティブTUI
+- 📊 SQLiteベース実行履歴
+- 🔌 動的プラグインシステム
+- 🎯 インテリジェントtypo検出
 
 ## インストール
 
@@ -391,42 +423,100 @@ cmdrun watch dev --path src --path lib
 
 詳細は[Watch Modeガイド](docs/user-guide/WATCH_MODE.md)を参照してください。
 
-### 言語設定（i18n）
+### インタラクティブモード（TUI）
 
-cmdrunは英語と日本語の国際化をサポートしています。`commands.toml`で言語を設定できます：
+Fuzzy finderを使った対話的なターミナルUIを起動できます。
 
-```toml
-[config]
-language = "japanese"  # または "english"（デフォルト）
+```bash
+# インタラクティブモード起動
+cmdrun interactive
+# または
+cmdrun -i
 ```
 
-**サポートされるメッセージ：**
-- コマンド実行（実行中、完了、エラー）
-- 対話的プロンプト（コマンドID、説明など）
-- 成功/エラーメッセージ（コマンドが追加されました、コマンドが見つかりませんなど）
-- バリデーションエラー（空の入力、重複コマンドなど）
+**機能:**
+- 🔍 **Fuzzy Finder**: 全コマンドのインクリメンタルサーチ
+- ⚡ **クイック実行**: Enterキーでコマンド実行
+- 📊 **ライブプレビュー**: コマンド詳細、依存関係、実行履歴を表示
+- ⌨️ **キーボードナビゲーション**:
+  - `↑`/`↓` または `j`/`k`: コマンド選択
+  - `Enter`: 選択したコマンドを実行
+  - `Ctrl+U`: 検索入力をクリア
+  - `Ctrl+W`: 単語を後方削除
+  - `Esc` または `q`: 終了
 
-**例（日本語）：**
+**プレビューパネル:**
+- コマンドの説明と実際のコマンド文字列
+- 環境変数展開後のプレビュー
+- 実行統計（実行回数、最終実行時刻）
+
+詳細は [TUI実装サマリー](docs/TUI_IMPLEMENTATION_SUMMARY.md) を参照してください。
+
+### Typo検出
+
+cmdrunはコマンド名のタイポを自動検出し、修正候補を提案します。
+
+**例:**
 ```bash
-$ cmdrun add test-ja "echo テスト" "日本語テストコマンド"
-📝 コマンドを追加中 'test-ja' ...
-✓ コマンドを追加しました 'test-ja'
-  説明: 日本語テストコマンド
+$ cmdrun seach docker
+Error: Unknown command 'seach'
+
+もしかして:
+  → search (distance: 1)
+  → watch (distance: 2)
+
+利用可能なコマンドは 'cmdrun --help' で確認してください。
+```
+
+**設定:**
+```toml
+[config]
+typo_detection = true
+typo_threshold = 2        # 最大Levenshtein距離
+auto_correct = false      # trueで自動修正
+```
+
+**多言語エラーメッセージ:**
+- 英語: "Did you mean 'X'?"
+- 日本語: "もしかして: 'X' ですか？"
+- 簡体中国語: "您是否想输入 'X'？"
+- 繁体中国語: "您是否想輸入 'X'？"
+
+### 言語設定（i18n）
+
+cmdrunは4言語をサポート: **英語、日本語、簡体中国語（简体中文）、繁体中国語（繁體中文）**
+
+**自動言語検出:**
+- `LANG` 環境変数を読み取り
+- サポート: `en`, `ja`, `zh_CN`, `zh_TW`, `zh_HK`
+
+**ローカライズ済みコマンド（9個）:**
+- `cmdrun add`, `search`, `init`, `remove`, `info`
+- `cmdrun config`, `watch`, `validate`, `edit`
+- Typo提案の多言語エラーメッセージ
+
+**設定:**
+```toml
+[config]
+language = "japanese"  # または "english", "chinese-simplified", "chinese-traditional"
+```
+
+**例（日本語）:**
+```bash
+$ cmdrun add test "echo テスト" "テストコマンド"
+📝 コマンドを追加中 'test' ...
+✓ コマンドを追加しました 'test'
+  説明: テストコマンド
   コマンド: echo テスト
 ```
 
-**例（英語）：**
-```bash
-$ cmdrun add test-en "echo test" "English test command"
-📝 Adding command 'test-en' ...
-✓ Command added successfully 'test-en'
-  Description: English test command
-  Command: echo test
-```
+**ドキュメント:**
+- English: [README.md](README.md)
+- 日本語: [README.ja.md](README.ja.md)
+- 简体中文: [README.zh-CN.md](README.zh-CN.md)
+- 繁體中文: [README.zh-TW.md](README.zh-TW.md)
 
-**現在サポートされているコマンド：**
-- `cmdrun add` - 完全にローカライズ済み（プロンプト、メッセージ、エラー）
-- より多くのコマンドが将来のリリースでローカライズされます
+詳細は [I18Nガイド](docs/user-guide/I18N.md) を参照してください。
 
 ### カスタム設定ファイル
 

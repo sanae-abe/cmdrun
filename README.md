@@ -1,6 +1,10 @@
 # cmdrun
 
-[English](README.md) | [日本語](README.ja.md)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/sanae-abe/cmdrun)
+[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
+[English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
 
 > **A personal global command manager for your frequently used commands**
 >
@@ -37,6 +41,34 @@
 - **TOML configuration** - Type-safe, easy to read
 - **Powerful features** - Dependencies, parallel execution, hooks, Watch Mode
 - **Great errors** - Detailed error messages with context
+
+### 🎯 Unique Advantages
+
+**vs just (24.5k stars):**
+- ✅ Interactive TUI mode (just: CLI only)
+- ✅ Execution history & statistics (just: none)
+- ✅ Plugin system (just: none)
+- ✅ Environment management (just: none)
+
+**vs task (13.2k stars):**
+- ✅ Advanced security (eval-free, fuzzing)
+- ✅ Multilingual support (task: English only)
+- ✅ Template system (task: none)
+- ✅ Built with Rust (task: Go)
+
+**vs cargo-make (2.5k stars):**
+- ✅ 2.3x faster startup (6.5ms vs 15ms)
+- ✅ Language-agnostic (cargo-make: Rust-focused)
+- ✅ Modern UX (TUI, typo detection)
+- ✅ Interactive mode
+
+**Only cmdrun has all:**
+- 🔒 Zero-eval security with fuzzing (373,423 tests, 0 vulnerabilities)
+- 🌍 4-language support (EN/JA/ZH-CN/ZH-TW)
+- 🎨 Interactive TUI with fuzzy finder
+- 📊 SQLite-based execution history
+- 🔌 Dynamic plugin system
+- 🎯 Intelligent typo detection
 
 ## Installation
 
@@ -404,42 +436,100 @@ cmdrun watch dev --path src --path lib
 
 See [Watch Mode Guide](docs/user-guide/WATCH_MODE.md) for details.
 
-### Language Settings (i18n)
+### Interactive Mode (TUI)
 
-cmdrun supports internationalization with English and Japanese languages. Configure the language in your `commands.toml`:
+Launch an interactive terminal UI for fuzzy finding and executing commands.
 
+```bash
+# Start interactive mode
+cmdrun interactive
+# or
+cmdrun -i
+```
+
+**Features:**
+- 🔍 **Fuzzy Finder**: Incremental search across all commands
+- ⚡ **Quick Execution**: Run commands with Enter key
+- 📊 **Live Preview**: View command details, dependencies, and execution history
+- ⌨️ **Keyboard Navigation**:
+  - `↑`/`↓` or `j`/`k`: Navigate commands
+  - `Enter`: Execute selected command
+  - `Ctrl+U`: Clear search input
+  - `Ctrl+W`: Delete word backward
+  - `Esc` or `q`: Quit
+
+**Preview Panel:**
+- Command description and actual command string
+- Environment variables expansion preview
+- Execution statistics (run count, last execution time)
+
+See [TUI Implementation Summary](docs/TUI_IMPLEMENTATION_SUMMARY.md) for details.
+
+### Typo Detection
+
+cmdrun automatically detects typos in command names and suggests corrections.
+
+**Example:**
+```bash
+$ cmdrun seach docker
+Error: Unknown command 'seach'
+
+Did you mean one of these?
+  → search (distance: 1)
+  → watch (distance: 2)
+
+Run 'cmdrun --help' for available commands.
+```
+
+**Configuration:**
 ```toml
 [config]
-language = "japanese"  # or "english" (default)
+typo_detection = true
+typo_threshold = 2        # Maximum Levenshtein distance
+auto_correct = false      # Set to true for automatic correction
 ```
 
-**Supported Messages:**
-- Command execution (Running, Completed, Error)
-- Interactive prompts (Command ID, Description, etc.)
-- Success/error messages (Command added, Command not found, etc.)
-- Validation errors (Empty input, duplicate commands, etc.)
+**Multilingual Error Messages:**
+- English: "Did you mean 'X'?"
+- Japanese: "もしかして: 'X' ですか？"
+- Chinese (Simplified): "您是否想输入 'X'？"
+- Chinese (Traditional): "您是否想輸入 'X'？"
 
-**Example (Japanese):**
+### Language Settings (i18n)
+
+cmdrun supports 4 languages: **English, Japanese, Simplified Chinese (简体中文), Traditional Chinese (繁體中文)**.
+
+**Automatic Language Detection:**
+- Reads `LANG` environment variable
+- Supports: `en`, `ja`, `zh_CN`, `zh_TW`, `zh_HK`
+
+**Localized Commands (9 commands):**
+- `cmdrun add`, `search`, `init`, `remove`, `info`
+- `cmdrun config`, `watch`, `validate`, `edit`
+- Typo suggestions with multilingual error messages
+
+**Configuration:**
+```toml
+[config]
+language = "english"  # or "japanese", "chinese-simplified", "chinese-traditional"
+```
+
+**Example (Chinese - Simplified):**
 ```bash
-$ cmdrun add test-ja "echo テスト" "日本語テストコマンド"
-📝 コマンドを追加中 'test-ja' ...
-✓ コマンドを追加しました 'test-ja'
-  説明: 日本語テストコマンド
-  コマンド: echo テスト
+$ cmdrun add test "echo 测试" "测试命令"
+📝 正在添加命令 'test' ...
+✓ 成功添加命令 'test'
+  说明: 测试命令
+  命令: echo 测试
 ```
 
-**Example (English):**
-```bash
-$ cmdrun add test-en "echo test" "English test command"
-📝 Adding command 'test-en' ...
-✓ Command added successfully 'test-en'
-  Description: English test command
-  Command: echo test
-```
+**Documentation:**
+- English: [README.md](README.md)
+- 日本语: [README.ja.md](README.ja.md)
+- 简体中文: [README.zh-CN.md](README.zh-CN.md)
+- 繁體中文: [README.zh-TW.md](README.zh-TW.md)
 
-**Currently Supported Commands:**
-- `cmdrun add` - Fully localized (prompts, messages, errors)
-- More commands will be localized in future releases
+See [I18N Guide](docs/user-guide/I18N.md) for details.
 
 ### Custom Configuration Files
 

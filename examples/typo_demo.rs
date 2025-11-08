@@ -7,12 +7,29 @@ use cmdrun::utils::typo_detector::TypoDetector;
 fn main() {
     println!("=== cmdrun Typo Detection System Demo ===\n");
 
-    let detector = TypoDetector::new();
     let commands = vec![
-        "run", "list", "init", "validate", "graph", "completion", "remove", "add", "open",
-        "edit", "info", "search", "config", "watch", "env", "history", "retry", "template",
+        "run",
+        "list",
+        "init",
+        "validate",
+        "graph",
+        "completion",
+        "remove",
+        "add",
+        "open",
+        "edit",
+        "info",
+        "search",
+        "config",
+        "watch",
+        "env",
+        "history",
+        "retry",
+        "template",
         "plugin",
     ];
+
+    let detector = TypoDetector::new();
 
     println!("Available commands:");
     for cmd in &commands {
@@ -43,7 +60,7 @@ fn main() {
             println!("  Did you mean:");
             for (suggestion, distance) in &suggestions {
                 println!("    {} (distance: {})", suggestion, distance);
-                if suggestion == expected_correction {
+                if *suggestion == expected_correction {
                     println!("      ✓ Correct!");
                 }
             }

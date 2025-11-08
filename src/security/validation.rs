@@ -288,6 +288,24 @@ pub fn escape_shell_arg(arg: &str) -> String {
     }
 }
 
+/// Check for dangerous environment variables
+pub fn check_dangerous_env_vars<S: std::hash::BuildHasher>(
+    env: &std::collections::HashMap<String, String, S>,
+) -> Vec<String> {
+    const DANGEROUS_ENV_VARS: &[&str] = &[
+        "LD_PRELOAD",
+        "LD_LIBRARY_PATH",
+        "DYLD_INSERT_LIBRARIES",
+        "DYLD_LIBRARY_PATH",
+        "PATH",
+    ];
+
+    env.keys()
+        .filter(|k| DANGEROUS_ENV_VARS.contains(&k.as_str()) || k.starts_with("DYLD_"))
+        .cloned()
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -599,22 +617,4 @@ mod tests {
         assert!(validator.validate("echo hello").is_safe());
         assert!(!validator.validate("echo hello; rm -rf /").is_safe());
     }
-}
-
-/// Check for dangerous environment variables
-pub fn check_dangerous_env_vars<S: std::hash::BuildHasher>(
-    env: &std::collections::HashMap<String, String, S>,
-) -> Vec<String> {
-    const DANGEROUS_ENV_VARS: &[&str] = &[
-        "LD_PRELOAD",
-        "LD_LIBRARY_PATH",
-        "DYLD_INSERT_LIBRARIES",
-        "DYLD_LIBRARY_PATH",
-        "PATH",
-    ];
-
-    env.keys()
-        .filter(|k| DANGEROUS_ENV_VARS.contains(&k.as_str()) || k.starts_with("DYLD_"))
-        .cloned()
-        .collect()
 }

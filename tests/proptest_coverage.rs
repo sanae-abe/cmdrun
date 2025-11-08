@@ -187,7 +187,7 @@ proptest! {
         let _ = lenient.validate(&cmd);
 
         // If command has dangerous chars, strict mode should catch it
-        if cmd.contains(&['|', ';', '&']) {
+        if cmd.contains(['|', ';', '&']) {
             prop_assert!(!strict_result.is_safe());
         }
     }

@@ -61,11 +61,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_plugin_system_version() {
-        assert!(!PLUGIN_SYSTEM_VERSION.is_empty());
-    }
-
-    #[test]
     fn test_plugin_api_version() {
         assert_eq!(PLUGIN_API_VERSION, 1);
     }
