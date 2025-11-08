@@ -42,27 +42,9 @@
 - **Powerful features** - Dependencies, parallel execution, hooks, Watch Mode
 - **Great errors** - Detailed error messages with context
 
-### 🎯 Unique Advantages
+### 🎯 What Makes cmdrun Special
 
-**vs just (24.5k stars):**
-- ✅ Interactive TUI mode (just: CLI only)
-- ✅ Execution history & statistics (just: none)
-- ✅ Plugin system (just: none)
-- ✅ Environment management (just: none)
-
-**vs task (13.2k stars):**
-- ✅ Advanced security (eval-free, fuzzing)
-- ✅ Multilingual support (task: English only)
-- ✅ Template system (task: none)
-- ✅ Built with Rust (task: Go)
-
-**vs cargo-make (2.5k stars):**
-- ✅ 2.3x faster startup (6.5ms vs 15ms)
-- ✅ Language-agnostic (cargo-make: Rust-focused)
-- ✅ Modern UX (TUI, typo detection)
-- ✅ Interactive mode
-
-**Only cmdrun has all:**
+**Unique combination of features:**
 - 🔒 Zero-eval security with fuzzing (373,423 tests, 0 vulnerabilities)
 - 🌍 4-language support (EN/JA/ZH-CN/ZH-TW)
 - 🎨 Interactive TUI with fuzzy finder
