@@ -166,6 +166,18 @@
   - [x] 4コマンド実装（list, info, enable, disable）
   - [x] ドキュメント850行（API仕様、開発ガイド）
 
+##### グローバル設定機能完了（2025-11-08）
+
+- [x] グローバル設定ファイルサポート ✅
+  - [x] プラットフォーム別パス自動検出
+    - Linux: `~/.config/cmdrun/commands.toml`
+    - macOS: `~/Library/Application Support/cmdrun/commands.toml`
+    - Windows: `%APPDATA%/cmdrun/commands.toml`
+  - [x] 自動マージ機能（ローカル > グローバル）
+  - [x] `merge_with()` メソッド実装
+  - [x] 統合テスト追加
+  - [x] 全339テストパス
+
 #### 🟢 低優先度
 
 ##### Watch Mode拡張
