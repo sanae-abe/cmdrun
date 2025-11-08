@@ -603,7 +603,7 @@ mod tests {
 
 /// Check for dangerous environment variables
 pub fn check_dangerous_env_vars<S: std::hash::BuildHasher>(
-    env: &std::collections::HashMap<String, String, S>
+    env: &std::collections::HashMap<String, String, S>,
 ) -> Vec<String> {
     const DANGEROUS_ENV_VARS: &[&str] = &[
         "LD_PRELOAD",
@@ -614,9 +614,7 @@ pub fn check_dangerous_env_vars<S: std::hash::BuildHasher>(
     ];
 
     env.keys()
-        .filter(|k| {
-            DANGEROUS_ENV_VARS.contains(&k.as_str()) || k.starts_with("DYLD_")
-        })
+        .filter(|k| DANGEROUS_ENV_VARS.contains(&k.as_str()) || k.starts_with("DYLD_"))
         .cloned()
         .collect()
 }

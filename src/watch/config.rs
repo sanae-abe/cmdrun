@@ -85,13 +85,14 @@ impl WatchConfig {
         use tracing::warn;
 
         if path.is_symlink() {
-            let target = std::fs::read_link(path)
-                .unwrap_or_else(|_| PathBuf::from("<unreadable>"));
+            let target = std::fs::read_link(path).unwrap_or_else(|_| PathBuf::from("<unreadable>"));
 
             if self.warn_on_symlinks {
-                warn!("⚠️  Watching symlink: {} -> {}",
+                warn!(
+                    "⚠️  Watching symlink: {} -> {}",
                     path.display(),
-                    target.display());
+                    target.display()
+                );
                 warn!("   Symlinks can be used to watch sensitive system files");
             }
 
