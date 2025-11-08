@@ -96,6 +96,11 @@ impl WatchRunner {
 
     /// Start watching and executing commands
     pub async fn run(&mut self) -> Result<()> {
+        // Validate watch paths for symlink security
+        for path in &self.config.paths {
+            self.config.validate_watch_path(path)?;
+        }
+
         let command_name = match &self.execution_mode {
             ExecutionMode::Shell { command, .. } => command.clone(),
             ExecutionMode::Cmdrun { command_name, .. } => command_name.clone(),

@@ -112,6 +112,17 @@ impl CommandExecutor {
         let mut merged_env = self.context.env.clone();
         merged_env.extend(command.env.clone());
 
+        // 危険な環境変数チェック
+        use crate::security::validation::check_dangerous_env_vars;
+        let dangerous_vars = check_dangerous_env_vars(&command.env);
+        if !dangerous_vars.is_empty() {
+            warn!(
+                "⚠️  Command '{}' sets potentially dangerous environment variables: {:?}",
+                command.description, dangerous_vars
+            );
+            warn!("   This could be used for privilege escalation or code injection");
+        }
+
         // 変数展開
         let interpolated_commands = self.interpolate_commands(&commands, command)?;
 

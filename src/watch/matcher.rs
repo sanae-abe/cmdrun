@@ -117,6 +117,8 @@ mod tests {
             exclude: exclude.into_iter().map(String::from).collect(),
             debounce_ms: 500,
             ignore_gitignore: true, // Disable gitignore for tests
+            follow_symlinks: false,
+            warn_on_symlinks: false,
             recursive: true,
         }
     }

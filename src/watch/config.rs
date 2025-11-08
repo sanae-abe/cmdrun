@@ -1,7 +1,7 @@
 //! Watch configuration structures
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 /// Watch configuration
@@ -27,6 +27,14 @@ pub struct WatchConfig {
     /// Whether to watch recursively
     #[serde(default = "default_recursive")]
     pub recursive: bool,
+
+    /// Whether to follow symlinks (default: false for security)
+    #[serde(default)]
+    pub follow_symlinks: bool,
+
+    /// Whether to warn about symlinks (default: true)
+    #[serde(default = "default_warn_symlinks")]
+    pub warn_on_symlinks: bool,
 }
 
 /// Watch pattern configuration
@@ -52,6 +60,8 @@ impl Default for WatchConfig {
             debounce_ms: default_debounce_ms(),
             ignore_gitignore: false,
             recursive: default_recursive(),
+            follow_symlinks: false,
+            warn_on_symlinks: default_warn_symlinks(),
         }
     }
 }
@@ -62,6 +72,40 @@ fn default_debounce_ms() -> u64 {
 
 fn default_recursive() -> bool {
     true
+}
+
+fn default_warn_symlinks() -> bool {
+    true
+}
+
+impl WatchConfig {
+    /// Validate watch path for symlink security
+    pub fn validate_watch_path(&self, path: &Path) -> anyhow::Result<()> {
+        use anyhow::anyhow;
+        use tracing::warn;
+
+        if path.is_symlink() {
+            let target = std::fs::read_link(path)
+                .unwrap_or_else(|_| PathBuf::from("<unreadable>"));
+
+            if self.warn_on_symlinks {
+                warn!("⚠️  Watching symlink: {} -> {}",
+                    path.display(),
+                    target.display());
+                warn!("   Symlinks can be used to watch sensitive system files");
+            }
+
+            if !self.follow_symlinks {
+                return Err(anyhow!(
+                    "Symlink watching disabled for security: {} -> {}. Use --follow-symlinks to override",
+                    path.display(),
+                    target.display()
+                ));
+            }
+        }
+
+        Ok(())
+    }
 }
 
 impl WatchConfig {
