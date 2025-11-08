@@ -6,13 +6,21 @@ cmdrunコマンドラインインターフェースの完全なリファレン�
 
 - [グローバルオプション](#グローバルオプション)
 - [コマンド](#コマンド)
+  - [init](#init) - プロジェクト初期化
   - [add](#add) - コマンドを追加
   - [run](#run) - コマンドを実行
+  - [retry](#retry) - 失敗コマンド再実行
   - [list](#list) - コマンド一覧
   - [remove](#remove) - コマンドを削除
   - [edit](#edit) - コマンドを編集
   - [info](#info) - コマンド情報を表示
   - [search](#search) - コマンドを検索
+  - [graph](#graph) - 依存関係グラフ表示
+  - [watch](#watch) - ファイル監視実行
+  - [env](#env) - 環境管理
+  - [history](#history) - 実行履歴管理
+  - [template](#template) - テンプレート管理
+  - [plugin](#plugin) - プラグイン管理
   - [open](#open) - 設定ファイルを開く
   - [validate](#validate) - 設定を検証
   - [config](#config) - 設定管理
@@ -110,6 +118,41 @@ cmdrun -vvv run build
 ---
 
 ## コマンド
+
+### init
+
+プロジェクトの初期化と設定ファイルの作成を行います。
+
+#### 構文
+
+```bash
+cmdrun init [OPTIONS]
+```
+
+#### 説明
+
+新しいプロジェクトでcmdrunを使い始める際に、設定ファイル（`commands.toml`）を作成します。
+テンプレートを指定すると、プロジェクトタイプに応じた事前定義コマンドが含まれます。
+
+#### オプション
+
+- `--template <TEMPLATE>` - 使用するテンプレート（rust, nodejs, python, react等）
+- `--language <LANG>` - 言語設定（japanese/english、デフォルト: english）
+
+#### 使用例
+
+```bash
+# デフォルト設定で初期化
+cmdrun init
+
+# Rustプロジェクト用テンプレートで初期化
+cmdrun init --template rust-cli
+
+# 日本語設定で初期化
+cmdrun init --language japanese --template nodejs-web
+```
+
+---
 
 ### add
 
@@ -211,6 +254,32 @@ cmdrun run dev -- --port 8080
 
 # 詳細出力で実行
 cmdrun -v run build
+```
+
+---
+
+### retry
+
+最後に失敗したコマンドを再実行します。
+
+#### 構文
+
+```bash
+cmdrun retry
+```
+
+#### 説明
+
+実行履歴から最後に失敗したコマンドを自動的に検出し、再実行します。
+デバッグやテスト修正後の確認に便利です。
+
+#### 使用例
+
+```bash
+# 失敗したテストを修正後に再実行
+npm run test  # 失敗
+# ... コードを修正 ...
+cmdrun retry  # 同じテストコマンドを再実行
 ```
 
 ---
@@ -437,6 +506,278 @@ cmdrun search git
 
 💡 詳細は cmdrun info <コマンド> で確認できます
 ```
+
+---
+
+### graph
+
+コマンドの依存関係グラフを表示します。
+
+#### 構文
+
+```bash
+cmdrun graph [OPTIONS] [COMMAND]
+```
+
+#### 説明
+
+指定したコマンドの依存関係をツリー形式で表示します。
+循環依存の検出や実行順序の確認に使用します。
+
+#### 引数
+
+- `[COMMAND]` - グラフ表示するコマンドのID（省略可）
+
+#### オプション
+
+- `--format <FORMAT>` - 出力形式（tree/dot、デフォルト: tree）
+
+#### 使用例
+
+```bash
+# buildコマンドの依存関係を表示
+cmdrun graph build
+
+# DOT形式で出力（Graphviz用）
+cmdrun graph build --format dot
+
+# 全コマンドの依存関係を表示
+cmdrun graph
+```
+
+#### 出力例
+
+```
+build
+├── lint
+├── test
+│   └── compile
+└── docs
+```
+
+---
+
+### watch
+
+ファイル変更を監視してコマンドを自動実行します。
+
+#### 構文
+
+```bash
+cmdrun watch [OPTIONS] <COMMAND>
+```
+
+#### 説明
+
+指定したパターンのファイル変更を監視し、変更があれば自動的にコマンドを実行します。
+開発時の自動ビルドやテスト実行に便利です。
+
+#### 引数
+
+- `<COMMAND>` - 実行するコマンドのID（必須）
+
+#### オプション
+
+- `--pattern <PATTERN>` - 監視するファイルパターン（例: `**/*.rs`）
+- `--path <PATH>` - 監視するディレクトリ（複数指定可能）
+- `--debounce <MS>` - デバウンス時間（ミリ秒、デフォルト: 500）
+- `--no-recursive` - 再帰的な監視を無効化
+
+#### 使用例
+
+```bash
+# Rustファイルの変更を監視してビルド
+cmdrun watch build --pattern "**/*.rs"
+
+# テストを自動実行（デバウンス1秒）
+cmdrun watch test --pattern "**/*.rs" --debounce 1000
+
+# 複数のディレクトリを監視
+cmdrun watch dev --path src --path lib
+```
+
+---
+
+### env
+
+環境管理を行います。
+
+#### 構文
+
+```bash
+cmdrun env <SUBCOMMAND>
+```
+
+#### 説明
+
+開発・ステージング・本番など異なる環境の作成・切り替え・管理を行います。
+各環境ごとに環境変数やコマンド設定を分離できます。
+
+#### サブコマンド
+
+- `create <NAME>` - 新しい環境を作成
+- `use <NAME>` - 環境を切り替え
+- `current` - 現在の環境を表示
+- `list` - 全環境を一覧表示
+- `set <KEY> <VALUE>` - 環境変数を設定
+- `remove <NAME>` - 環境を削除
+
+#### 使用例
+
+```bash
+# 環境を作成
+cmdrun env create dev --description "開発環境"
+cmdrun env create prod --description "本番環境"
+
+# 環境を切り替え
+cmdrun env use dev
+cmdrun run start  # 開発環境の設定で起動
+
+# 環境変数を設定
+cmdrun env set API_URL https://api.staging.com --env staging
+
+# 現在の環境を確認
+cmdrun env current
+
+# 全環境を表示
+cmdrun env list
+```
+
+**詳細は[環境管理ガイド](../ENVIRONMENT_MANAGEMENT.md)を参照してください。**
+
+---
+
+### history
+
+実行履歴の管理を行います。
+
+#### 構文
+
+```bash
+cmdrun history <SUBCOMMAND>
+```
+
+#### 説明
+
+コマンド実行履歴の記録・検索・統計表示・エクスポートを行います。
+SQLiteベースの永続化ストレージ（最大1000件）を使用します。
+
+#### サブコマンド
+
+- `list` - 履歴を一覧表示
+- `search <KEYWORD>` - キーワードで履歴を検索
+- `stats` - 統計情報を表示
+- `export` - 履歴をエクスポート
+- `clear` - 履歴をクリア
+
+#### 使用例
+
+```bash
+# 履歴を表示
+cmdrun history list
+
+# コマンドを検索
+cmdrun history search build
+
+# 統計情報を表示
+cmdrun history stats
+
+# JSON形式でエクスポート
+cmdrun history export --format json -o history.json
+
+# 履歴をクリア
+cmdrun history clear
+```
+
+**詳細は[履歴機能ガイド](HISTORY.md)を参照してください。**
+
+---
+
+### template
+
+テンプレート管理を行います。
+
+#### 構文
+
+```bash
+cmdrun template <SUBCOMMAND>
+```
+
+#### 説明
+
+プロジェクトテンプレートの使用・作成・共有を行います。
+ビルトインテンプレート（rust-cli, nodejs-web, python-data, react-app）を利用可能です。
+
+#### サブコマンド
+
+- `list` - 利用可能なテンプレートを一覧表示
+- `use <TEMPLATE>` - テンプレートを使用
+- `add <NAME>` - カスタムテンプレートを作成
+- `export <TEMPLATE> <PATH>` - テンプレートをエクスポート
+
+#### 使用例
+
+```bash
+# 利用可能なテンプレートを表示
+cmdrun template list
+
+# テンプレートを使用
+cmdrun template use rust-cli
+
+# カスタムテンプレートを作成
+cmdrun template add my-template
+
+# テンプレートをエクスポート
+cmdrun template export rust-cli ./my-template.toml
+```
+
+**ビルトインテンプレート:**
+- `rust-cli` - Rust CLI開発（cargo build/test/clippy/fmt）
+- `nodejs-web` - Node.js Web開発（npm dev/build/test）
+- `python-data` - Python データサイエンス（pytest/jupyter）
+- `react-app` - React アプリケーション（dev/build/storybook）
+
+**詳細は[テンプレート機能レポート](../../TEMPLATE_FEATURE_REPORT.md)を参照してください。**
+
+---
+
+### plugin
+
+プラグイン管理を行います。
+
+#### 構文
+
+```bash
+cmdrun plugin <SUBCOMMAND>
+```
+
+#### 説明
+
+外部プラグインによる機能拡張を管理します。
+動的プラグインローディング（libloading）により、コンパイル不要で機能を追加できます。
+
+#### サブコマンド
+
+- `list` - プラグインを一覧表示
+- `info <NAME>` - プラグインの詳細を表示
+- `enable <NAME>` - プラグインを有効化
+- `disable <NAME>` - プラグインを無効化
+
+#### 使用例
+
+```bash
+# プラグインを一覧表示
+cmdrun plugin list
+
+# プラグインの詳細を表示
+cmdrun plugin info logger
+
+# プラグインを有効化/無効化
+cmdrun plugin enable logger
+cmdrun plugin disable logger
+```
+
+**詳細は[プラグインシステムレポート](../../PLUGIN_SYSTEM_IMPLEMENTATION_REPORT.md)および[プラグインAPI](../plugins/API.md)を参照してください。**
 
 ---
 

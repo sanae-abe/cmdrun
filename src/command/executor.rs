@@ -5,6 +5,7 @@
 use crate::command::interpolation::InterpolationContext;
 use crate::config::schema::{Command, Platform};
 use crate::error::{ExecutionError, Result};
+use crate::i18n::{get_message, MessageKey};
 use crate::security::{CommandValidator, SensitiveEnv};
 use ahash::AHashMap;
 use colored::*;
@@ -34,6 +35,8 @@ pub struct ExecutionContext {
     pub echo: bool,
     /// カラー出力
     pub color: bool,
+    /// 言語設定
+    pub language: crate::config::Language,
 }
 
 impl Default for ExecutionContext {
@@ -46,6 +49,7 @@ impl Default for ExecutionContext {
             strict: true,
             echo: true,
             color: true,
+            language: crate::config::Language::default(),
         }
     }
 }
@@ -208,6 +212,9 @@ impl CommandExecutor {
         if self.context.echo {
             self.print_command(command);
         }
+
+        // シェルビルトイン警告
+        self.warn_shell_builtin(command, self.context.language);
 
         // シェルコマンド構築
         let (shell, args) = self.build_shell_command(command);
@@ -382,6 +389,116 @@ impl CommandExecutor {
             sensitive_env: SensitiveEnv::new(),
         }
     }
+
+    /// シェルビルトインコマンドかチェック
+    fn is_shell_builtin(command: &str) -> bool {
+        // コマンドの先頭部分を取得（パイプやリダイレクトの前）
+        let cmd_part = command
+            .split('|')
+            .next()
+            .unwrap_or("")
+            .split('>')
+            .next()
+            .unwrap_or("")
+            .split('<')
+            .next()
+            .unwrap_or("")
+            .trim();
+
+        // 最初の単語（コマンド名）を取得
+        let first_word = cmd_part
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .to_lowercase();
+
+        // サブプロセスで実行しても効果がないシェルビルトインコマンド
+        matches!(
+            first_word.as_str(),
+            "cd" | "export" | "alias" | "source" | "." | "ulimit" | "umask" | "set" | "shopt"
+        )
+    }
+
+    /// シェルビルトイン警告を表示
+    fn warn_shell_builtin(&self, command: &str, language: crate::config::Language) {
+        if Self::is_shell_builtin(command) {
+            let msg = get_message(MessageKey::WarningShellBuiltinNoEffect, language);
+            if self.context.color {
+                eprintln!("\n{}\n", msg.yellow().bold());
+            } else {
+                eprintln!("\n{}\n", msg);
+            }
+
+            // cdコマンドの場合、より詳しいヒントを表示
+            if Self::is_cd_command(command) {
+                self.show_cd_hint(command, language);
+            }
+        }
+    }
+
+    /// cdコマンドかチェック
+    fn is_cd_command(command: &str) -> bool {
+        let cmd_part = command
+            .split('|')
+            .next()
+            .unwrap_or("")
+            .split('>')
+            .next()
+            .unwrap_or("")
+            .split('<')
+            .next()
+            .unwrap_or("")
+            .trim();
+
+        cmd_part
+            .split_whitespace()
+            .next()
+            .unwrap_or("")
+            .to_lowercase()
+            == "cd"
+    }
+
+    /// cdコマンドのヒントを表示
+    fn show_cd_hint(&self, command: &str, language: crate::config::Language) {
+        let hint_msg = get_message(MessageKey::HintShellFunction, language);
+        let hint_cmd_msg = get_message(MessageKey::HintCdCommand, language);
+
+        // コマンドからディレクトリパスを抽出
+        let path = command
+            .trim()
+            .strip_prefix("cd")
+            .unwrap_or("")
+            .trim();
+
+        // 関数名を生成（簡易版）
+        let func_name = Self::generate_function_name(path);
+
+        if self.context.color {
+            eprintln!("{}", hint_msg.cyan());
+            eprintln!("{}", hint_cmd_msg.cyan());
+            eprintln!("   {}() {{ cd {}; }}\n", func_name.green().bold(), path.bright_white());
+        } else {
+            eprintln!("{}", hint_msg);
+            eprintln!("{}", hint_cmd_msg);
+            eprintln!("   {}() {{ cd {}; }}\n", func_name, path);
+        }
+    }
+
+    /// 関数名を生成（簡易版）
+    fn generate_function_name(path: &str) -> String {
+        // パスの最後の部分から関数名を生成
+        let path_parts: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+        if let Some(last) = path_parts.last() {
+            // ホームディレクトリ展開を除去
+            let name = last.replace('~', "").replace('.', "");
+            // 最初の3文字を取得（cdt, cdc など）
+            let short = name.chars().take(3).collect::<String>();
+            if !short.is_empty() {
+                return short;
+            }
+        }
+        "cdx".to_string() // デフォルト
+    }
 }
 
 /// デフォルトシェル検出
@@ -408,6 +525,20 @@ pub fn detect_shell() -> String {
 mod tests {
     use super::*;
     use crate::config::CommandSpec;
+
+    #[test]
+    fn test_is_shell_builtin() {
+        assert!(CommandExecutor::is_shell_builtin("cd /tmp"));
+        assert!(CommandExecutor::is_shell_builtin("cd ~/workspace"));
+        assert!(CommandExecutor::is_shell_builtin("export VAR=value"));
+        assert!(CommandExecutor::is_shell_builtin("alias ll='ls -la'"));
+        assert!(CommandExecutor::is_shell_builtin("source ~/.bashrc"));
+        assert!(CommandExecutor::is_shell_builtin(". ~/.bashrc"));
+
+        assert!(!CommandExecutor::is_shell_builtin("ls -la"));
+        assert!(!CommandExecutor::is_shell_builtin("echo hello"));
+        assert!(!CommandExecutor::is_shell_builtin("npm install"));
+    }
 
     #[tokio::test]
     async fn test_simple_command() {

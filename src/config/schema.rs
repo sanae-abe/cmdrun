@@ -42,6 +42,27 @@ impl Default for CommandsConfig {
     }
 }
 
+impl CommandsConfig {
+    /// Merge configurations (overlay takes precedence)
+    pub fn merge_with(self, overlay: Self) -> Self {
+        Self {
+            config: self.config.merge_with(overlay.config),
+            commands: {
+                let mut merged = self.commands;
+                merged.extend(overlay.commands);
+                merged
+            },
+            aliases: {
+                let mut merged = self.aliases;
+                merged.extend(overlay.aliases);
+                merged
+            },
+            hooks: self.hooks.merge_with(overlay.hooks),
+            plugins: self.plugins.merge_with(overlay.plugins),
+        }
+    }
+}
+
 /// 言語設定
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
 #[serde(rename_all = "lowercase")]
@@ -95,6 +116,25 @@ impl Default for GlobalConfig {
             working_dir: default_working_dir(),
             language: Language::default(),
             env: AHashMap::new(),
+        }
+    }
+}
+
+impl GlobalConfig {
+    /// Merge global configs (overlay takes precedence, env vars are combined)
+    pub fn merge_with(self, overlay: Self) -> Self {
+        Self {
+            shell: overlay.shell,
+            strict_mode: overlay.strict_mode,
+            parallel: overlay.parallel,
+            timeout: overlay.timeout,
+            working_dir: overlay.working_dir,
+            language: overlay.language,
+            env: {
+                let mut merged = self.env;
+                merged.extend(overlay.env);
+                merged
+            },
         }
     }
 }
@@ -198,6 +238,21 @@ pub struct Hooks {
     pub commands: AHashMap<String, CommandHooks>,
 }
 
+impl Hooks {
+    /// Merge hooks (overlay takes precedence)
+    pub fn merge_with(self, overlay: Self) -> Self {
+        Self {
+            pre_run: overlay.pre_run.or(self.pre_run),
+            post_run: overlay.post_run.or(self.post_run),
+            commands: {
+                let mut merged = self.commands;
+                merged.extend(overlay.commands);
+                merged
+            },
+        }
+    }
+}
+
 /// コマンド別フック
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct CommandHooks {
@@ -218,6 +273,20 @@ pub struct PluginsConfig {
     /// プラグイン別設定
     #[serde(flatten)]
     pub plugins: AHashMap<String, crate::plugin::PluginConfig>,
+}
+
+impl PluginsConfig {
+    /// Merge plugin configs (overlay takes complete precedence)
+    pub fn merge_with(self, overlay: Self) -> Self {
+        Self {
+            enabled: overlay.enabled,
+            plugins: {
+                let mut merged = self.plugins;
+                merged.extend(overlay.plugins);
+                merged
+            },
+        }
+    }
 }
 
 // ===================================================================

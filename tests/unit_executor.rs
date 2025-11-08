@@ -15,6 +15,7 @@ async fn test_executor_creation() {
         strict: true,
         echo: true,
         color: true,
+        language: cmdrun::config::Language::default(),
     };
 
     let _executor = CommandExecutor::new(ctx);
@@ -31,6 +32,7 @@ async fn test_execute_simple_command() {
         strict: false,
         echo: false,
         color: false,
+        language: cmdrun::config::Language::default(),
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -61,6 +63,7 @@ async fn test_execute_parallel() {
         strict: false,
         echo: false,
         color: false,
+        language: cmdrun::config::Language::default(),
     };
 
     let executor = CommandExecutor::new(ctx);

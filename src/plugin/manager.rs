@@ -13,8 +13,6 @@ use super::registry::PluginRegistry;
 #[cfg(feature = "plugin-system")]
 use crate::error::{CmdrunError, Result};
 #[cfg(feature = "plugin-system")]
-use ahash::AHashMap;
-#[cfg(feature = "plugin-system")]
 use std::path::Path;
 #[cfg(feature = "plugin-system")]
 use std::sync::Arc;
@@ -138,8 +136,8 @@ impl PluginManager {
     /// Execute post-execution hooks
     pub fn execute_post_hooks(
         &self,
-        context: &PluginContext,
-        result: &mut CommandResult,
+        _context: &PluginContext,
+        _result: &mut CommandResult,
     ) -> Result<()> {
         debug!("Executing post-execution hooks");
 
@@ -165,7 +163,7 @@ impl PluginManager {
     }
 
     /// Execute error hooks
-    pub fn execute_error_hooks(&self, context: &PluginContext, error: &CmdrunError) -> Result<()> {
+    pub fn execute_error_hooks(&self, _context: &PluginContext, _error: &CmdrunError) -> Result<()> {
         debug!("Executing error hooks");
 
         let plugins = self.registry.list();

@@ -55,6 +55,7 @@ async fn main() -> anyhow::Result<()> {
         strict: true,
         echo: true,
         color: true,
+        language: cmdrun::config::Language::default(),
     };
 
     let executor = CommandExecutor::new(ctx);

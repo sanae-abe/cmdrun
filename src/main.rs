@@ -239,6 +239,7 @@ async fn run_command(
         strict: config.config.strict_mode,
         echo: true,
         color: true,
+        language: config.config.language,
     };
 
     let executor = CommandExecutor::new(ctx);

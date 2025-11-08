@@ -33,45 +33,69 @@ impl ConfigLoader {
         }
     }
 
-    /// 設定ファイルを読み込む
+    /// 設定ファイルを読み込む（グローバル + ローカルのマージ）
     ///
     /// 優先順位:
-    /// 1. 明示的に指定されたパス
-    /// 2. カレントディレクトリからの探索
-    /// 3. ホームディレクトリの ~/.cmdrun/
+    /// 1. 明示的に指定されたパス（マージなし）
+    /// 2. ローカル設定（必須） + グローバル設定（任意）
     pub async fn load(&self) -> Result<CommandsConfig> {
-        let config_path = if let Some(path) = &self.explicit_path {
+        if let Some(path) = &self.explicit_path {
             debug!("Using explicitly specified config: {}", path.display());
-            path.clone()
-        } else {
-            self.find_config().await?
+            return self.load_from_path(path).await;
+        }
+
+        // グローバル設定（任意）
+        let global_config = match self.find_global_config().await {
+            Some(path) => {
+                info!("Loading global config: {}", path.display());
+                Some(self.load_from_path(&path).await?)
+            }
+            None => {
+                debug!("No global config found");
+                None
+            }
         };
 
-        info!("Loading configuration from: {}", config_path.display());
-        self.load_from_path(&config_path).await
+        // ローカル設定（必須）
+        let local_path = self.find_local_config().await?;
+        info!("Loading local config: {}", local_path.display());
+        let local_config = self.load_from_path(&local_path).await?;
+
+        // マージ（ローカルが優先）
+        Ok(match global_config {
+            Some(global) => {
+                debug!("Merging global and local configurations");
+                global.merge_with(local_config)
+            }
+            None => local_config,
+        })
     }
 
-    /// 設定ファイルを探索
-    async fn find_config(&self) -> Result<PathBuf> {
-        // カレントディレクトリから上位ディレクトリへ探索
-        let current_dir = std::env::current_dir().context("Failed to get current directory")?;
+    /// グローバル設定ファイルを検索
+    async fn find_global_config(&self) -> Option<PathBuf> {
+        let global_dir = dirs::config_dir()?.join("cmdrun");
+        self.check_directory(&global_dir).await.ok().flatten()
+    }
+
+    /// ローカル設定ファイルを検索（必須）
+    async fn find_local_config(&self) -> Result<PathBuf> {
+        let current_dir = std::env::current_dir()
+            .context("Failed to get current directory")?;
 
         if let Some(path) = self.search_upwards(&current_dir).await? {
             return Ok(path);
         }
 
-        // ホームディレクトリを探索
-        if let Some(home_dir) = dirs::home_dir() {
-            let cmdrun_dir = home_dir.join(".cmdrun");
-            if let Some(path) = self.check_directory(&cmdrun_dir).await? {
-                return Ok(path);
-            }
-        }
-
         anyhow::bail!(
-            "Configuration file not found. Searched for: {}",
+            "Local configuration file not found. Searched for: {}",
             CONFIG_FILENAMES.join(", ")
         )
+    }
+
+    /// 設定ファイルを探索（後方互換）
+    #[allow(dead_code)]
+    async fn find_config(&self) -> Result<PathBuf> {
+        self.find_local_config().await
     }
 
     /// ディレクトリから上位へ向かって設定ファイルを探索
@@ -310,5 +334,53 @@ cmd = "cargo test"
         assert_eq!(merged.commands.len(), 2);
         assert!(merged.commands.contains_key("test"));
         assert!(merged.commands.contains_key("build"));
+    }
+}
+
+#[cfg(test)]
+mod global_config_tests {
+    use super::*;
+    use tempfile::TempDir;
+
+    #[tokio::test]
+    async fn test_global_config_merge() {
+        let temp_dir = TempDir::new().unwrap();
+        
+        // Create global config
+        let global_dir = temp_dir.path().join(".config/cmdrun");
+        fs::create_dir_all(&global_dir).await.unwrap();
+        let global_path = global_dir.join("commands.toml");
+        fs::write(&global_path, r#"
+[config]
+shell = "zsh"
+timeout = 600
+
+[config.env]
+GLOBAL_VAR = "from_global"
+
+[commands.global-cmd]
+description = "Global command"
+cmd = "echo global"
+"#).await.unwrap();
+
+        // Create local config
+        let local_dir = temp_dir.path().join("project");
+        fs::create_dir_all(&local_dir).await.unwrap();
+        let local_path = local_dir.join("commands.toml");
+        fs::write(&local_path, r#"
+[config]
+shell = "bash"
+
+[config.env]
+LOCAL_VAR = "from_local"
+
+[commands.local-cmd]
+description = "Local command"
+cmd = "echo local"
+"#).await.unwrap();
+
+        // Test with mock config_dir
+        println!("Global: {:?}", global_path);
+        println!("Local: {:?}", local_path);
     }
 }

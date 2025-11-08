@@ -71,6 +71,11 @@ pub enum MessageKey {
     LabelYes,
     LabelNo,
 
+    // ====== 警告メッセージ ======
+    WarningShellBuiltinNoEffect,
+    HintShellFunction,
+    HintCdCommand,
+
     // ====== エラーメッセージ ======
     ErrorEmptyCommandId,
     ErrorEmptyCommand,
@@ -286,6 +291,11 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             LabelYes => "yes",
             LabelNo => "no",
 
+            // ====== 警告メッセージ ======
+            WarningShellBuiltinNoEffect => "⚠ This shell builtin command runs in a subprocess and won't affect the current shell",
+            HintShellFunction => "💡 Hint: Use shell functions for directory navigation",
+            HintCdCommand => "   Add to ~/.cmdrun/shell-functions.sh:",
+
             // ====== エラーメッセージ ======
             ErrorEmptyCommandId => "Command ID cannot be empty",
             ErrorEmptyCommand => "Command cannot be empty",
@@ -494,6 +504,11 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             LabelBackupCreated => "バックアップを作成しました",
             LabelYes => "はい",
             LabelNo => "いいえ",
+
+            // ====== 警告メッセージ ======
+            WarningShellBuiltinNoEffect => "⚠ このシェルビルトインコマンドはサブプロセスで実行されるため、現在のシェルには影響しません",
+            HintShellFunction => "💡 ヒント: ディレクトリ移動にはシェル関数を使ってください",
+            HintCdCommand => "   ~/.cmdrun/shell-functions.sh に追加:",
 
             // ====== エラーメッセージ ======
             ErrorEmptyCommandId => "コマンドIDは空にできません",
