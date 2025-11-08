@@ -191,7 +191,7 @@ harness = false
 
 [features]
 # デフォルト機能
-default = ["color", "json-output"]
+default = ["color", "json-output", "plugin-system"]
 
 # オプション機能
 color = []

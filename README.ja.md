@@ -1,6 +1,6 @@
 # cmdrun
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](https://github.com/sanae-abe/cmdrun)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/sanae-abe/cmdrun)
 [![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
