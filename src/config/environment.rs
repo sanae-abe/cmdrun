@@ -104,7 +104,9 @@ impl EnvironmentManager {
 
         // environment セクションを抽出
         if let Some(env_section) = full_config.get("environment") {
-            let env_config: EnvironmentConfig = env_section.clone().try_into()
+            let env_config: EnvironmentConfig = env_section
+                .clone()
+                .try_into()
                 .context("Failed to parse environment section")?;
             Ok(env_config)
         } else {
@@ -127,8 +129,8 @@ impl EnvironmentManager {
         };
 
         // environment セクションを更新
-        let env_value = toml::to_string(config)
-            .context("Failed to serialize environment config")?;
+        let env_value =
+            toml::to_string(config).context("Failed to serialize environment config")?;
         let env_table: toml::Value = toml::from_str(&env_value)?;
 
         if let toml::Value::Table(ref mut table) = full_config {
@@ -140,7 +142,10 @@ impl EnvironmentManager {
         let content = toml::to_string_pretty(&full_config)?;
         fs::write(&config_path, content).await?;
 
-        info!("Environment configuration saved to: {}", config_path.display());
+        info!(
+            "Environment configuration saved to: {}",
+            config_path.display()
+        );
         Ok(())
     }
 
@@ -256,7 +261,9 @@ impl EnvironmentManager {
 
         if env_name == "default" {
             // デフォルト環境の場合は基本設定ファイルに保存
-            anyhow::bail!("Cannot set variables for 'default' environment. Use a specific environment name.");
+            anyhow::bail!(
+                "Cannot set variables for 'default' environment. Use a specific environment name."
+            );
         } else {
             // 特定環境の変数を設定
             if let Some(env) = config.environments.get_mut(env_name) {
@@ -270,11 +277,7 @@ impl EnvironmentManager {
     }
 
     /// 環境を作成
-    pub async fn create_environment(
-        &self,
-        name: String,
-        description: String,
-    ) -> Result<()> {
+    pub async fn create_environment(&self, name: String, description: String) -> Result<()> {
         let mut config = self.load_environment_config().await?;
 
         if config.environments.contains_key(&name) {
@@ -355,7 +358,11 @@ mod tests {
 
         // 変数を設定
         manager
-            .set_variable("prod", "API_URL".to_string(), "https://api.example.com".to_string())
+            .set_variable(
+                "prod",
+                "API_URL".to_string(),
+                "https://api.example.com".to_string(),
+            )
             .await
             .unwrap();
 

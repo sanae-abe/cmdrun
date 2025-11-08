@@ -85,10 +85,12 @@ impl PluginManager {
         let mut plugin = unsafe { self.loader.load(path)? };
 
         // Initialize with config
-        plugin.on_load(config).map_err(|e| CmdrunError::PluginError {
-            plugin: plugin.metadata().name,
-            message: format!("Failed to initialize plugin: {}", e),
-        })?;
+        plugin
+            .on_load(config)
+            .map_err(|e| CmdrunError::PluginError {
+                plugin: plugin.metadata().name,
+                message: format!("Failed to initialize plugin: {}", e),
+            })?;
 
         // Register the plugin
         self.registry.register(plugin)?;
@@ -163,7 +165,11 @@ impl PluginManager {
     }
 
     /// Execute error hooks
-    pub fn execute_error_hooks(&self, _context: &PluginContext, _error: &CmdrunError) -> Result<()> {
+    pub fn execute_error_hooks(
+        &self,
+        _context: &PluginContext,
+        _error: &CmdrunError,
+    ) -> Result<()> {
         debug!("Executing error hooks");
 
         let plugins = self.registry.list();
@@ -263,7 +269,10 @@ impl PluginManager {
         Self
     }
 
-    pub fn load_plugins(&mut self, _plugins: &ahash::AHashMap<String, PluginConfig>) -> Result<(), crate::error::CmdrunError> {
+    pub fn load_plugins(
+        &mut self,
+        _plugins: &ahash::AHashMap<String, PluginConfig>,
+    ) -> Result<(), crate::error::CmdrunError> {
         Ok(())
     }
 }

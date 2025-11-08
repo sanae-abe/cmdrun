@@ -38,8 +38,7 @@ pub struct HistoryEntry {
 impl HistoryEntry {
     /// Get the start time as a DateTime
     pub fn start_time_as_datetime(&self) -> DateTime<Utc> {
-        DateTime::from_timestamp_millis(self.start_time)
-            .unwrap_or_else(|| Utc::now())
+        DateTime::from_timestamp_millis(self.start_time).unwrap_or_else(|| Utc::now())
     }
 
     /// Get execution duration as a formatted string
@@ -83,8 +82,9 @@ impl HistoryStorage {
 
         // Ensure parent directory exists
         if let Some(parent) = path.parent() {
-            std::fs::create_dir_all(parent)
-                .with_context(|| format!("Failed to create history directory: {}", parent.display()))?;
+            std::fs::create_dir_all(parent).with_context(|| {
+                format!("Failed to create history directory: {}", parent.display())
+            })?;
         }
 
         let conn = Connection::open(path)
@@ -263,11 +263,9 @@ impl HistoryStorage {
 
     /// Get history statistics
     pub fn get_stats(&self) -> Result<HistoryStats> {
-        let total: i64 = self.conn.query_row(
-            "SELECT COUNT(*) FROM command_history",
-            [],
-            |row| row.get(0),
-        )?;
+        let total: i64 =
+            self.conn
+                .query_row("SELECT COUNT(*) FROM command_history", [], |row| row.get(0))?;
 
         let successful: i64 = self.conn.query_row(
             "SELECT COUNT(*) FROM command_history WHERE success = 1",
@@ -281,7 +279,8 @@ impl HistoryStorage {
             |row| row.get(0),
         )?;
 
-        let avg_duration: Option<f64> = self.conn
+        let avg_duration: Option<f64> = self
+            .conn
             .query_row(
                 "SELECT AVG(duration_ms) FROM command_history WHERE duration_ms IS NOT NULL",
                 [],
@@ -302,7 +301,10 @@ impl HistoryStorage {
     pub fn clear(&mut self) -> Result<usize> {
         let count = self.conn.execute("DELETE FROM command_history", [])?;
         // Reset auto-increment counter
-        self.conn.execute("DELETE FROM sqlite_sequence WHERE name='command_history'", [])?;
+        self.conn.execute(
+            "DELETE FROM sqlite_sequence WHERE name='command_history'",
+            [],
+        )?;
         Ok(count)
     }
 
@@ -315,19 +317,28 @@ impl HistoryStorage {
     /// Export history to CSV format
     pub fn export_csv(&self, limit: Option<usize>) -> Result<String> {
         let entries = self.list(limit, None)?;
-        let mut csv = String::from("id,command,args,start_time,duration_ms,exit_code,success,working_dir\n");
+        let mut csv =
+            String::from("id,command,args,start_time,duration_ms,exit_code,success,working_dir\n");
 
         for entry in entries {
             csv.push_str(&format!(
                 "{},{},{},{},{},{},{},{}\n",
                 entry.id,
                 Self::escape_csv(&entry.command),
-                entry.args.as_deref().map(Self::escape_csv).unwrap_or_default(),
+                entry
+                    .args
+                    .as_deref()
+                    .map(Self::escape_csv)
+                    .unwrap_or_default(),
                 entry.start_time_as_datetime().to_rfc3339(),
                 entry.duration_ms.map(|d| d.to_string()).unwrap_or_default(),
                 entry.exit_code.map(|c| c.to_string()).unwrap_or_default(),
                 entry.success,
-                entry.working_dir.as_deref().map(Self::escape_csv).unwrap_or_default(),
+                entry
+                    .working_dir
+                    .as_deref()
+                    .map(Self::escape_csv)
+                    .unwrap_or_default(),
             ));
         }
 
@@ -336,11 +347,9 @@ impl HistoryStorage {
 
     /// Cleanup old entries to enforce max_entries limit
     fn cleanup_old_entries(&mut self) -> Result<()> {
-        let count: i64 = self.conn.query_row(
-            "SELECT COUNT(*) FROM command_history",
-            [],
-            |row| row.get(0),
-        )?;
+        let count: i64 =
+            self.conn
+                .query_row("SELECT COUNT(*) FROM command_history", [], |row| row.get(0))?;
 
         if count > self.max_entries as i64 {
             let to_delete = count - self.max_entries as i64;
@@ -491,7 +500,9 @@ mod tests {
 
         storage.add(&create_test_entry("build", true)).unwrap();
         storage.add(&create_test_entry("test", true)).unwrap();
-        storage.add(&create_test_entry("build-release", true)).unwrap();
+        storage
+            .add(&create_test_entry("build-release", true))
+            .unwrap();
 
         let results = storage.search("build", None).unwrap();
         assert_eq!(results.len(), 2);

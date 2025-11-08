@@ -10,8 +10,10 @@ use tracing::{debug, error, info};
 
 use super::config::WatchConfig;
 use super::debouncer::FileDebouncer;
-use super::executor::CommandExecutor;
+use super::executor::CommandExecutor as WatchCommandExecutor;
 use super::matcher::PatternMatcher;
+use crate::command::executor::{CommandExecutor as CmdrunExecutor, ExecutionContext};
+use crate::config::schema::Command;
 
 /// Watch event information
 #[derive(Debug, Clone)]
@@ -23,13 +25,25 @@ pub struct WatchEvent {
     pub kind: EventKind,
 }
 
+/// Execution mode for watch runner
+enum ExecutionMode {
+    /// Execute shell command directly
+    Shell {
+        command: String,
+        executor: WatchCommandExecutor,
+    },
+    /// Execute cmdrun command
+    Cmdrun {
+        command_name: String,
+        command_def: Command,
+        executor: CmdrunExecutor,
+    },
+}
+
 /// Watch runner that monitors filesystem changes and executes commands
 pub struct WatchRunner {
     /// Watch configuration
     config: WatchConfig,
-
-    /// Command to execute on file changes
-    command: String,
 
     /// Pattern matcher
     matcher: Arc<PatternMatcher>,
@@ -37,31 +51,59 @@ pub struct WatchRunner {
     /// Custom debouncer
     debouncer: FileDebouncer,
 
-    /// Command executor
-    executor: CommandExecutor,
+    /// Execution mode
+    execution_mode: ExecutionMode,
 }
 
 impl WatchRunner {
-    /// Create a new watch runner
+    /// Create a new watch runner with shell command execution
     pub fn new(config: WatchConfig, command: String, base_path: &Path) -> Result<Self> {
         let matcher = Arc::new(PatternMatcher::from_config(&config, base_path)?);
         let debouncer = FileDebouncer::new(config.debounce_duration());
-        let executor = CommandExecutor::new(base_path.to_path_buf());
+        let executor = WatchCommandExecutor::new(base_path.to_path_buf());
 
         Ok(Self {
             config,
-            command,
             matcher,
             debouncer,
-            executor,
+            execution_mode: ExecutionMode::Shell { command, executor },
+        })
+    }
+
+    /// Create a new watch runner with cmdrun command execution
+    pub fn new_with_cmdrun(
+        config: WatchConfig,
+        command_name: String,
+        command_def: Command,
+        exec_ctx: ExecutionContext,
+        base_path: &Path,
+    ) -> Result<Self> {
+        let matcher = Arc::new(PatternMatcher::from_config(&config, base_path)?);
+        let debouncer = FileDebouncer::new(config.debounce_duration());
+        let executor = CmdrunExecutor::new(exec_ctx);
+
+        Ok(Self {
+            config,
+            matcher,
+            debouncer,
+            execution_mode: ExecutionMode::Cmdrun {
+                command_name,
+                command_def,
+                executor,
+            },
         })
     }
 
     /// Start watching and executing commands
     pub async fn run(&mut self) -> Result<()> {
+        let command_name = match &self.execution_mode {
+            ExecutionMode::Shell { command, .. } => command.clone(),
+            ExecutionMode::Cmdrun { command_name, .. } => command_name.clone(),
+        };
+
         info!(
             paths = ?self.config.paths,
-            command = %self.command,
+            command = %command_name,
             "Starting watch mode"
         );
 
@@ -126,7 +168,25 @@ impl WatchRunner {
                     "File changed, executing command"
                 );
 
-                if let Err(e) = self.executor.execute(&self.command, &event.path).await {
+                let result: anyhow::Result<()> = match &self.execution_mode {
+                    ExecutionMode::Shell { command, executor } => {
+                        executor.execute(command, &event.path).await
+                    }
+                    ExecutionMode::Cmdrun {
+                        command_name: _,
+                        command_def,
+                        executor,
+                    } => {
+                        // Execute cmdrun command and convert error type
+                        executor
+                            .execute(command_def)
+                            .await
+                            .map(|_| ())
+                            .map_err(|e| anyhow::anyhow!("{}", e))
+                    }
+                };
+
+                if let Err(e) = result {
                     error!(
                         error = %e,
                         path = %event.path.display(),
@@ -146,11 +206,6 @@ impl WatchRunner {
     /// Get a reference to the matcher
     pub fn matcher(&self) -> &PatternMatcher {
         &self.matcher
-    }
-
-    /// Get a mutable reference to the executor
-    pub fn executor_mut(&mut self) -> &mut CommandExecutor {
-        &mut self.executor
     }
 }
 
@@ -197,27 +252,16 @@ mod tests {
         let mut config = WatchConfig::new();
         config.paths = vec![temp_dir.path().to_path_buf()];
         config.patterns = vec![super::super::config::WatchPattern {
-            pattern: "*.rs".to_string(),
+            pattern: "**/*.rs".to_string(),
             case_insensitive: false,
         }];
+        config.ignore_gitignore = true; // Disable gitignore for testing
 
         let runner = WatchRunner::new(config, "echo test".to_string(), temp_dir.path()).unwrap();
 
+        // Test that matcher works correctly
         let matcher = runner.matcher();
-        assert!(matcher.should_watch(Path::new("test.rs")));
+        assert!(matcher.should_watch(Path::new("src/test.rs")));
         assert!(!matcher.should_watch(Path::new("test.txt")));
-    }
-
-    #[tokio::test]
-    async fn test_executor_mut_access() {
-        let temp_dir = TempDir::new().unwrap();
-        let config = WatchConfig::new().add_path(temp_dir.path());
-
-        let mut runner =
-            WatchRunner::new(config, "echo test".to_string(), temp_dir.path()).unwrap();
-
-        let executor = runner.executor_mut();
-        // Test that executor can be modified
-        assert_eq!(executor.working_dir, temp_dir.path());
     }
 }

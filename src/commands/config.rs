@@ -32,7 +32,11 @@ pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
         "strict_mode" => println!("{}", config.config.strict_mode),
         "parallel" => println!("{}", config.config.parallel),
         "working_dir" => println!("{}", config.config.working_dir.display()),
-        _ => anyhow::bail!("{}: {}", get_message(MessageKey::ErrorUnknownConfigKey, lang), key),
+        _ => anyhow::bail!(
+            "{}: {}",
+            get_message(MessageKey::ErrorUnknownConfigKey, lang),
+            key
+        ),
     }
 
     Ok(())
@@ -79,7 +83,11 @@ pub async fn handle_set(key: &str, value: &str, config_file_path: Option<PathBuf
         "working_dir" => {
             doc["config"]["working_dir"] = toml_edit::value(value);
         }
-        _ => anyhow::bail!("{}: {}", get_message(MessageKey::ErrorUnknownConfigKey, lang), key),
+        _ => anyhow::bail!(
+            "{}: {}",
+            get_message(MessageKey::ErrorUnknownConfigKey, lang),
+            key
+        ),
     }
 
     fs::write(&config_path, doc.to_string())?;
@@ -152,7 +160,11 @@ pub async fn handle_show(config_path: Option<PathBuf>) -> Result<()> {
         println!();
         println!(
             "  {}",
-            format!("{}:", get_message(MessageKey::LabelEnvironmentVariables, lang)).dimmed()
+            format!(
+                "{}:",
+                get_message(MessageKey::LabelEnvironmentVariables, lang)
+            )
+            .dimmed()
         );
         for (key, value) in &config.config.env {
             println!("    {} = {}", key.cyan(), value);

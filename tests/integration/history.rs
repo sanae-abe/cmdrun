@@ -1,5 +1,6 @@
 //! Integration tests for history functionality
 
+use ahash::AHashMap;
 use cmdrun::history::{HistoryEntry, HistoryRecorder, HistoryStorage};
 use std::collections::HashMap;
 use tempfile::NamedTempFile;
@@ -66,19 +67,12 @@ fn test_history_recorder() {
     let storage = HistoryStorage::with_path(temp_file.path()).unwrap();
     let mut recorder = HistoryRecorder::with_storage(storage);
 
-    let mut env = HashMap::new();
+    let mut env = AHashMap::new();
     env.insert("PATH".to_string(), "/usr/bin".to_string());
     env.insert("API_KEY".to_string(), "secret".to_string());
 
     let id = recorder
-        .record(
-            "deploy",
-            &["production".to_string()],
-            &env,
-            2500,
-            0,
-            true,
-        )
+        .record("deploy", &["production".to_string()], &env, 2500, 0, true)
         .unwrap();
 
     let entry = recorder.storage().get_by_id(id).unwrap().unwrap();
@@ -160,7 +154,9 @@ fn test_history_pagination() {
 
     // Add 20 entries
     for i in 0..20 {
-        storage.add(&create_test_entry(&format!("cmd{}", i), true)).unwrap();
+        storage
+            .add(&create_test_entry(&format!("cmd{}", i), true))
+            .unwrap();
     }
 
     // First page
@@ -181,20 +177,13 @@ fn test_sensitive_data_filtering() {
     let storage = HistoryStorage::with_path(temp_file.path()).unwrap();
     let mut recorder = HistoryRecorder::with_storage(storage);
 
-    let mut env = HashMap::new();
+    let mut env = AHashMap::new();
     env.insert("PATH".to_string(), "/usr/bin".to_string());
     env.insert("API_KEY".to_string(), "super_secret".to_string());
     env.insert("PASSWORD".to_string(), "hunter2".to_string());
     env.insert("HOME".to_string(), "/home/user".to_string());
 
-    let id = recorder.record(
-        "test",
-        &[],
-        &env,
-        100,
-        0,
-        true,
-    ).unwrap();
+    let id = recorder.record("test", &[], &env, 100, 0, true).unwrap();
 
     let entry = recorder.storage().get_by_id(id).unwrap().unwrap();
     if let Some(env_json) = entry.environment {

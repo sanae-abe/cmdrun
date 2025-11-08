@@ -37,7 +37,11 @@ async fn test_environment_lifecycle() {
 
     // Test 5: Set environment variable
     manager
-        .set_variable("dev", "API_URL".to_string(), "http://localhost:3000".to_string())
+        .set_variable(
+            "dev",
+            "API_URL".to_string(),
+            "http://localhost:3000".to_string(),
+        )
         .await
         .unwrap();
 
@@ -149,10 +153,7 @@ async fn test_environment_not_found_error() {
     // Try to switch to non-existent environment
     let result = manager.switch_environment("nonexistent").await;
     assert!(result.is_err());
-    assert!(result
-        .unwrap_err()
-        .to_string()
-        .contains("not found"));
+    assert!(result.unwrap_err().to_string().contains("not found"));
 }
 
 #[tokio::test]
@@ -174,10 +175,7 @@ async fn test_duplicate_environment_error() {
         .create_environment("test".to_string(), "Duplicate".to_string())
         .await;
     assert!(result.is_err());
-    assert!(result
-        .unwrap_err()
-        .to_string()
-        .contains("already exists"));
+    assert!(result.unwrap_err().to_string().contains("already exists"));
 }
 
 #[tokio::test]

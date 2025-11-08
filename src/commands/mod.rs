@@ -21,7 +21,10 @@ pub use add::handle_add;
 pub use completion::handle_completion;
 pub use config::{handle_get, handle_set, handle_show};
 pub use edit::handle_edit;
-pub use env::{handle_create, handle_current, handle_info as handle_env_info, handle_list as handle_env_list, handle_set as handle_env_set, handle_use};
+pub use env::{
+    handle_create, handle_current, handle_info as handle_env_info, handle_list as handle_env_list,
+    handle_set as handle_env_set, handle_use,
+};
 pub use history::{
     handle_history, handle_history_clear, handle_history_export, handle_history_search,
     handle_retry, ExportFormat,
@@ -37,3 +40,8 @@ pub use template::{
 };
 pub use validate::handle_validate;
 pub use watch::handle_watch;
+
+#[cfg(feature = "plugin-system")]
+pub use plugin::{
+    handle_plugin_disable, handle_plugin_enable, handle_plugin_info, handle_plugin_list,
+};

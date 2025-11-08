@@ -68,10 +68,12 @@ impl PluginRegistry {
 
         // Initialize plugin with empty config
         let config = AHashMap::new();
-        plugin.on_load(&config).map_err(|e| CmdrunError::PluginError {
-            plugin: name.clone(),
-            message: format!("Failed to initialize plugin: {}", e),
-        })?;
+        plugin
+            .on_load(&config)
+            .map_err(|e| CmdrunError::PluginError {
+                plugin: name.clone(),
+                message: format!("Failed to initialize plugin: {}", e),
+            })?;
 
         // Add to registry
         let mut plugins = self.plugins.write().map_err(|e| CmdrunError::PluginError {
@@ -106,10 +108,13 @@ impl PluginRegistry {
         })?;
 
         if let Some(mut instance) = plugins.remove(name) {
-            instance.plugin.on_unload().map_err(|e| CmdrunError::PluginError {
-                plugin: name.to_string(),
-                message: format!("Failed to unload plugin: {}", e),
-            })?;
+            instance
+                .plugin
+                .on_unload()
+                .map_err(|e| CmdrunError::PluginError {
+                    plugin: name.to_string(),
+                    message: format!("Failed to unload plugin: {}", e),
+                })?;
             info!("Plugin unregistered successfully: {}", name);
             Ok(())
         } else {

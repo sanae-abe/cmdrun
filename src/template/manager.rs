@@ -21,7 +21,10 @@ impl TemplateManager {
         // Create directory if it doesn't exist
         if !template_dir.exists() {
             fs::create_dir_all(&template_dir).with_context(|| {
-                format!("Failed to create template directory: {}", template_dir.display())
+                format!(
+                    "Failed to create template directory: {}",
+                    template_dir.display()
+                )
             })?;
         }
 
@@ -49,8 +52,8 @@ impl TemplateManager {
         }
 
         // Serialize to TOML
-        let toml_content = toml::to_string_pretty(template)
-            .context("Failed to serialize template to TOML")?;
+        let toml_content =
+            toml::to_string_pretty(template).context("Failed to serialize template to TOML")?;
 
         // Write to file
         fs::write(&file_path, toml_content)
@@ -101,8 +104,8 @@ impl TemplateManager {
 
         // Add user templates
         if self.template_dir.exists() {
-            for entry in fs::read_dir(&self.template_dir)
-                .context("Failed to read template directory")?
+            for entry in
+                fs::read_dir(&self.template_dir).context("Failed to read template directory")?
             {
                 let entry = entry.context("Failed to read directory entry")?;
                 let path = entry.path();
@@ -146,8 +149,8 @@ impl TemplateManager {
     pub fn export(&self, name: &str, output_path: &Path) -> Result<()> {
         let template = self.load(name)?;
 
-        let toml_content = toml::to_string_pretty(&template)
-            .context("Failed to serialize template to TOML")?;
+        let toml_content =
+            toml::to_string_pretty(&template).context("Failed to serialize template to TOML")?;
 
         fs::write(output_path, toml_content)
             .with_context(|| format!("Failed to export template to {}", output_path.display()))?;
@@ -276,7 +279,11 @@ mod tests {
 
         // Save template
         let result = manager.save(&template);
-        assert!(result.is_ok(), "Failed to save template: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Failed to save template: {:?}",
+            result.err()
+        );
 
         // Load template
         let loaded = manager.load("test-template").unwrap();
@@ -307,7 +314,11 @@ mod tests {
     fn test_load_builtin_template() {
         let (manager, _temp_dir) = create_test_manager();
         let result = manager.load("rust-cli");
-        assert!(result.is_ok(), "Failed to load builtin template: {:?}", result.err());
+        assert!(
+            result.is_ok(),
+            "Failed to load builtin template: {:?}",
+            result.err()
+        );
     }
 
     #[test]

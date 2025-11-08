@@ -8,6 +8,17 @@ use std::path::{Path, PathBuf};
 use tokio::fs;
 use tracing::{debug, info};
 
+/// 設定ファイルと読み込み情報
+#[derive(Debug, Clone)]
+pub struct LoadedConfig {
+    /// 設定内容
+    pub config: CommandsConfig,
+    /// グローバル設定ファイルパス
+    pub global_path: Option<PathBuf>,
+    /// ローカル設定ファイルパス
+    pub local_path: Option<PathBuf>,
+}
+
 /// 設定ファイル名（優先順位順）
 const CONFIG_FILENAMES: &[&str] = &["commands.toml", ".cmdrun.toml", "cmdrun.toml"];
 
@@ -16,6 +27,10 @@ const CONFIG_FILENAMES: &[&str] = &["commands.toml", ".cmdrun.toml", "cmdrun.tom
 pub struct ConfigLoader {
     /// 明示的に指定された設定ファイルパス
     explicit_path: Option<PathBuf>,
+    /// 実際に使用されたグローバル設定ファイルパス
+    pub loaded_global_path: Option<PathBuf>,
+    /// 実際に使用されたローカル設定ファイルパス
+    pub loaded_local_path: Option<PathBuf>,
 }
 
 impl ConfigLoader {
@@ -23,6 +38,8 @@ impl ConfigLoader {
     pub fn new() -> Self {
         Self {
             explicit_path: None,
+            loaded_global_path: None,
+            loaded_local_path: None,
         }
     }
 
@@ -30,6 +47,8 @@ impl ConfigLoader {
     pub fn with_path<P: Into<PathBuf>>(path: P) -> Self {
         Self {
             explicit_path: Some(path.into()),
+            loaded_global_path: None,
+            loaded_local_path: None,
         }
     }
 
@@ -39,20 +58,32 @@ impl ConfigLoader {
     /// 1. 明示的に指定されたパス（マージなし）
     /// 2. ローカル設定（必須） + グローバル設定（任意）
     pub async fn load(&self) -> Result<CommandsConfig> {
+        let loaded = self.load_with_paths().await?;
+        Ok(loaded.config)
+    }
+
+    /// 設定ファイルを読み込み、パス情報も返す
+    pub async fn load_with_paths(&self) -> Result<LoadedConfig> {
         if let Some(path) = &self.explicit_path {
             debug!("Using explicitly specified config: {}", path.display());
-            return self.load_from_path(path).await;
+            let config = self.load_from_path(path).await?;
+            return Ok(LoadedConfig {
+                config,
+                global_path: None,
+                local_path: Some(path.clone()),
+            });
         }
 
         // グローバル設定（任意）
-        let global_config = match self.find_global_config().await {
+        let (global_config, global_path) = match self.find_global_config().await {
             Some(path) => {
                 info!("Loading global config: {}", path.display());
-                Some(self.load_from_path(&path).await?)
+                let config = self.load_from_path(&path).await?;
+                (Some(config), Some(path))
             }
             None => {
                 debug!("No global config found");
-                None
+                (None, None)
             }
         };
 
@@ -62,13 +93,84 @@ impl ConfigLoader {
         let local_config = self.load_from_path(&local_path).await?;
 
         // マージ（ローカルが優先）
-        Ok(match global_config {
+        let merged_config = match global_config {
             Some(global) => {
                 debug!("Merging global and local configurations");
                 global.merge_with(local_config)
             }
             None => local_config,
+        };
+
+        Ok(LoadedConfig {
+            config: merged_config,
+            global_path,
+            local_path: Some(local_path),
         })
+    }
+
+    /// 環境を考慮して設定ファイルを読み込む
+    ///
+    /// 優先順位:
+    /// 1. グローバル設定（任意）
+    /// 2. ローカル設定（必須）
+    /// 3. 環境別設定（任意、最優先）
+    pub async fn load_with_environment(&self) -> Result<CommandsConfig> {
+        use crate::config::environment::EnvironmentManager;
+
+        // 基本設定を読み込み
+        let mut config = self.load().await?;
+
+        // 現在の環境を取得
+        let env_manager = EnvironmentManager::default_instance()
+            .context("Failed to initialize environment manager")?;
+
+        let current_env = env_manager.get_current_environment().await?;
+
+        // デフォルト環境以外の場合、環境別設定をマージ
+        if current_env != "default" {
+            if let Some(env_config) = self.load_environment_config(&current_env).await? {
+                info!("Merging environment-specific config: {}", current_env);
+                config = config.merge_with(env_config);
+
+                // 環境固有の環境変数を追加
+                if let Ok(env_config_data) = env_manager.load_environment_config().await {
+                    if let Some(env) = env_config_data.environments.get(&current_env) {
+                        config.config.env.extend(env.variables.clone());
+                    }
+                }
+            }
+        }
+
+        Ok(config)
+    }
+
+    /// 環境別設定ファイルを読み込む
+    async fn load_environment_config(&self, env_name: &str) -> Result<Option<CommandsConfig>> {
+        // 現在のディレクトリで環境別設定を探す
+        let current_dir = std::env::current_dir().context("Failed to get current directory")?;
+
+        // commands.{env}.toml の形式
+        let env_filename = format!("commands.{}.toml", env_name);
+        let env_path = current_dir.join(&env_filename);
+
+        if env_path.exists() && env_path.is_file() {
+            info!("Loading environment config: {}", env_path.display());
+            let config = self.load_from_path(&env_path).await?;
+            return Ok(Some(config));
+        }
+
+        // .cmdrun/config.{env}.toml も探す
+        let cmdrun_env_path = current_dir
+            .join(".cmdrun")
+            .join(format!("config.{}.toml", env_name));
+        if cmdrun_env_path.exists() && cmdrun_env_path.is_file() {
+            info!("Loading environment config: {}", cmdrun_env_path.display());
+            let config = self.load_from_path(&cmdrun_env_path).await?;
+            return Ok(Some(config));
+        }
+
+        debug!("No environment-specific config found for: {}", env_name);
+        Ok(None)
     }
 
     /// グローバル設定ファイルを検索
@@ -79,8 +181,7 @@ impl ConfigLoader {
 
     /// ローカル設定ファイルを検索（必須）
     async fn find_local_config(&self) -> Result<PathBuf> {
-        let current_dir = std::env::current_dir()
-            .context("Failed to get current directory")?;
+        let current_dir = std::env::current_dir().context("Failed to get current directory")?;
 
         if let Some(path) = self.search_upwards(&current_dir).await? {
             return Ok(path);
@@ -345,12 +446,14 @@ mod global_config_tests {
     #[tokio::test]
     async fn test_global_config_merge() {
         let temp_dir = TempDir::new().unwrap();
-        
+
         // Create global config
         let global_dir = temp_dir.path().join(".config/cmdrun");
         fs::create_dir_all(&global_dir).await.unwrap();
         let global_path = global_dir.join("commands.toml");
-        fs::write(&global_path, r#"
+        fs::write(
+            &global_path,
+            r#"
 [config]
 shell = "zsh"
 timeout = 600
@@ -361,13 +464,18 @@ GLOBAL_VAR = "from_global"
 [commands.global-cmd]
 description = "Global command"
 cmd = "echo global"
-"#).await.unwrap();
+"#,
+        )
+        .await
+        .unwrap();
 
         // Create local config
         let local_dir = temp_dir.path().join("project");
         fs::create_dir_all(&local_dir).await.unwrap();
         let local_path = local_dir.join("commands.toml");
-        fs::write(&local_path, r#"
+        fs::write(
+            &local_path,
+            r#"
 [config]
 shell = "bash"
 
@@ -377,7 +485,10 @@ LOCAL_VAR = "from_local"
 [commands.local-cmd]
 description = "Local command"
 cmd = "echo local"
-"#).await.unwrap();
+"#,
+        )
+        .await
+        .unwrap();
 
         // Test with mock config_dir
         println!("Global: {:?}", global_path);

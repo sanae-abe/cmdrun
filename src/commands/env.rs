@@ -90,7 +90,12 @@ pub async fn handle_set(key: String, value: String, env_name: Option<String>) ->
     manager
         .set_variable(&target_env, key.clone(), value.clone())
         .await
-        .with_context(|| format!("Failed to set variable {} in environment '{}'", key, target_env))?;
+        .with_context(|| {
+            format!(
+                "Failed to set variable {} in environment '{}'",
+                key, target_env
+            )
+        })?;
 
     println!(
         "{} Set {}={} in environment '{}'",
@@ -143,7 +148,9 @@ pub async fn handle_info(env_name: Option<String>) -> Result<()> {
 
     if target_env == "default" {
         println!("  {}: Default environment", "Description".dimmed());
-        println!("  {}: .cmdrun/config.toml", "Config file".dimmed());
+        println!();
+        println!("  {}:", "Configuration files".bold());
+        println!("    {}: commands.toml", "Base config".dimmed());
     } else if let Some(env) = config.environments.get(&target_env) {
         println!("  {}: {}", "Description".dimmed(), env.description);
 
@@ -155,9 +162,42 @@ pub async fn handle_info(env_name: Option<String>) -> Result<()> {
             }
         }
 
-        let config_path = manager.get_env_config_path(&target_env);
         println!();
-        println!("  {}: {}", "Config file".dimmed(), config_path.display());
+        println!("  {}:", "Configuration files".bold());
+        println!("    {}: commands.toml", "Base config".dimmed());
+
+        // 環境別設定ファイルの候補を表示
+        let current_dir = std::env::current_dir().context("Failed to get current directory")?;
+
+        let env_config_path = current_dir.join(format!("commands.{}.toml", target_env));
+        let cmdrun_env_path = current_dir
+            .join(".cmdrun")
+            .join(format!("config.{}.toml", target_env));
+
+        if env_config_path.exists() {
+            println!(
+                "    {}: {} ({})",
+                "Environment config".dimmed(),
+                env_config_path.display(),
+                "found".green()
+            );
+        } else {
+            println!(
+                "    {}: {} ({})",
+                "Environment config".dimmed(),
+                env_config_path.display(),
+                "not found".yellow()
+            );
+        }
+
+        if cmdrun_env_path.exists() {
+            println!(
+                "    {}: {} ({})",
+                "Alt environment config".dimmed(),
+                cmdrun_env_path.display(),
+                "found".green()
+            );
+        }
     } else {
         anyhow::bail!("Environment '{}' not found", target_env);
     }

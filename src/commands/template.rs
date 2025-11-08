@@ -39,12 +39,18 @@ pub async fn handle_template_add(name: Option<String>, config_path: Option<PathB
         .interact_text()?;
 
     if description.trim().is_empty() {
-        anyhow::bail!("{}", get_message(MessageKey::ErrorEmptyDescription, language));
+        anyhow::bail!(
+            "{}",
+            get_message(MessageKey::ErrorEmptyDescription, language)
+        );
     }
 
     // Create template from current configuration
-    let user_template =
-        crate::template::schema::UserTemplate::from_commands_config(template_name.clone(), description, &config);
+    let user_template = crate::template::schema::UserTemplate::from_commands_config(
+        template_name.clone(),
+        description,
+        &config,
+    );
 
     // Save template
     let manager = TemplateManager::new()?;

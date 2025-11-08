@@ -464,11 +464,7 @@ impl CommandExecutor {
         let hint_cmd_msg = get_message(MessageKey::HintCdCommand, language);
 
         // コマンドからディレクトリパスを抽出
-        let path = command
-            .trim()
-            .strip_prefix("cd")
-            .unwrap_or("")
-            .trim();
+        let path = command.trim().strip_prefix("cd").unwrap_or("").trim();
 
         // 関数名を生成（簡易版）
         let func_name = Self::generate_function_name(path);
@@ -476,7 +472,11 @@ impl CommandExecutor {
         if self.context.color {
             eprintln!("{}", hint_msg.cyan());
             eprintln!("{}", hint_cmd_msg.cyan());
-            eprintln!("   {}() {{ cd {}; }}\n", func_name.green().bold(), path.bright_white());
+            eprintln!(
+                "   {}() {{ cd {}; }}\n",
+                func_name.green().bold(),
+                path.bright_white()
+            );
         } else {
             eprintln!("{}", hint_msg);
             eprintln!("{}", hint_cmd_msg);

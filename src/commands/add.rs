@@ -11,6 +11,7 @@ use toml_edit::{value, Array, DocumentMut, InlineTable, Item, Table};
 
 use crate::config::{ConfigLoader, Language};
 use crate::i18n::{get_message, MessageKey};
+use crate::security::validation::CommandValidator;
 
 /// Handle the add command
 pub async fn handle_add(
@@ -202,6 +203,15 @@ async fn add_command_to_config(
         id.green().bold(),
         config_path.display()
     );
+
+    // Security validation: Check for dangerous shell metacharacters
+    let validator = CommandValidator::new();
+    let validation_result = validator.validate(&command);
+    if !validation_result.is_safe() {
+        if let Some(err) = validation_result.error() {
+            bail!("Security validation failed: {}", err);
+        }
+    }
 
     // Read existing TOML file
     let toml_content = fs::read_to_string(&config_path)

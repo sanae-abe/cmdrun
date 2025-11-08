@@ -74,9 +74,12 @@ pub async fn handle_edit(command_id: Option<String>, config_path: Option<PathBuf
     );
     println!(
         "  {} {}",
-        format!("{}:", get_message(MessageKey::EditConfirmBeforeExecution, lang))
-            .white()
-            .bold(),
+        format!(
+            "{}:",
+            get_message(MessageKey::EditConfirmBeforeExecution, lang)
+        )
+        .white()
+        .bold(),
         command.confirm
     );
     println!();

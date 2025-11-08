@@ -24,7 +24,8 @@ fn bench_simple_commands(c: &mut Criterion) {
 fn bench_regex_matching(c: &mut Criterion) {
     use regex::Regex;
 
-    let var_pattern = Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(:[?+\-])?([^}]*)?\}").unwrap();
+    let var_pattern =
+        Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*|[0-9]+)(:[?+\-])?([^}]*)?\}").unwrap();
 
     let mut group = c.benchmark_group("regex_matching");
 

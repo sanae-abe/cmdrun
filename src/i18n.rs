@@ -136,6 +136,10 @@ pub enum MessageKey {
     InfoCommandSpecification,
     InfoExecutionSettings,
     InfoPlatformSupport,
+    InfoConfigurationPaths,
+    InfoGlobalConfigPath,
+    InfoLocalConfigPath,
+    InfoActualWorkingDirectory,
 
     // ====== Config コマンド ======
     ConfigSet,
@@ -356,6 +360,10 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             InfoCommandSpecification => "Command specification",
             InfoExecutionSettings => "Execution settings",
             InfoPlatformSupport => "Platform support",
+            InfoConfigurationPaths => "Configuration paths",
+            InfoGlobalConfigPath => "Global config",
+            InfoLocalConfigPath => "Local config",
+            InfoActualWorkingDirectory => "Actual working directory",
 
             // ====== Config コマンド ======
             ConfigSet => "Set",
@@ -570,6 +578,10 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             InfoCommandSpecification => "コマンド仕様",
             InfoExecutionSettings => "実行設定",
             InfoPlatformSupport => "プラットフォームサポート",
+            InfoConfigurationPaths => "設定ファイルパス",
+            InfoGlobalConfigPath => "グローバル設定",
+            InfoLocalConfigPath => "ローカル設定",
+            InfoActualWorkingDirectory => "実際の作業ディレクトリ",
 
             // ====== Config コマンド ======
             ConfigSet => "設定しました",

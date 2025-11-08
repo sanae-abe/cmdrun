@@ -15,21 +15,21 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
     } else {
         ConfigLoader::new()
     };
-    let config = config_loader.load().await?;
+    let loaded = config_loader.load_with_paths().await?;
+    let config = &loaded.config;
     let lang = config.config.language;
 
     // Get command ID (from argument or interactive selection)
     let id = if let Some(id) = command_id {
         id
     } else {
-        select_command_interactive(&config, lang)?
+        select_command_interactive(config, lang)?
     };
 
     // Find command
-    let command = config
-        .commands
-        .get(&id)
-        .ok_or_else(|| anyhow::anyhow!("{}", get_message(MessageKey::ErrorCommandNotFound, lang)))?;
+    let command = config.commands.get(&id).ok_or_else(|| {
+        anyhow::anyhow!("{}", get_message(MessageKey::ErrorCommandNotFound, lang))
+    })?;
 
     // Display detailed information
     println!(
@@ -127,9 +127,12 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
     if !command.env.is_empty() {
         println!(
             "{}",
-            format!("{}:", get_message(MessageKey::LabelEnvironmentVariables, lang))
-                .white()
-                .bold()
+            format!(
+                "{}:",
+                get_message(MessageKey::LabelEnvironmentVariables, lang)
+            )
+            .white()
+            .bold()
         );
         for (key, value) in &command.env {
             println!("  {} = {}", key.yellow(), value.bright_white());
@@ -180,6 +183,53 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
         println!();
     }
 
+    // Configuration paths
+    println!(
+        "{}",
+        format!("{}:", get_message(MessageKey::InfoConfigurationPaths, lang))
+            .white()
+            .bold()
+    );
+    if let Some(global_path) = &loaded.global_path {
+        println!(
+            "  {} {}",
+            format!("{}:", get_message(MessageKey::InfoGlobalConfigPath, lang)).dimmed(),
+            global_path.display().to_string().bright_white()
+        );
+    }
+    if let Some(local_path) = &loaded.local_path {
+        println!(
+            "  {} {}",
+            format!("{}:", get_message(MessageKey::InfoLocalConfigPath, lang)).dimmed(),
+            local_path.display().to_string().bright_white()
+        );
+    }
+
+    // Actual working directory
+    let actual_working_dir = if let Some(cmd_working_dir) = &command.working_dir {
+        cmd_working_dir.clone()
+    } else {
+        config.config.working_dir.clone()
+    };
+
+    // Resolve to absolute path if needed
+    let absolute_working_dir = if actual_working_dir.is_absolute() {
+        actual_working_dir
+    } else {
+        std::env::current_dir()?.join(&actual_working_dir)
+    };
+
+    println!(
+        "  {} {}",
+        format!(
+            "{}:",
+            get_message(MessageKey::InfoActualWorkingDirectory, lang)
+        )
+        .dimmed(),
+        absolute_working_dir.display().to_string().bright_white()
+    );
+    println!();
+
     Ok(())
 }
 
@@ -189,7 +239,10 @@ fn select_command_interactive(
     lang: crate::config::schema::Language,
 ) -> Result<String> {
     if config.commands.is_empty() {
-        anyhow::bail!("{}", get_message(MessageKey::ErrorNoCommandsAvailable, lang));
+        anyhow::bail!(
+            "{}",
+            get_message(MessageKey::ErrorNoCommandsAvailable, lang)
+        );
     }
 
     println!(
@@ -228,7 +281,10 @@ fn select_command_interactive(
         .map_err(|_| anyhow::anyhow!("{}", get_message(MessageKey::ErrorInvalidSelection, lang)))?;
 
     if selection < 1 || selection > commands.len() {
-        anyhow::bail!("{}", get_message(MessageKey::ErrorSelectionOutOfRange, lang));
+        anyhow::bail!(
+            "{}",
+            get_message(MessageKey::ErrorSelectionOutOfRange, lang)
+        );
     }
 
     Ok(commands[selection - 1].0.clone())

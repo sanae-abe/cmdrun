@@ -112,8 +112,14 @@ mod tests {
 
     #[test]
     fn test_builtin_template_parse() {
-        assert_eq!(BuiltinTemplate::parse("rust-cli"), Some(BuiltinTemplate::RustCli));
-        assert_eq!(BuiltinTemplate::parse("rustcli"), Some(BuiltinTemplate::RustCli));
+        assert_eq!(
+            BuiltinTemplate::parse("rust-cli"),
+            Some(BuiltinTemplate::RustCli)
+        );
+        assert_eq!(
+            BuiltinTemplate::parse("rustcli"),
+            Some(BuiltinTemplate::RustCli)
+        );
         assert_eq!(
             BuiltinTemplate::parse("nodejs-web"),
             Some(BuiltinTemplate::NodejsWeb)
@@ -122,7 +128,10 @@ mod tests {
             BuiltinTemplate::parse("python-data"),
             Some(BuiltinTemplate::PythonData)
         );
-        assert_eq!(BuiltinTemplate::parse("react-app"), Some(BuiltinTemplate::ReactApp));
+        assert_eq!(
+            BuiltinTemplate::parse("react-app"),
+            Some(BuiltinTemplate::ReactApp)
+        );
         assert_eq!(BuiltinTemplate::parse("unknown"), None);
     }
 

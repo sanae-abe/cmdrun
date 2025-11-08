@@ -6,8 +6,10 @@ use std::env;
 use std::path::PathBuf;
 use tracing::{info, warn};
 
+use crate::command::executor::ExecutionContext;
 use crate::config::loader::ConfigLoader;
 use crate::i18n::{get_message, MessageKey};
+use crate::platform::shell::detect_shell;
 use crate::watch::{WatchConfig, WatchPattern, WatchRunner};
 
 /// Handle the watch command
@@ -25,22 +27,41 @@ pub async fn handle_watch(
     ignore_gitignore: bool,
     no_recursive: bool,
 ) -> Result<()> {
-    // Load config to get language setting
+    // Load cmdrun configuration
     let config_loader = ConfigLoader::new();
-    let config = config_loader.load().await.unwrap_or_default();
-    let lang = config.config.language;
+    let cmdrun_config = config_loader.load().await?;
+    let lang = cmdrun_config.config.language;
+
+    // Validate that the command exists in the configuration
+    let cmd_def = cmdrun_config.commands.get(&command).ok_or_else(|| {
+        anyhow::anyhow!(
+            "Unknown command: {}\n\nAvailable commands:\n{}",
+            command,
+            cmdrun_config
+                .commands
+                .keys()
+                .map(|k| format!("  - {}", k))
+                .collect::<Vec<_>>()
+                .join("\n")
+        )
+    })?;
 
     // Display watch configuration
-    display_watch_info(&command, &args, &paths, &patterns, &exclude, debounce_ms, lang);
-
-    // Build the full command with arguments
-    let full_command = build_full_command(&command, &args);
+    display_watch_info(
+        &command,
+        &args,
+        &paths,
+        &patterns,
+        &exclude,
+        debounce_ms,
+        lang,
+    );
 
     // Get base path (current directory if no paths specified)
     let base_path = get_base_path(&paths)?;
 
     // Build watch configuration
-    let config = build_watch_config(
+    let watch_config = build_watch_config(
         paths,
         patterns,
         exclude,
@@ -49,9 +70,36 @@ pub async fn handle_watch(
         no_recursive,
     )?;
 
-    // Create and run the watch runner
-    let mut runner = WatchRunner::new(config, full_command, &base_path)
-        .context("Failed to create watch runner")?;
+    // Create execution context for the command
+    let mut env = cmdrun_config.config.env.clone();
+
+    // Add positional arguments as environment variables
+    for (idx, arg) in args.iter().enumerate() {
+        env.insert((idx + 1).to_string(), arg.clone());
+    }
+
+    let exec_ctx = ExecutionContext {
+        working_dir: cmdrun_config.config.working_dir.clone(),
+        env,
+        shell: detect_shell()
+            .map(|s| s.name)
+            .unwrap_or_else(|_| cmdrun_config.config.shell.clone()),
+        timeout: cmd_def.timeout.or(Some(cmdrun_config.config.timeout)),
+        strict: cmdrun_config.config.strict_mode,
+        echo: false, // Don't echo in watch mode to reduce noise
+        color: true,
+        language: lang,
+    };
+
+    // Create and run the watch runner with cmdrun integration
+    let mut runner = WatchRunner::new_with_cmdrun(
+        watch_config,
+        command.clone(),
+        cmd_def.clone(),
+        exec_ctx,
+        &base_path,
+    )
+    .context("Failed to create watch runner")?;
 
     // Set up signal handler
     let mut shutdown_rx = setup_signal_handler().await?;
@@ -162,7 +210,8 @@ fn display_watch_info(
     println!("{}", "═".repeat(60).bright_black());
 }
 
-/// Build the full command string with arguments
+/// Build the full command string with arguments (kept for backward compatibility)
+#[allow(dead_code)]
 fn build_full_command(command: &str, args: &[String]) -> String {
     if args.is_empty() {
         command.to_string()

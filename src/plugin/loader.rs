@@ -75,14 +75,13 @@ impl PluginLoader {
         }
 
         // Load the library
-        let library = Library::new(path).map_err(|e| {
-            CmdrunError::PluginLoad(format!("Failed to load library: {}", e))
-        })?;
+        let library = Library::new(path)
+            .map_err(|e| CmdrunError::PluginLoad(format!("Failed to load library: {}", e)))?;
 
         // Get the plugin creation function
-        let create: Symbol<PluginCreate> = library
-            .get(b"_plugin_create")
-            .map_err(|e| CmdrunError::PluginLoad(format!("Symbol _plugin_create not found: {}", e)))?;
+        let create: Symbol<PluginCreate> = library.get(b"_plugin_create").map_err(|e| {
+            CmdrunError::PluginLoad(format!("Symbol _plugin_create not found: {}", e))
+        })?;
 
         // Create the plugin instance
         let plugin_ptr = create();
@@ -137,9 +136,8 @@ impl PluginLoader {
 
         // Try to load library temporarily
         unsafe {
-            let library = Library::new(path).map_err(|e| {
-                CmdrunError::PluginLoad(format!("Failed to load library: {}", e))
-            })?;
+            let library = Library::new(path)
+                .map_err(|e| CmdrunError::PluginLoad(format!("Failed to load library: {}", e)))?;
 
             // Check for required symbols
             let has_create = library.get::<PluginCreate>(b"_plugin_create").is_ok();

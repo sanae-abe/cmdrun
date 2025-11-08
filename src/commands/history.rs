@@ -2,7 +2,7 @@
 //!
 //! Provides command history display, search, clear, and export functionality.
 
-use crate::history::{HistoryStorage, HistoryEntry};
+use crate::history::{HistoryEntry, HistoryStorage};
 use anyhow::{Context, Result};
 use colored::*;
 use std::path::PathBuf;
@@ -14,8 +14,7 @@ pub async fn handle_history(
     show_failed_only: bool,
     show_stats: bool,
 ) -> Result<()> {
-    let storage = HistoryStorage::new()
-        .context("Failed to open history database")?;
+    let storage = HistoryStorage::new().context("Failed to open history database")?;
 
     if show_stats {
         display_stats(&storage)?;
@@ -24,7 +23,8 @@ pub async fn handle_history(
 
     let entries = if show_failed_only {
         // Get all entries and filter failed ones
-        storage.list(None, None)?
+        storage
+            .list(None, None)?
             .into_iter()
             .filter(|e| !e.success)
             .take(limit.unwrap_or(50))
@@ -47,19 +47,14 @@ pub async fn handle_history(
     }
 
     println!();
-    println!(
-        "{} Showing {} entries",
-        "ℹ".blue(),
-        count
-    );
+    println!("{} Showing {} entries", "ℹ".blue(), count);
 
     Ok(())
 }
 
 /// Handle the history search command
 pub async fn handle_history_search(query: &str, limit: Option<usize>) -> Result<()> {
-    let storage = HistoryStorage::new()
-        .context("Failed to open history database")?;
+    let storage = HistoryStorage::new().context("Failed to open history database")?;
 
     println!(
         "{} Searching for: {}",
@@ -101,16 +96,11 @@ pub async fn handle_history_clear(force: bool) -> Result<()> {
         }
     }
 
-    let mut storage = HistoryStorage::new()
-        .context("Failed to open history database")?;
+    let mut storage = HistoryStorage::new().context("Failed to open history database")?;
 
     let count = storage.clear()?;
 
-    println!(
-        "{} Cleared {} history entries",
-        "✓".green().bold(),
-        count
-    );
+    println!("{} Cleared {} history entries", "✓".green().bold(), count);
 
     Ok(())
 }
@@ -121,8 +111,7 @@ pub async fn handle_history_export(
     output: Option<PathBuf>,
     limit: Option<usize>,
 ) -> Result<()> {
-    let storage = HistoryStorage::new()
-        .context("Failed to open history database")?;
+    let storage = HistoryStorage::new().context("Failed to open history database")?;
 
     let data = match format {
         ExportFormat::Json => storage.export_json(limit)?,
@@ -147,14 +136,15 @@ pub async fn handle_history_export(
 
 /// Handle the retry command (re-execute last failed command)
 pub async fn handle_retry(id: Option<i64>) -> Result<()> {
-    let storage = HistoryStorage::new()
-        .context("Failed to open history database")?;
+    let storage = HistoryStorage::new().context("Failed to open history database")?;
 
     let entry = if let Some(id) = id {
-        storage.get_by_id(id)?
+        storage
+            .get_by_id(id)?
             .ok_or_else(|| anyhow::anyhow!("No history entry found with ID {}", id))?
     } else {
-        storage.get_last_failed()?
+        storage
+            .get_last_failed()?
             .ok_or_else(|| anyhow::anyhow!("No failed commands in history"))?
     };
 
@@ -164,12 +154,16 @@ pub async fn handle_retry(id: Option<i64>) -> Result<()> {
         entry.command.bright_white()
     );
     println!("  {} {}", "ID:".dimmed(), entry.id);
-    println!("  {} {}", "Original run:".dimmed(), entry.start_time_as_datetime());
+    println!(
+        "  {} {}",
+        "Original run:".dimmed(),
+        entry.start_time_as_datetime()
+    );
     println!();
 
     // Import the necessary modules for re-execution
-    use crate::config::loader::ConfigLoader;
     use crate::command::executor::{CommandExecutor, ExecutionContext};
+    use crate::config::loader::ConfigLoader;
     use crate::platform::shell::detect_shell;
 
     // Load configuration
@@ -177,10 +171,12 @@ pub async fn handle_retry(id: Option<i64>) -> Result<()> {
     let config = config_loader.load().await?;
 
     // Find command
-    let command = config
-        .commands
-        .get(&entry.command)
-        .ok_or_else(|| anyhow::anyhow!("Command not found in current configuration: {}", entry.command))?;
+    let command = config.commands.get(&entry.command).ok_or_else(|| {
+        anyhow::anyhow!(
+            "Command not found in current configuration: {}",
+            entry.command
+        )
+    })?;
 
     // Parse arguments from history
     let args: Vec<String> = if let Some(args_json) = &entry.args {

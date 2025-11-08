@@ -110,9 +110,12 @@ pub async fn handle_validate(
 
     println!(
         "{}",
-        format!("{}...", get_message(MessageKey::ValidatingConfiguration, lang))
-            .cyan()
-            .bold()
+        format!(
+            "{}...",
+            get_message(MessageKey::ValidatingConfiguration, lang)
+        )
+        .cyan()
+        .bold()
     );
     println!();
 
@@ -150,8 +153,11 @@ pub async fn handle_validate(
         println!();
         println!(
             "{}",
-            format!("{}...", get_message(MessageKey::ValidateCheckingCircularDependencies, lang))
-                .cyan()
+            format!(
+                "{}...",
+                get_message(MessageKey::ValidateCheckingCircularDependencies, lang)
+            )
+            .cyan()
         );
 
         for (name, _) in &config.commands {
@@ -172,7 +178,11 @@ pub async fn handle_validate(
         println!();
         println!(
             "{}",
-            format!("{}:", get_message(MessageKey::ValidateValidatingCommands, lang)).cyan()
+            format!(
+                "{}:",
+                get_message(MessageKey::ValidateValidatingCommands, lang)
+            )
+            .cyan()
         );
 
         for (name, cmd) in &config.commands {
@@ -197,7 +207,11 @@ pub async fn handle_validate(
         println!();
         println!(
             "{}",
-            format!("{}:", get_message(MessageKey::ValidateValidatingAliases, lang)).cyan()
+            format!(
+                "{}:",
+                get_message(MessageKey::ValidateValidatingAliases, lang)
+            )
+            .cyan()
         );
 
         for (alias, target) in &config.aliases {
@@ -219,12 +233,18 @@ pub async fn handle_validate(
         println!();
         println!(
             "{}",
-            format!("{}...", get_message(MessageKey::ValidateBuildingDependencyGraph, lang)).cyan()
+            format!(
+                "{}...",
+                get_message(MessageKey::ValidateBuildingDependencyGraph, lang)
+            )
+            .cyan()
         );
 
         match validator.build_dependency_graph() {
             Ok(_graph) => {
-                report.add_info(get_message(MessageKey::ValidateDependencyGraphBuilt, lang).to_string());
+                report.add_info(
+                    get_message(MessageKey::ValidateDependencyGraphBuilt, lang).to_string(),
+                );
 
                 // Show execution order for some commands
                 for (name, _) in config.commands.iter().take(3) {

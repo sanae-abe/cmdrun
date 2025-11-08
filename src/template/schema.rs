@@ -152,10 +152,9 @@ mod tests {
     #[test]
     fn test_template_validation_invalid_command_id() {
         let mut template = create_valid_template();
-        template.commands.insert(
-            "invalid id with spaces".to_string(),
-            create_test_command(),
-        );
+        template
+            .commands
+            .insert("invalid id with spaces".to_string(), create_test_command());
         assert!(template.validate().is_err());
     }
 
@@ -171,7 +170,9 @@ mod tests {
     #[test]
     fn test_from_commands_config() {
         let mut config = crate::config::schema::CommandsConfig::default();
-        config.commands.insert("test".to_string(), create_test_command());
+        config
+            .commands
+            .insert("test".to_string(), create_test_command());
 
         let template = UserTemplate::from_commands_config(
             "test-template".to_string(),

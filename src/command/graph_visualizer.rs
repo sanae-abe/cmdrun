@@ -58,7 +58,12 @@ impl<'a> GraphVisualizer<'a> {
             writeln!(&mut output)?;
 
             if cmd.deps.is_empty() {
-                writeln!(&mut output, "  {}", "No dependencies".dimmed())?;
+                writeln!(
+                    &mut output,
+                    "  {} {}",
+                    "ℹ".blue(),
+                    "No dependencies (this command runs independently)".dimmed()
+                )?;
             } else {
                 self.print_tree_recursive(cmd_name, &mut output, "", true)?;
             }
@@ -745,7 +750,7 @@ mod tests {
         let result = visualizer.visualize(Some("standalone"), GraphFormat::Tree, false);
         assert!(result.is_ok());
         let output = result.unwrap();
-        assert!(output.contains("No dependencies"));
+        assert!(output.contains("No dependencies") || output.contains("runs independently"));
     }
 
     #[test]

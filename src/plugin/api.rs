@@ -172,11 +172,7 @@ pub trait Plugin: Send + Sync {
     ///
     /// Called after successful command execution. Can modify result or trigger
     /// additional actions.
-    fn post_execute(
-        &self,
-        _context: &PluginContext,
-        _result: &mut CommandResult,
-    ) -> Result<()> {
+    fn post_execute(&self, _context: &PluginContext, _result: &mut CommandResult) -> Result<()> {
         Ok(())
     }
 

@@ -157,13 +157,15 @@ pub async fn handle_init(
 /// Interactive language selection
 fn select_language_interactive() -> Result<Language> {
     println!();
-    println!("{}", "Select your preferred language / 言語を選択してください".cyan().bold());
+    println!(
+        "{}",
+        "Select your preferred language / 言語を選択してください"
+            .cyan()
+            .bold()
+    );
     println!();
 
-    let items = vec![
-        "English",
-        "日本語 (Japanese)",
-    ];
+    let items = vec!["English", "日本語 (Japanese)"];
 
     let selection = Select::with_theme(&ColorfulTheme::default())
         .items(&items)
@@ -227,11 +229,7 @@ fn inject_language_setting(content: &str, language: Language) -> String {
         }
     } else {
         // No [config] section, add it at the beginning
-        format!(
-            "[config]\nlanguage = \"{}\"\n\n{}",
-            language_str,
-            content
-        )
+        format!("[config]\nlanguage = \"{}\"\n\n{}", language_str, content)
     }
 }
 
@@ -260,21 +258,9 @@ fn print_next_steps(output_path: &Path, language: Language) {
         Language::Japanese => "cmdrun run <名前> でコマンドを実行",
     };
 
-    println!(
-        "  {} {}",
-        "1.".bright_white().bold(),
-        step1_msg.yellow()
-    );
-    println!(
-        "  {} {}",
-        "2.".bright_white().bold(),
-        step2_msg
-    );
-    println!(
-        "  {} {}",
-        "3.".bright_white().bold(),
-        step3_msg
-    );
+    println!("  {} {}", "1.".bright_white().bold(), step1_msg.yellow());
+    println!("  {} {}", "2.".bright_white().bold(), step2_msg);
+    println!("  {} {}", "3.".bright_white().bold(), step3_msg);
     println!();
 
     // Example commands

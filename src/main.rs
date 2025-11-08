@@ -4,7 +4,11 @@
 
 use anyhow::Result;
 use clap::Parser;
-use cmdrun::cli::{Cli, Commands, ConfigAction, EnvAction, GraphFormat, HistoryAction, TemplateAction};
+#[cfg(feature = "plugin-system")]
+use cmdrun::cli::PluginAction;
+use cmdrun::cli::{
+    Cli, Commands, ConfigAction, EnvAction, GraphFormat, HistoryAction, TemplateAction,
+};
 use cmdrun::command::dependency::DependencyGraph;
 use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
 use cmdrun::command::graph_visualizer::GraphVisualizer;
@@ -152,7 +156,12 @@ async fn run(cli: Cli) -> Result<()> {
             }
         },
         Commands::History { action } => match action {
-            HistoryAction::List { limit, offset, failed, stats } => {
+            HistoryAction::List {
+                limit,
+                offset,
+                failed,
+                stats,
+            } => {
                 cmdrun::commands::handle_history(Some(limit), offset, failed, stats).await?;
             }
             HistoryAction::Search { query, limit } => {
@@ -161,7 +170,11 @@ async fn run(cli: Cli) -> Result<()> {
             HistoryAction::Clear { force } => {
                 cmdrun::commands::handle_history_clear(force).await?;
             }
-            HistoryAction::Export { format, output, limit } => {
+            HistoryAction::Export {
+                format,
+                output,
+                limit,
+            } => {
                 let export_format = match format {
                     cmdrun::cli::ExportFormat::Json => cmdrun::commands::ExportFormat::Json,
                     cmdrun::cli::ExportFormat::Csv => cmdrun::commands::ExportFormat::Csv,
@@ -195,6 +208,21 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_template_import(file).await?;
             }
         },
+        #[cfg(feature = "plugin-system")]
+        Commands::Plugin { action } => match action {
+            PluginAction::List { enabled, verbose } => {
+                cmdrun::commands::handle_plugin_list(enabled, verbose, config_path).await?;
+            }
+            PluginAction::Info { name } => {
+                cmdrun::commands::handle_plugin_info(&name, config_path).await?;
+            }
+            PluginAction::Enable { name } => {
+                cmdrun::commands::handle_plugin_enable(&name, config_path).await?;
+            }
+            PluginAction::Disable { name } => {
+                cmdrun::commands::handle_plugin_disable(&name, config_path).await?;
+            }
+        },
     }
 
     Ok(())
@@ -207,13 +235,17 @@ async fn run_command(
     parallel: bool,
     config_path: Option<std::path::PathBuf>,
 ) -> Result<()> {
-    // Load configuration
+    // Initialize history recorder
+    let storage = cmdrun::history::HistoryStorage::new()?;
+    let mut recorder = cmdrun::history::HistoryRecorder::with_storage(storage);
+
+    // Load configuration (with environment support)
     let config_loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)
     } else {
         ConfigLoader::new()
     };
-    let config = config_loader.load().await?;
+    let config = config_loader.load_with_environment().await?;
 
     // Find command
     let command = config
@@ -231,7 +263,7 @@ async fn run_command(
 
     let ctx = ExecutionContext {
         working_dir: config.config.working_dir.clone(),
-        env,
+        env: env.clone(),
         shell: detect_shell()
             .map(|s| s.name)
             .unwrap_or_else(|_| config.config.shell.clone()),
@@ -289,15 +321,46 @@ async fn run_command(
             // 並列実行
             let results = executor.execute_parallel(&commands).await?;
 
-            // 結果チェック
-            for result in results {
+            // 結果チェックと履歴記録
+            for (cmd_idx, result) in results.iter().enumerate() {
+                let cmd_name = group.commands[cmd_idx];
+                let duration_ms = result.duration.as_millis() as i64;
+
+                // 各コマンドの履歴を記録
+                if let Err(e) = recorder.record(
+                    cmd_name,
+                    &args,
+                    &env,
+                    duration_ms,
+                    result.exit_code,
+                    result.success,
+                ) {
+                    eprintln!("Warning: Failed to record command history: {}", e);
+                }
+
                 if !result.success {
+                    // Record failure state before bailing
+                    let _id = recorder.record(
+                        name,
+                        &args,
+                        &env,
+                        result.duration.as_millis() as i64,
+                        result.exit_code,
+                        false,
+                    );
                     anyhow::bail!("Command failed with exit code {}", result.exit_code);
                 }
             }
         }
 
         let total_duration = start.elapsed();
+        let duration_ms = total_duration.as_millis() as i64;
+
+        // メインコマンドの履歴を記録（すべて成功した場合）
+        if let Err(e) = recorder.record(name, &args, &env, duration_ms, 0, true) {
+            eprintln!("Warning: Failed to record main command history: {}", e);
+        }
+
         println!(
             "{} All commands completed in {:.2}s",
             "✓".green().bold(),
@@ -311,7 +374,29 @@ async fn run_command(
             command.description.bright_white()
         );
 
-        let result = executor.execute(command).await?;
+        // Execute and always record history (even on failure)
+        let result = match executor.execute(command).await {
+            Ok(r) => r,
+            Err(e) => {
+                // Record failed execution in history before returning error
+                let _ = recorder.record(name, &args, &env, 0, 1, false);
+                return Err(e.into());
+            }
+        };
+
+        let duration_ms = result.duration.as_millis() as i64;
+
+        // 履歴を記録
+        if let Err(e) = recorder.record(
+            name,
+            &args,
+            &env,
+            duration_ms,
+            result.exit_code,
+            result.success,
+        ) {
+            eprintln!("Warning: Failed to record command history: {}", e);
+        }
 
         if result.success {
             println!(
@@ -334,7 +419,7 @@ async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -
     } else {
         ConfigLoader::new()
     };
-    let config = config_loader.load().await?;
+    let config = config_loader.load_with_environment().await?;
 
     if config.commands.is_empty() {
         println!("{}", "No commands defined".yellow());
@@ -383,7 +468,7 @@ async fn list_completion(config_path: Option<std::path::PathBuf>) -> Result<()> 
     } else {
         ConfigLoader::new()
     };
-    let config = config_loader.load().await?;
+    let config = config_loader.load_with_environment().await?;
 
     // Output command names one per line for shell completion
     for name in config.commands.keys() {
@@ -406,7 +491,7 @@ async fn show_dependency_graph(
     } else {
         ConfigLoader::new()
     };
-    let config = config_loader.load().await?;
+    let config = config_loader.load_with_environment().await?;
 
     // グラフ視覚化
     let visualizer = GraphVisualizer::new(&config);

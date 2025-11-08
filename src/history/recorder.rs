@@ -4,6 +4,7 @@
 //! execution history.
 
 use super::storage::{HistoryEntry, HistoryStorage};
+use ahash::AHashMap;
 use anyhow::Result;
 use chrono::Utc;
 use serde_json;
@@ -12,7 +13,14 @@ use std::env;
 
 /// Sensitive environment variable patterns to exclude from history
 const SENSITIVE_ENV_PATTERNS: &[&str] = &[
-    "KEY", "SECRET", "TOKEN", "PASSWORD", "PASS", "API", "AUTH", "CREDENTIAL",
+    "KEY",
+    "SECRET",
+    "TOKEN",
+    "PASSWORD",
+    "PASS",
+    "API",
+    "AUTH",
+    "CREDENTIAL",
 ];
 
 /// History recorder that tracks command executions
@@ -50,7 +58,7 @@ impl HistoryRecorder {
         &mut self,
         command: &str,
         args: &[String],
-        env: &HashMap<String, String>,
+        env: &AHashMap<String, String>,
     ) -> Result<i64> {
         let entry = HistoryEntry {
             id: 0, // Will be assigned by database
@@ -86,7 +94,9 @@ impl HistoryRecorder {
         success: bool,
     ) -> Result<()> {
         // Get the original entry
-        let mut entry = self.storage.get_by_id(id)?
+        let mut entry = self
+            .storage
+            .get_by_id(id)?
             .ok_or_else(|| anyhow::anyhow!("History entry not found: {}", id))?;
 
         // Update with completion data
@@ -105,7 +115,7 @@ impl HistoryRecorder {
         &mut self,
         command: &str,
         args: &[String],
-        env: &HashMap<String, String>,
+        env: &AHashMap<String, String>,
         duration_ms: i64,
         exit_code: i32,
         success: bool,
@@ -146,14 +156,16 @@ impl HistoryRecorder {
     }
 
     /// Serialize environment variables, filtering sensitive data
-    fn serialize_env(&self, env: &HashMap<String, String>) -> Result<String> {
+    fn serialize_env(&self, env: &AHashMap<String, String>) -> Result<String> {
         let filtered = if self.filter_sensitive {
             env.iter()
                 .filter(|(k, _)| !self.is_sensitive_key(k))
                 .map(|(k, v)| (k.clone(), v.clone()))
                 .collect::<HashMap<_, _>>()
         } else {
-            env.clone()
+            env.iter()
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect::<HashMap<_, _>>()
         };
 
         Ok(serde_json::to_string(&filtered)?)
@@ -162,7 +174,9 @@ impl HistoryRecorder {
     /// Check if an environment variable name is sensitive
     fn is_sensitive_key(&self, key: &str) -> bool {
         let key_upper = key.to_uppercase();
-        SENSITIVE_ENV_PATTERNS.iter().any(|pattern| key_upper.contains(pattern))
+        SENSITIVE_ENV_PATTERNS
+            .iter()
+            .any(|pattern| key_upper.contains(pattern))
     }
 }
 
@@ -191,16 +205,18 @@ mod tests {
     #[test]
     fn test_record_complete() {
         let mut recorder = create_test_recorder();
-        let env = HashMap::new();
+        let env = AHashMap::new();
 
-        let id = recorder.record(
-            "test-command",
-            &["arg1".to_string(), "arg2".to_string()],
-            &env,
-            1500,
-            0,
-            true,
-        ).unwrap();
+        let id = recorder
+            .record(
+                "test-command",
+                &["arg1".to_string(), "arg2".to_string()],
+                &env,
+                1500,
+                0,
+                true,
+            )
+            .unwrap();
 
         assert!(id > 0);
 
@@ -224,7 +240,7 @@ mod tests {
     #[test]
     fn test_env_serialization_with_filtering() {
         let recorder = create_test_recorder();
-        let mut env = HashMap::new();
+        let mut env = AHashMap::new();
         env.insert("PATH".to_string(), "/usr/bin".to_string());
         env.insert("API_KEY".to_string(), "secret".to_string());
         env.insert("HOME".to_string(), "/home/user".to_string());
@@ -242,7 +258,7 @@ mod tests {
         let mut recorder = create_test_recorder();
         recorder.set_filter_sensitive(false);
 
-        let mut env = HashMap::new();
+        let mut env = AHashMap::new();
         env.insert("API_KEY".to_string(), "secret".to_string());
 
         let serialized = recorder.serialize_env(&env).unwrap();
