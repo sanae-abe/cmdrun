@@ -6,9 +6,9 @@
 
 [English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
 
-> **A personal global command manager for your frequently used commands**
+> **A fast, secure, cross-platform command runner**
 >
-> Register your commands once, run them from anywhere. Fast, secure, and cross-platform.
+> Register your commands once, run them from anywhere.
 
 ## Table of Contents
 
@@ -137,7 +137,7 @@ scoop install cmdrun
 
 ## Basic Usage
 
-cmdrun is a **personal global command manager** that allows you to register and run frequently used commands from anywhere on your system.
+cmdrun is a **fast, secure, cross-platform command runner** that allows you to register and run frequently used commands from anywhere on your system.
 
 #### Register your frequently used commands
 
