@@ -139,7 +139,7 @@ cmdrun add docker-clean "docker system prune -af" "Clean up unused Docker resour
 cmdrun add db-backup "pg_dump mydb > backup_$(date +%Y%m%d).sql" "Backup database"
 ```
 
-<img src="docs/screenshots/add.webp" alt="Adding Commands" width="600">
+<!-- <img src="docs/screenshots/add.webp" alt="Adding Commands" width="600"> -->
 
 #### Run and manage your commands
 
@@ -157,9 +157,9 @@ cmdrun search docker
 cmdrun remove dev
 ```
 
-<img src="docs/screenshots/run.webp" alt="Running Commands" width="600">
+<!-- <img src="docs/screenshots/run.webp" alt="Running Commands" width="600"> -->
 
-<img src="docs/screenshots/list.webp" alt="Listing Commands" width="600">
+<!-- <img src="docs/screenshots/list.webp" alt="Listing Commands" width="600"> -->
 
 #### Configuration management
 

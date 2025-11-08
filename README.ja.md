@@ -126,7 +126,7 @@ cmdrun add docker-clean "docker system prune -af" "未使用のDockerリソー�
 cmdrun add db-backup "pg_dump mydb > backup_$(date +%Y%m%d).sql" "データベースをバックアップ"
 ```
 
-<img src="docs/screenshots/add.webp" alt="コマンド追加" width="600">
+<!-- <img src="docs/screenshots/add.webp" alt="コマンド追加" width="600"> -->
 
 #### コマンドを実行・管理
 
@@ -144,9 +144,9 @@ cmdrun search docker
 cmdrun remove dev
 ```
 
-<img src="docs/screenshots/run.webp" alt="コマンド実行" width="600">
+<!-- <img src="docs/screenshots/run.webp" alt="コマンド実行" width="600"> -->
 
-<img src="docs/screenshots/list.webp" alt="コマンド一覧" width="600">
+<!-- <img src="docs/screenshots/list.webp" alt="コマンド一覧" width="600"> -->
 
 #### 設定管理
 
