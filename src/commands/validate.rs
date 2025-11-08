@@ -96,7 +96,7 @@ pub async fn handle_validate(
 ) -> Result<()> {
     // Load configuration first to get language setting
     let config_loader = if let Some(p) = &path {
-        ConfigLoader::with_path(p.clone())
+        ConfigLoader::with_path(p.clone())?
     } else {
         ConfigLoader::new()
     };

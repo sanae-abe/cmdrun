@@ -12,7 +12,7 @@ use crate::template::TemplateManager;
 /// Handle template add command
 pub async fn handle_template_add(name: Option<String>, config_path: Option<PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

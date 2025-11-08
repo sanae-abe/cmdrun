@@ -44,12 +44,25 @@ impl ConfigLoader {
     }
 
     /// 明示的なパスを指定してローダーを作成
-    pub fn with_path<P: Into<PathBuf>>(path: P) -> Self {
-        Self {
-            explicit_path: Some(path.into()),
+    pub fn with_path<P: Into<PathBuf>>(path: P) -> Result<Self> {
+        let path = path.into();
+
+        // パストラバーサル対策：パスを正規化
+        let canonical_path = std::fs::canonicalize(&path)
+            .with_context(|| format!("Invalid config path: {}", path.display()))?;
+
+        // セキュリティ警告：プロジェクト外のパス
+        if let Ok(current_dir) = std::env::current_dir() {
+            if !canonical_path.starts_with(&current_dir) {
+                debug!("⚠️  Config file outside project directory: {}", canonical_path.display());
+            }
+        }
+
+        Ok(Self {
+            explicit_path: Some(canonical_path),
             loaded_global_path: None,
             loaded_local_path: None,
-        }
+        })
     }
 
     /// 設定ファイルを読み込む（グローバル + ローカルのマージ）
@@ -325,7 +338,7 @@ cmd = "cargo test"
         let mut file = File::create(&config_path).await.unwrap();
         file.write_all(toml_content.as_bytes()).await.unwrap();
 
-        let loader = ConfigLoader::with_path(&config_path);
+        let loader = ConfigLoader::with_path(&config_path).unwrap();
         let config = loader.load().await.unwrap();
 
         assert_eq!(config.config.shell, "bash");
@@ -335,7 +348,7 @@ cmd = "cargo test"
 
     #[tokio::test]
     async fn test_config_not_found() {
-        let loader = ConfigLoader::with_path("/nonexistent/path/commands.toml");
+        let loader = ConfigLoader::with_path("/nonexistent/path/commands.toml").unwrap();
         let result = loader.load().await;
         assert!(result.is_err());
     }
@@ -356,7 +369,7 @@ cmd = "cargo test"
         let content = fs::read_to_string(&config_path).await.unwrap();
         assert_eq!(content, invalid_toml);
 
-        let loader = ConfigLoader::with_path(&config_path);
+        let loader = ConfigLoader::with_path(&config_path).unwrap();
         let result = loader.load().await;
         assert!(
             result.is_err(),

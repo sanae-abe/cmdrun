@@ -12,7 +12,7 @@ use tokio::fs;
 pub async fn handle_remove(id: String, force: bool, config_path: Option<PathBuf>) -> Result<()> {
     // Load configuration
     let loader = if let Some(path) = &config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

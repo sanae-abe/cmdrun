@@ -165,7 +165,7 @@ impl EnvironmentManager {
 
         // 基本設定を読み込み
         let mut config = if base_config_path.exists() {
-            let loader = ConfigLoader::with_path(&base_config_path);
+            let loader = ConfigLoader::with_path(&base_config_path)?;
             loader.load().await?
         } else {
             CommandsConfig::default()
@@ -179,7 +179,7 @@ impl EnvironmentManager {
                 env_config_path.display()
             );
 
-            let env_loader = ConfigLoader::with_path(&env_config_path);
+            let env_loader = ConfigLoader::with_path(&env_config_path)?;
             let env_config = env_loader.load().await?;
 
             config = self.merge_configs(config, env_config);

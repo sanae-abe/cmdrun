@@ -109,6 +109,9 @@ pub enum InterpolationError {
 
     #[error("Recursive variable expansion detected: {0}")]
     RecursiveExpansion(String),
+
+    #[error("Variable expansion result too large: {0} bytes (max 10KB)")]
+    ExpansionTooLarge(usize),
 }
 
 /// Result型のエイリアス

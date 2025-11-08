@@ -24,7 +24,7 @@ pub async fn handle_add(
 ) -> Result<()> {
     // Load config to get language setting
     let config_loader = if let Some(path) = &config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

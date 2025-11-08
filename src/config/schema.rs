@@ -183,6 +183,49 @@ pub struct Command {
     pub confirm: bool,
 }
 
+impl Command {
+    /// コマンドの安全性を検証
+    pub fn validate(&self) -> Result<(), String> {
+        use crate::security::validation::CommandValidator;
+
+        let validator = CommandValidator::new().allow_variable_expansion();
+
+        match &self.cmd {
+            CommandSpec::Single(cmd) => {
+                if !validator.validate(cmd).is_safe() {
+                    return Err(format!("Dangerous command detected in '{}': {}",
+                        self.description, cmd));
+                }
+            }
+            CommandSpec::Multiple(cmds) => {
+                for cmd in cmds {
+                    if !validator.validate(cmd).is_safe() {
+                        return Err(format!("Dangerous command detected in '{}': {}",
+                            self.description, cmd));
+                    }
+                }
+            }
+            CommandSpec::Platform(platform_cmds) => {
+                let commands = [
+                    &platform_cmds.unix,
+                    &platform_cmds.linux,
+                    &platform_cmds.macos,
+                    &platform_cmds.windows,
+                ];
+                for cmd_opt in commands.iter() {
+                    if let Some(cmd) = cmd_opt {
+                        if !validator.validate(cmd).is_safe() {
+                            return Err(format!("Dangerous command detected in '{}': {}",
+                                self.description, cmd));
+                        }
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+}
+
 /// コマンド仕様（文字列、配列、プラットフォーム別）
 #[derive(Debug, Clone, Serialize)]
 pub enum CommandSpec {

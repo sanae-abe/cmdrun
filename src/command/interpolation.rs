@@ -14,6 +14,9 @@ use once_cell::sync::Lazy;
 use regex::Regex;
 use std::env;
 
+/// 変数展開結果の最大サイズ（DoS防止）
+const MAX_EXPANSION_LENGTH: usize = 10_240; // 10KB
+
 /// 変数展開パターン（コンパイル時最適化）
 /// 位置引数（${1}, ${2}等）と通常変数（${VAR}）の両方に対応
 static VAR_PATTERN: Lazy<Regex> =
@@ -69,6 +72,11 @@ impl InterpolationContext {
     fn interpolate_with_depth(&self, input: &str, depth: usize) -> Result<String> {
         if depth >= self.max_depth {
             return Err(InterpolationError::RecursiveExpansion(input.to_string()).into());
+        }
+
+        // DoS防止：文字列サイズチェック
+        if input.len() > MAX_EXPANSION_LENGTH {
+            return Err(InterpolationError::ExpansionTooLarge(input.len()).into());
         }
 
         let mut result = String::with_capacity(input.len());

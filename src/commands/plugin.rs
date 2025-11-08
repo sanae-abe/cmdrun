@@ -21,7 +21,7 @@ pub async fn handle_plugin_list(
     config_path: Option<PathBuf>,
 ) -> Result<()> {
     let loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -112,7 +112,7 @@ pub async fn handle_plugin_list(
 #[cfg(feature = "plugin-system")]
 pub async fn handle_plugin_info(name: &str, config_path: Option<PathBuf>) -> Result<()> {
     let loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -213,7 +213,7 @@ pub async fn handle_plugin_info(name: &str, config_path: Option<PathBuf>) -> Res
 #[cfg(feature = "plugin-system")]
 pub async fn handle_plugin_enable(name: &str, config_path: Option<PathBuf>) -> Result<()> {
     let loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -233,7 +233,7 @@ pub async fn handle_plugin_enable(name: &str, config_path: Option<PathBuf>) -> R
 #[cfg(feature = "plugin-system")]
 pub async fn handle_plugin_disable(name: &str, config_path: Option<PathBuf>) -> Result<()> {
     let loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

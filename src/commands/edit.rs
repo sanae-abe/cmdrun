@@ -12,7 +12,7 @@ use tracing::info;
 /// Edit an existing command interactively
 pub async fn handle_edit(command_id: Option<String>, config_path: Option<PathBuf>) -> Result<()> {
     let config_loader = if let Some(ref path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -196,7 +196,7 @@ async fn save_edited_command(
     config_path: Option<PathBuf>,
 ) -> Result<()> {
     let config_loader = if let Some(ref path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

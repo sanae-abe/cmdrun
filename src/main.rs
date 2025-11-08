@@ -241,7 +241,7 @@ async fn run_command(
 
     // Load configuration (with environment support)
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -415,7 +415,7 @@ async fn run_command(
 /// List available commands
 async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -464,7 +464,7 @@ async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -
 /// List command names for shell completion
 async fn list_completion(config_path: Option<std::path::PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -487,7 +487,7 @@ async fn show_dependency_graph(
     config_path: Option<std::path::PathBuf>,
 ) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

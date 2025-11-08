@@ -12,7 +12,7 @@ use crate::i18n::{get_message, MessageKey};
 /// Get a configuration value
 pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -46,7 +46,7 @@ pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
 pub async fn handle_set(key: &str, value: &str, config_file_path: Option<PathBuf>) -> Result<()> {
     // Load config first to get language setting
     let temp_loader = if let Some(ref path) = config_file_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
@@ -106,7 +106,7 @@ pub async fn handle_set(key: &str, value: &str, config_file_path: Option<PathBuf
 /// Show all configuration settings
 pub async fn handle_show(config_path: Option<PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

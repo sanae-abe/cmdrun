@@ -10,7 +10,7 @@ use std::path::PathBuf;
 /// Search commands by keyword (case-insensitive)
 pub async fn handle_search(keyword: String, config_path: Option<PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
-        ConfigLoader::with_path(path)
+        ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };

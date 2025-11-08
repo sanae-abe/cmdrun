@@ -244,12 +244,20 @@ impl HistoryStorage {
     /// Search history entries by command name or arguments
     pub fn search(&self, query: &str, limit: Option<usize>) -> Result<Vec<HistoryEntry>> {
         let limit = limit.unwrap_or(50);
-        let search_pattern = format!("%{}%", query);
+
+        // SQLワイルドカードエスケープ（情報漏洩防止）
+        let escaped_query = query
+            .replace('\\', r"\\")
+            .replace('%', r"\%")
+            .replace('_', r"\_")
+            .replace('[', r"\[");
+
+        let search_pattern = format!("%{}%", escaped_query);
 
         let mut stmt = self.conn.prepare(
             "SELECT id, command, args, start_time, duration_ms, exit_code, success, working_dir, environment
              FROM command_history
-             WHERE command LIKE ?1 OR args LIKE ?1
+             WHERE command LIKE ?1 ESCAPE '\\' OR args LIKE ?1 ESCAPE '\\'
              ORDER BY start_time DESC
              LIMIT ?2",
         )?;
@@ -382,12 +390,22 @@ impl HistoryStorage {
         })
     }
 
-    /// Escape CSV field
+    /// Escape CSV field (with formula injection protection)
     fn escape_csv(s: &str) -> String {
-        if s.contains(',') || s.contains('"') || s.contains('\n') {
-            format!("\"{}\"", s.replace('"', "\"\""))
+        // 数式インジェクション防止：危険な文字で始まる場合は'でプレフィックス
+        let sanitized = if s.starts_with('=') || s.starts_with('+') ||
+                          s.starts_with('-') || s.starts_with('@') ||
+                          s.starts_with('\t') || s.starts_with('\r') {
+            format!("'{}", s)
         } else {
             s.to_string()
+        };
+
+        // 標準CSVエスケープ
+        if sanitized.contains(',') || sanitized.contains('"') || sanitized.contains('\n') {
+            format!("\"{}\"", sanitized.replace('"', "\"\""))
+        } else {
+            sanitized
         }
     }
 }
