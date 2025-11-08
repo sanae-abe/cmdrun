@@ -223,6 +223,18 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_plugin_disable(&name, config_path).await?;
             }
         },
+        Commands::Interactive => {
+            // Load configuration
+            let config_loader = if let Some(ref path) = config_path {
+                ConfigLoader::with_path(path.clone())?
+            } else {
+                ConfigLoader::new()
+            };
+            let config = config_loader.load_with_environment().await?;
+
+            // Launch interactive mode
+            cmdrun::tui::run_interactive(config, config_path).await?;
+        }
     }
 
     Ok(())
@@ -248,10 +260,59 @@ async fn run_command(
     let config = config_loader.load_with_environment().await?;
 
     // Find command
-    let command = config
-        .commands
-        .get(name)
-        .ok_or_else(|| anyhow::anyhow!("Command not found: {}", name))?;
+    let command = match config.commands.get(name) {
+        Some(cmd) => cmd,
+        None => {
+            // Typo detection if command not found
+            if config.config.typo_detection {
+                use cmdrun::i18n::{get_message, MessageKey};
+                use cmdrun::utils::typo_detector::{TypoDetector, TypoDetectorConfig};
+
+                let detector = TypoDetector::with_config(TypoDetectorConfig {
+                    threshold: config.config.typo_threshold,
+                    max_suggestions: 5,
+                });
+
+                let available_commands: Vec<&str> =
+                    config.commands.keys().map(|s| s.as_str()).collect();
+                let suggestions = detector.suggest(name, &available_commands);
+
+                if !suggestions.is_empty() {
+                    let language = config.config.language;
+                    eprintln!(
+                        "{} '{}'",
+                        get_message(MessageKey::TypoUnknownCommand, language)
+                            .red()
+                            .bold(),
+                        name.bright_white()
+                    );
+                    eprintln!();
+                    eprintln!(
+                        "{} {}",
+                        "💡".bright_white(),
+                        get_message(MessageKey::TypoDidYouMean, language)
+                    );
+                    for (suggestion, distance) in suggestions {
+                        eprintln!(
+                            "  {} {} {}",
+                            "→".cyan(),
+                            suggestion.green().bold(),
+                            format!("(distance: {})", distance).dimmed()
+                        );
+                    }
+                    eprintln!();
+                    eprintln!(
+                        "{} {}",
+                        "ℹ".bright_white(),
+                        get_message(MessageKey::TypoRunHelp, language).dimmed()
+                    );
+                    anyhow::bail!("Command not found: {}", name);
+                }
+            }
+
+            return Err(anyhow::anyhow!("Command not found: {}", name));
+        }
+    };
 
     // Create execution context with positional arguments
     let mut env = config.config.env.clone();

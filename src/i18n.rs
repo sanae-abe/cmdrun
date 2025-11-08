@@ -211,6 +211,12 @@ pub enum MessageKey {
     EnvErrorAlreadyExists,
     EnvErrorCannotSetDefault,
 
+    // ====== Typo検出 ======
+    TypoUnknownCommand,
+    TypoDidYouMean,
+    TypoSuggestions,
+    TypoRunHelp,
+
     // ====== その他 ======
     AddingCommand,
     RemovingCommand,
@@ -435,6 +441,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             EnvErrorAlreadyExists => "Environment already exists",
             EnvErrorCannotSetDefault => "Cannot set variables for 'default' environment",
 
+            // ====== Typo検出 ======
+            TypoUnknownCommand => "Unknown command",
+            TypoDidYouMean => "Did you mean one of these?",
+            TypoSuggestions => "Suggestions",
+            TypoRunHelp => "Run 'cmdrun --help' for available commands",
+
             // ====== その他 ======
             AddingCommand => "Adding command",
             RemovingCommand => "Removing command",
@@ -653,6 +665,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             EnvErrorAlreadyExists => "環境は既に存在します",
             EnvErrorCannotSetDefault => "デフォルト環境には変数を設定できません",
 
+            // ====== Typo検出 ======
+            TypoUnknownCommand => "不明なコマンド",
+            TypoDidYouMean => "もしかして:",
+            TypoSuggestions => "候補",
+            TypoRunHelp => "'cmdrun --help' で利用可能なコマンドを確認できます",
+
             // ====== その他 ======
             AddingCommand => "コマンドを追加中",
             RemovingCommand => "コマンドを削除中",
@@ -665,6 +683,454 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             CreatingBackup => "バックアップを作成中",
             MatchingCommands => "件の一致するコマンド",
             Template => "テンプレート",
+        },
+        Language::ChineseSimplified => match key {
+            // ====== 实行状态 ======
+            Running => "运行中",
+            Completed => "已完成",
+            Error => "错误",
+            Warning => "警告",
+            Success => "成功",
+
+            // ====== CRUD操作 ======
+            CommandAdded => "成功添加命令",
+            CommandRemoved => "成功删除命令",
+            CommandUpdated => "成功更新命令",
+
+            // ====== 验证 ======
+            Validating => "正在验证配置",
+            ConfigValid => "配置有效",
+            ValidationFailed => "验证失败",
+            ValidatingConfiguration => "正在验证配置...",
+            ConfigurationIsValid => "配置有效",
+
+            // ====== 交互提示 ======
+            PromptCommandId => "命令ID",
+            PromptCommand => "命令",
+            PromptDescription => "描述",
+            PromptCategory => "分类",
+            PromptTags => "标签（逗号分隔）",
+            PromptConfirm => "确定吗？",
+            PromptSelectCommand => "选择要编辑的命令",
+            PromptWhatToDo => "您想做什么？",
+            PromptEnterNumber => "输入数字",
+            PromptSelectTemplate => "选择模板",
+            PromptSelectLanguage => "选择首选语言",
+
+            // ====== 选项 ======
+            OptionYesAdd => "是，添加此命令",
+            OptionNoEdit => "否，重新编辑",
+            OptionCancel => "取消",
+            OptionEnglish => "English (英语)",
+            OptionJapanese => "日本語 (日语)",
+
+            // ====== 预览·标签 ======
+            LabelPreview => "预览",
+            LabelId => "ID",
+            LabelCommand => "命令",
+            LabelDescription => "描述",
+            LabelCategory => "分类",
+            LabelTags => "标签",
+            LabelCurrentSettings => "当前设置",
+            LabelDependencies => "依赖关系",
+            LabelPlatforms => "平台",
+            LabelWorkingDirectory => "工作目录",
+            LabelEnvironmentVariables => "环境变量",
+            LabelExecutionSettings => "执行设置",
+            LabelParallel => "并行执行",
+            LabelConfirm => "执行前确认",
+            LabelTimeout => "超时",
+            LabelCommandDetails => "命令详情",
+            LabelConfiguration => "配置",
+            LabelLanguage => "语言",
+            LabelShell => "shell",
+            LabelStrictMode => "严格模式",
+            LabelBackupCreated => "已创建备份",
+            LabelYes => "是",
+            LabelNo => "否",
+
+            // ====== 警告消息 ======
+            WarningShellBuiltinNoEffect => "⚠ 此shell内置命令在子进程中运行，不会影响当前shell",
+            HintShellFunction => "💡 提示：使用shell函数进行目录导航",
+            HintCdCommand => "   添加到 ~/.cmdrun/shell-functions.sh：",
+
+            // ====== 错误消息 ======
+            ErrorEmptyCommandId => "命令ID不能为空",
+            ErrorEmptyCommand => "命令不能为空",
+            ErrorEmptyDescription => "描述不能为空",
+            ErrorCommandNotFound => "找不到命令",
+            ErrorCommandExists => "命令已存在",
+            ErrorConfigNotFound => "找不到配置文件",
+            ErrorInvalidConfig => "无效配置",
+            ErrorInvalidSelection => "无效选择",
+            ErrorSelectionOutOfRange => "选择超出范围",
+            ErrorNoCommandsAvailable => "没有可用命令",
+            ErrorUnknownTemplate => "未知模板",
+            ErrorFileAlreadyExists => "配置文件已存在",
+            ErrorCircularDependency => "检测到循环依赖",
+            ErrorValidationFailed => "验证失败",
+            ErrorCommandFailed => "命令执行失败",
+            ErrorUnknownConfigKey => "未知配置键",
+            ErrorAliasTargetNotFound => "找不到别名目标",
+
+            // ====== 帮助文本 ======
+            HelpAddCommand => "向配置中添加新命令",
+            HelpRemoveCommand => "从配置中删除命令",
+            HelpEditCommand => "编辑现有命令",
+            HelpListCommands => "列出所有可用命令",
+            HelpRunCommand => "运行命令",
+            HelpValidateConfig => "验证配置文件",
+            HelpSearchCommand => "按关键字搜索命令",
+            HelpInfoCommand => "显示命令详细信息",
+            HelpConfigCommand => "管理配置设置",
+            HelpWatchCommand => "监视文件并在更改时运行命令",
+            HelpInitCommand => "初始化新配置文件",
+
+            // ====== List 命令 ======
+            ListNoCommandsDefined => "未定义命令",
+            ListAvailableCommands => "可用命令",
+            ListCommandCount => "个已定义命令",
+            ListAliasCount => "个已定义别名",
+
+            // ====== Run 命令 ======
+            RunRunningCommand => "运行中",
+            RunWithParallelDependencies => "（含并行依赖）",
+            RunExecutionPlan => "执行计划",
+            RunGroup => "组",
+            RunAllCommandsCompleted => "所有命令已完成",
+            RunCompletedIn => "完成时间",
+            RunCommandFailedWithCode => "命令执行失败，退出代码",
+
+            // ====== Search 命令 ======
+            SearchSearchingFor => "搜索中",
+            SearchNoCommandsMatching => "没有匹配的命令",
+            SearchFound => "找到",
+            SearchMatchedIn => "匹配位置",
+            SearchUseInfoToSeeDetails => "使用 cmdrun info <命令> 查看详情",
+
+            // ====== Info 命令 ======
+            InfoSelectCommandToView => "选择要查看详情的命令",
+            InfoBasicInformation => "基本信息",
+            InfoCommandSpecification => "命令规范",
+            InfoExecutionSettings => "执行设置",
+            InfoPlatformSupport => "平台支持",
+            InfoConfigurationPaths => "配置文件路径",
+            InfoGlobalConfigPath => "全局配置",
+            InfoLocalConfigPath => "本地配置",
+            InfoActualWorkingDirectory => "实际工作目录",
+
+            // ====== Config 命令 ======
+            ConfigSet => "已设置",
+            ConfigShowingConfiguration => "显示配置",
+
+            // ====== Validate 命令 ======
+            ValidateLoadedConfigFrom => "已加载配置文件",
+            ValidateCheckingCircularDependencies => "正在检查循环依赖...",
+            ValidateNoCircularDependenciesFor => "无循环依赖",
+            ValidateValidatingCommands => "正在验证命令",
+            ValidateValidatingAliases => "正在验证别名",
+            ValidateBuildingDependencyGraph => "正在构建依赖关系图...",
+            ValidateDependencyGraphBuilt => "依赖关系图构建成功",
+            ValidateExecutionOrder => "执行顺序",
+            ValidateErrors => "错误",
+            ValidateWarnings => "警告",
+            ValidateInformation => "信息",
+            ValidateFailedWithErrors => "配置验证失败，错误数",
+            ValidateCommandsDefined => "个已定义命令",
+            ValidateAliasesDefined => "个已定义别名",
+
+            // ====== Init 命令 ======
+            InitCreated => "已创建",
+            InitUsing => "使用中",
+            InitNextSteps => "下一步",
+            InitStep1EditFile => "编辑 {0} 来定义您的命令",
+            InitStep2ListCommands => "运行 cmdrun list 列出可用命令",
+            InitStep3RunCommand => "运行 cmdrun run <名称> 执行命令",
+            InitExampleCommands => "示例命令",
+            InitTemplateDescription => "模板",
+            InitLanguageSet => "语言已设置为",
+
+            // ====== Watch 命令 ======
+            WatchConfiguration => "监视配置",
+            WatchCommand => "命令",
+            WatchWatching => "监视中",
+            WatchPatterns => "模式",
+            WatchExclude => "排除",
+            WatchDebounce => "防抖",
+            WatchModeStarted => "监视模式已启动。按 Ctrl+C 停止。",
+            WatchPresCtrlCToStop => "按 Ctrl+C 停止",
+            WatchModeStoppedByUser => "用户已停止监视模式",
+
+            // ====== Remove 命令 ======
+            RemoveRemovalTarget => "删除目标",
+            RemoveType => "类型",
+            RemovePlatformSpecific => "平台特定",
+
+            // ====== Edit 命令 ======
+            EditParallelExecution => "并行执行",
+            EditConfirmBeforeExecution => "执行前确认",
+
+            // ====== Graph 命令 ======
+            GraphSavedTo => "图表已保存至",
+            GraphRenderWith => "渲染工具",
+            GraphViewAt => "查看位置",
+
+            // ====== Env 命令 ======
+            EnvCurrent => "当前环境",
+            EnvAvailableEnvironments => "可用环境",
+            EnvSwitchedTo => "已切换到环境",
+            EnvCreated => "已创建环境",
+            EnvVariableSet => "已设置变量",
+            EnvEnvironment => "环境",
+            EnvDescription => "描述",
+            EnvConfigFile => "配置文件",
+            EnvEnvironmentVariables => "环境变量",
+            EnvErrorNotFound => "找不到环境",
+            EnvErrorAlreadyExists => "环境已存在",
+            EnvErrorCannotSetDefault => "无法为'default'环境设置变量",
+
+            // ====== Typo检测 ======
+            TypoUnknownCommand => "未知命令",
+            TypoDidYouMean => "您是否想输入:",
+            TypoSuggestions => "建议",
+            TypoRunHelp => "运行 'cmdrun --help' 查看可用命令",
+
+            // ====== 其他 ======
+            AddingCommand => "正在添加命令",
+            RemovingCommand => "正在删除命令",
+            UpdatingCommand => "正在更新命令",
+            OpeningEditor => "正在打开编辑器",
+            SearchResults => "搜索结果",
+            NoCommandsFound => "找不到命令",
+            Cancelled => "已取消",
+            LoadingConfiguration => "正在加载配置",
+            CreatingBackup => "正在创建备份",
+            MatchingCommands => "个匹配命令",
+            Template => "模板",
+        },
+        Language::ChineseTraditional => match key {
+            // ====== 執行狀態 ======
+            Running => "執行中",
+            Completed => "已完成",
+            Error => "錯誤",
+            Warning => "警告",
+            Success => "成功",
+
+            // ====== CRUD操作 ======
+            CommandAdded => "成功新增命令",
+            CommandRemoved => "成功刪除命令",
+            CommandUpdated => "成功更新命令",
+
+            // ====== 驗證 ======
+            Validating => "正在驗證配置",
+            ConfigValid => "配置有效",
+            ValidationFailed => "驗證失敗",
+            ValidatingConfiguration => "正在驗證配置...",
+            ConfigurationIsValid => "配置有效",
+
+            // ====== 互動提示 ======
+            PromptCommandId => "命令ID",
+            PromptCommand => "命令",
+            PromptDescription => "描述",
+            PromptCategory => "分類",
+            PromptTags => "標籤（逗號分隔）",
+            PromptConfirm => "您確定嗎？",
+            PromptSelectCommand => "選擇要編輯的命令",
+            PromptWhatToDo => "您想做什麼？",
+            PromptEnterNumber => "輸入數字",
+            PromptSelectTemplate => "選擇範本",
+            PromptSelectLanguage => "選擇偏好語言",
+
+            // ====== 選項 ======
+            OptionYesAdd => "是，新增此命令",
+            OptionNoEdit => "否，重新編輯",
+            OptionCancel => "取消",
+            OptionEnglish => "English (英語)",
+            OptionJapanese => "日本語 (日語)",
+
+            // ====== 預覽·標籤 ======
+            LabelPreview => "預覽",
+            LabelId => "ID",
+            LabelCommand => "命令",
+            LabelDescription => "描述",
+            LabelCategory => "分類",
+            LabelTags => "標籤",
+            LabelCurrentSettings => "目前設定",
+            LabelDependencies => "相依性",
+            LabelPlatforms => "平台",
+            LabelWorkingDirectory => "工作目錄",
+            LabelEnvironmentVariables => "環境變數",
+            LabelExecutionSettings => "執行設定",
+            LabelParallel => "並行執行",
+            LabelConfirm => "執行前確認",
+            LabelTimeout => "逾時",
+            LabelCommandDetails => "命令詳情",
+            LabelConfiguration => "配置",
+            LabelLanguage => "語言",
+            LabelShell => "shell",
+            LabelStrictMode => "嚴格模式",
+            LabelBackupCreated => "已建立備份",
+            LabelYes => "是",
+            LabelNo => "否",
+
+            // ====== 警告訊息 ======
+            WarningShellBuiltinNoEffect => "⚠ 此shell內建命令在子處理序中執行，不會影響目前shell",
+            HintShellFunction => "💡 提示：使用shell函式進行目錄導覽",
+            HintCdCommand => "   新增至 ~/.cmdrun/shell-functions.sh：",
+
+            // ====== 錯誤訊息 ======
+            ErrorEmptyCommandId => "命令ID不能為空",
+            ErrorEmptyCommand => "命令不能為空",
+            ErrorEmptyDescription => "描述不能為空",
+            ErrorCommandNotFound => "找不到命令",
+            ErrorCommandExists => "命令已存在",
+            ErrorConfigNotFound => "找不到配置檔案",
+            ErrorInvalidConfig => "無效配置",
+            ErrorInvalidSelection => "無效選擇",
+            ErrorSelectionOutOfRange => "選擇超出範圍",
+            ErrorNoCommandsAvailable => "沒有可用命令",
+            ErrorUnknownTemplate => "未知範本",
+            ErrorFileAlreadyExists => "配置檔案已存在",
+            ErrorCircularDependency => "偵測到循環相依",
+            ErrorValidationFailed => "驗證失敗",
+            ErrorCommandFailed => "命令執行失敗",
+            ErrorUnknownConfigKey => "未知配置鍵",
+            ErrorAliasTargetNotFound => "找不到別名目標",
+
+            // ====== 說明文字 ======
+            HelpAddCommand => "向配置中新增命令",
+            HelpRemoveCommand => "從配置中刪除命令",
+            HelpEditCommand => "編輯現有命令",
+            HelpListCommands => "列出所有可用命令",
+            HelpRunCommand => "執行命令",
+            HelpValidateConfig => "驗證配置檔案",
+            HelpSearchCommand => "按關鍵字搜尋命令",
+            HelpInfoCommand => "顯示命令詳細資訊",
+            HelpConfigCommand => "管理配置設定",
+            HelpWatchCommand => "監視檔案並在變更時執行命令",
+            HelpInitCommand => "初始化新配置檔案",
+
+            // ====== List 命令 ======
+            ListNoCommandsDefined => "未定義命令",
+            ListAvailableCommands => "可用命令",
+            ListCommandCount => "個已定義命令",
+            ListAliasCount => "個已定義別名",
+
+            // ====== Run 命令 ======
+            RunRunningCommand => "執行中",
+            RunWithParallelDependencies => "（含並行相依）",
+            RunExecutionPlan => "執行計畫",
+            RunGroup => "群組",
+            RunAllCommandsCompleted => "所有命令已完成",
+            RunCompletedIn => "完成時間",
+            RunCommandFailedWithCode => "命令執行失敗，結束代碼",
+
+            // ====== Search 命令 ======
+            SearchSearchingFor => "搜尋中",
+            SearchNoCommandsMatching => "沒有符合的命令",
+            SearchFound => "找到",
+            SearchMatchedIn => "符合位置",
+            SearchUseInfoToSeeDetails => "使用 cmdrun info <命令> 檢視詳情",
+
+            // ====== Info 命令 ======
+            InfoSelectCommandToView => "選擇要檢視詳情的命令",
+            InfoBasicInformation => "基本資訊",
+            InfoCommandSpecification => "命令規範",
+            InfoExecutionSettings => "執行設定",
+            InfoPlatformSupport => "平台支援",
+            InfoConfigurationPaths => "配置檔案路徑",
+            InfoGlobalConfigPath => "全域配置",
+            InfoLocalConfigPath => "本機配置",
+            InfoActualWorkingDirectory => "實際工作目錄",
+
+            // ====== Config 命令 ======
+            ConfigSet => "已設定",
+            ConfigShowingConfiguration => "顯示配置",
+
+            // ====== Validate 命令 ======
+            ValidateLoadedConfigFrom => "已載入配置檔案",
+            ValidateCheckingCircularDependencies => "正在檢查循環相依...",
+            ValidateNoCircularDependenciesFor => "無循環相依",
+            ValidateValidatingCommands => "正在驗證命令",
+            ValidateValidatingAliases => "正在驗證別名",
+            ValidateBuildingDependencyGraph => "正在建立相依性圖...",
+            ValidateDependencyGraphBuilt => "相依性圖建立成功",
+            ValidateExecutionOrder => "執行順序",
+            ValidateErrors => "錯誤",
+            ValidateWarnings => "警告",
+            ValidateInformation => "資訊",
+            ValidateFailedWithErrors => "配置驗證失敗，錯誤數",
+            ValidateCommandsDefined => "個已定義命令",
+            ValidateAliasesDefined => "個已定義別名",
+
+            // ====== Init 命令 ======
+            InitCreated => "已建立",
+            InitUsing => "使用中",
+            InitNextSteps => "下一步",
+            InitStep1EditFile => "編輯 {0} 來定義您的命令",
+            InitStep2ListCommands => "執行 cmdrun list 列出可用命令",
+            InitStep3RunCommand => "執行 cmdrun run <名稱> 執行命令",
+            InitExampleCommands => "範例命令",
+            InitTemplateDescription => "範本",
+            InitLanguageSet => "語言已設定為",
+
+            // ====== Watch 命令 ======
+            WatchConfiguration => "監視配置",
+            WatchCommand => "命令",
+            WatchWatching => "監視中",
+            WatchPatterns => "模式",
+            WatchExclude => "排除",
+            WatchDebounce => "防抖",
+            WatchModeStarted => "監視模式已啟動。按 Ctrl+C 停止。",
+            WatchPresCtrlCToStop => "按 Ctrl+C 停止",
+            WatchModeStoppedByUser => "使用者已停止監視模式",
+
+            // ====== Remove 命令 ======
+            RemoveRemovalTarget => "刪除目標",
+            RemoveType => "類型",
+            RemovePlatformSpecific => "平台特定",
+
+            // ====== Edit 命令 ======
+            EditParallelExecution => "並行執行",
+            EditConfirmBeforeExecution => "執行前確認",
+
+            // ====== Graph 命令 ======
+            GraphSavedTo => "圖表已儲存至",
+            GraphRenderWith => "算繪工具",
+            GraphViewAt => "檢視位置",
+
+            // ====== Env 命令 ======
+            EnvCurrent => "目前環境",
+            EnvAvailableEnvironments => "可用環境",
+            EnvSwitchedTo => "已切換至環境",
+            EnvCreated => "已建立環境",
+            EnvVariableSet => "已設定變數",
+            EnvEnvironment => "環境",
+            EnvDescription => "描述",
+            EnvConfigFile => "配置檔案",
+            EnvEnvironmentVariables => "環境變數",
+            EnvErrorNotFound => "找不到環境",
+            EnvErrorAlreadyExists => "環境已存在",
+            EnvErrorCannotSetDefault => "無法為'default'環境設定變數",
+
+            // ====== Typo檢測 ======
+            TypoUnknownCommand => "未知命令",
+            TypoDidYouMean => "您是否想輸入:",
+            TypoSuggestions => "建議",
+            TypoRunHelp => "執行 'cmdrun --help' 檢視可用命令",
+
+            // ====== 其他 ======
+            AddingCommand => "正在新增命令",
+            RemovingCommand => "正在刪除命令",
+            UpdatingCommand => "正在更新命令",
+            OpeningEditor => "正在開啟編輯器",
+            SearchResults => "搜尋結果",
+            NoCommandsFound => "找不到命令",
+            Cancelled => "已取消",
+            LoadingConfiguration => "正在載入配置",
+            CreatingBackup => "正在建立備份",
+            MatchingCommands => "個符合命令",
+            Template => "範本",
         },
     }
 }

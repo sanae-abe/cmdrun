@@ -7,4 +7,4 @@ pub mod recorder;
 pub mod storage;
 
 pub use recorder::HistoryRecorder;
-pub use storage::{HistoryEntry, HistoryStorage};
+pub use storage::{CommandStats, HistoryEntry, HistoryStorage};

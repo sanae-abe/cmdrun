@@ -305,6 +305,29 @@ impl HistoryStorage {
         })
     }
 
+    /// Get statistics for a specific command
+    pub fn get_command_stats(&self, command_name: &str) -> Result<CommandStats> {
+        let total_count: i64 = self.conn.query_row(
+            "SELECT COUNT(*) FROM command_history WHERE command = ?1",
+            [command_name],
+            |row| row.get(0),
+        )?;
+
+        let last_run_at: Option<String> = self
+            .conn
+            .query_row(
+                "SELECT datetime(start_time / 1000, 'unixepoch') FROM command_history WHERE command = ?1 ORDER BY start_time DESC LIMIT 1",
+                [command_name],
+                |row| row.get(0),
+            )
+            .optional()?;
+
+        Ok(CommandStats {
+            total_count,
+            last_run_at,
+        })
+    }
+
     /// Clear all history entries
     pub fn clear(&mut self) -> Result<usize> {
         let count = self.conn.execute("DELETE FROM command_history", [])?;
@@ -421,6 +444,13 @@ pub struct HistoryStats {
     pub successful: usize,
     pub failed: usize,
     pub avg_duration_ms: Option<f64>,
+}
+
+/// Command-specific statistics
+#[derive(Debug, Clone, Serialize)]
+pub struct CommandStats {
+    pub total_count: i64,
+    pub last_run_at: Option<String>,
 }
 
 impl HistoryStats {

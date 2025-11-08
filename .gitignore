@@ -29,3 +29,6 @@ coverage/
 # Debug
 debug/
 commands.toml
+
+# Private documentation
+docs/private/

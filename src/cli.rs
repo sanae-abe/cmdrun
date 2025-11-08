@@ -412,6 +412,25 @@ pub enum Commands {
         #[command(subcommand)]
         action: PluginAction,
     },
+
+    /// Interactive mode - fuzzy finder for command selection
+    ///
+    /// Launch an interactive terminal UI with fuzzy search for selecting
+    /// and executing commands. This provides a user-friendly way to explore
+    /// available commands and see detailed information before execution.
+    ///
+    /// Features:
+    ///   - Incremental fuzzy search
+    ///   - Real-time command preview
+    ///   - Keyboard navigation (↑↓ or j/k)
+    ///   - Execution statistics from history
+    ///
+    /// Examples:
+    ///   cmdrun interactive
+    ///   cmdrun interactive -c path/to/commands.toml
+    ///   cmdrun -i               # Short alias
+    #[command(visible_alias = "i")]
+    Interactive,
 }
 
 /// Configuration management actions

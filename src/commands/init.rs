@@ -140,6 +140,8 @@ pub async fn handle_init(
     let lang_display = match selected_language {
         Language::English => "English",
         Language::Japanese => "日本語",
+        Language::ChineseSimplified => "简体中文",
+        Language::ChineseTraditional => "繁體中文",
     };
     println!(
         "  {} {}",
@@ -208,6 +210,8 @@ fn inject_language_setting(content: &str, language: Language) -> String {
     let language_str = match language {
         Language::English => "english",
         Language::Japanese => "japanese",
+        Language::ChineseSimplified => "chinese_simplified",
+        Language::ChineseTraditional => "chinese_traditional",
     };
 
     // Find the [config] section and add language setting
@@ -246,16 +250,22 @@ fn print_next_steps(output_path: &Path, language: Language) {
     let step1_msg = match language {
         Language::English => format!("Edit {} to define your commands", output_path.display()),
         Language::Japanese => format!("{} を編集してコマンドを定義", output_path.display()),
+        Language::ChineseSimplified => format!("编辑 {} 来定义您的命令", output_path.display()),
+        Language::ChineseTraditional => format!("編輯 {} 來定義您的命令", output_path.display()),
     };
 
     let step2_msg = match language {
         Language::English => "Run cmdrun list to list available commands",
         Language::Japanese => "cmdrun list で利用可能なコマンド一覧を表示",
+        Language::ChineseSimplified => "运行 cmdrun list 列出可用命令",
+        Language::ChineseTraditional => "執行 cmdrun list 列出可用命令",
     };
 
     let step3_msg = match language {
         Language::English => "Run cmdrun run <name> to execute a command",
         Language::Japanese => "cmdrun run <名前> でコマンドを実行",
+        Language::ChineseSimplified => "运行 cmdrun run <名称> 执行命令",
+        Language::ChineseTraditional => "執行 cmdrun run <名稱> 執行命令",
     };
 
     println!("  {} {}", "1.".bright_white().bold(), step1_msg.yellow());
@@ -267,6 +277,8 @@ fn print_next_steps(output_path: &Path, language: Language) {
     let example_label = match language {
         Language::English => "Example commands:",
         Language::Japanese => "コマンド例:",
+        Language::ChineseSimplified => "示例命令：",
+        Language::ChineseTraditional => "範例命令：",
     };
 
     println!("{}", example_label.dimmed());

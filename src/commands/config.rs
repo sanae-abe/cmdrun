@@ -24,6 +24,8 @@ pub async fn handle_get(key: &str, config_path: Option<PathBuf>) -> Result<()> {
             let lang_str = match config.config.language {
                 crate::config::schema::Language::English => "english",
                 crate::config::schema::Language::Japanese => "japanese",
+                crate::config::schema::Language::ChineseSimplified => "chinese_simplified",
+                crate::config::schema::Language::ChineseTraditional => "chinese_traditional",
             };
             println!("{}", lang_str);
         }
@@ -116,6 +118,8 @@ pub async fn handle_show(config_path: Option<PathBuf>) -> Result<()> {
     let lang_str = match config.config.language {
         crate::config::schema::Language::English => "english",
         crate::config::schema::Language::Japanese => "japanese",
+        crate::config::schema::Language::ChineseSimplified => "chinese_simplified",
+        crate::config::schema::Language::ChineseTraditional => "chinese_traditional",
     };
 
     println!(

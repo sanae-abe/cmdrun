@@ -65,13 +65,17 @@ impl CommandsConfig {
 
 /// 言語設定
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize, Default)]
-#[serde(rename_all = "lowercase")]
+#[serde(rename_all = "snake_case")]
 pub enum Language {
     /// 英語
     #[default]
     English,
     /// 日本語
     Japanese,
+    /// 简体中文
+    ChineseSimplified,
+    /// 繁體中文
+    ChineseTraditional,
 }
 
 /// グローバル設定
@@ -104,6 +108,18 @@ pub struct GlobalConfig {
     /// グローバル環境変数
     #[serde(default)]
     pub env: AHashMap<String, String>,
+
+    /// Typo検出の有効化
+    #[serde(default = "default_true")]
+    pub typo_detection: bool,
+
+    /// Typo検出の閾値（Levenshtein distance）
+    #[serde(default = "default_typo_threshold")]
+    pub typo_threshold: usize,
+
+    /// 自動修正の有効化（将来の拡張用）
+    #[serde(default)]
+    pub auto_correct: bool,
 }
 
 impl Default for GlobalConfig {
@@ -116,6 +132,9 @@ impl Default for GlobalConfig {
             working_dir: default_working_dir(),
             language: Language::default(),
             env: AHashMap::new(),
+            typo_detection: true,
+            typo_threshold: default_typo_threshold(),
+            auto_correct: false,
         }
     }
 }
@@ -135,6 +154,9 @@ impl GlobalConfig {
                 merged.extend(overlay.env);
                 merged
             },
+            typo_detection: overlay.typo_detection,
+            typo_threshold: overlay.typo_threshold,
+            auto_correct: overlay.auto_correct,
         }
     }
 }
@@ -412,6 +434,10 @@ fn default_timeout() -> u64 {
 
 fn default_working_dir() -> PathBuf {
     PathBuf::from(".")
+}
+
+fn default_typo_threshold() -> usize {
+    2
 }
 
 // ===================================================================

@@ -96,6 +96,8 @@ impl BuiltinTemplate {
         match language {
             crate::config::Language::English => self.description_en(),
             crate::config::Language::Japanese => self.description_ja(),
+            crate::config::Language::ChineseSimplified => self.description_en(), // Fallback to English
+            crate::config::Language::ChineseTraditional => self.description_en(), // Fallback to English
         }
     }
 }
