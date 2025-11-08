@@ -147,9 +147,10 @@ fn test_history_max_entries() {
     let list = storage.list(None, None).unwrap();
     assert_eq!(list.len(), 5);
 
-    // Verify oldest entries were removed
-    assert_eq!(list.last().unwrap().command, "cmd5");
+    // Verify oldest entries were removed (keeps last 5: cmd5-cmd9)
+    // list is DESC order, so first=newest, last=oldest
     assert_eq!(list.first().unwrap().command, "cmd9");
+    assert_eq!(list.last().unwrap().command, "cmd5");
 }
 
 #[test]
