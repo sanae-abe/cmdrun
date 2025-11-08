@@ -24,10 +24,16 @@ async fn test_executor_creation() {
 
 #[tokio::test]
 async fn test_execute_simple_command() {
+    let shell = if cfg!(target_os = "windows") {
+        "cmd".to_string()
+    } else {
+        "bash".to_string()
+    };
+
     let ctx = ExecutionContext {
         working_dir: PathBuf::from("."),
         env: AHashMap::new(),
-        shell: "bash".to_string(),
+        shell,
         timeout: Some(30),
         strict: false,
         echo: false,
@@ -55,10 +61,16 @@ async fn test_execute_simple_command() {
 
 #[tokio::test]
 async fn test_execute_parallel() {
+    let shell = if cfg!(target_os = "windows") {
+        "cmd".to_string()
+    } else {
+        "bash".to_string()
+    };
+
     let ctx = ExecutionContext {
         working_dir: PathBuf::from("."),
         env: AHashMap::new(),
-        shell: "bash".to_string(),
+        shell,
         timeout: Some(30),
         strict: false,
         echo: false,
