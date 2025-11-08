@@ -193,15 +193,19 @@ impl Command {
         match &self.cmd {
             CommandSpec::Single(cmd) => {
                 if !validator.validate(cmd).is_safe() {
-                    return Err(format!("Dangerous command detected in '{}': {}",
-                        self.description, cmd));
+                    return Err(format!(
+                        "Dangerous command detected in '{}': {}",
+                        self.description, cmd
+                    ));
                 }
             }
             CommandSpec::Multiple(cmds) => {
                 for cmd in cmds {
                     if !validator.validate(cmd).is_safe() {
-                        return Err(format!("Dangerous command detected in '{}': {}",
-                            self.description, cmd));
+                        return Err(format!(
+                            "Dangerous command detected in '{}': {}",
+                            self.description, cmd
+                        ));
                     }
                 }
             }
@@ -215,8 +219,10 @@ impl Command {
                 for cmd_opt in commands.iter() {
                     if let Some(cmd) = cmd_opt {
                         if !validator.validate(cmd).is_safe() {
-                            return Err(format!("Dangerous command detected in '{}': {}",
-                                self.description, cmd));
+                            return Err(format!(
+                                "Dangerous command detected in '{}': {}",
+                                self.description, cmd
+                            ));
                         }
                     }
                 }

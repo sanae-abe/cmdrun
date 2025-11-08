@@ -393,9 +393,13 @@ impl HistoryStorage {
     /// Escape CSV field (with formula injection protection)
     fn escape_csv(s: &str) -> String {
         // 数式インジェクション防止：危険な文字で始まる場合は'でプレフィックス
-        let sanitized = if s.starts_with('=') || s.starts_with('+') ||
-                          s.starts_with('-') || s.starts_with('@') ||
-                          s.starts_with('\t') || s.starts_with('\r') {
+        let sanitized = if s.starts_with('=')
+            || s.starts_with('+')
+            || s.starts_with('-')
+            || s.starts_with('@')
+            || s.starts_with('\t')
+            || s.starts_with('\r')
+        {
             format!("'{}", s)
         } else {
             s.to_string()

@@ -54,7 +54,10 @@ impl ConfigLoader {
         // セキュリティ警告：プロジェクト外のパス
         if let Ok(current_dir) = std::env::current_dir() {
             if !canonical_path.starts_with(&current_dir) {
-                debug!("⚠️  Config file outside project directory: {}", canonical_path.display());
+                debug!(
+                    "⚠️  Config file outside project directory: {}",
+                    canonical_path.display()
+                );
             }
         }
 
@@ -348,8 +351,8 @@ cmd = "cargo test"
 
     #[tokio::test]
     async fn test_config_not_found() {
-        let loader = ConfigLoader::with_path("/nonexistent/path/commands.toml").unwrap();
-        let result = loader.load().await;
+        // Path validation now happens in with_path, so we expect it to fail there
+        let result = ConfigLoader::with_path("/nonexistent/path/commands.toml");
         assert!(result.is_err());
     }
 

@@ -259,7 +259,7 @@ cmd = "cargo build"
         assert!(result.is_ok());
 
         // Verify the command was removed
-        let loader = ConfigLoader::with_path(&config_path);
+        let loader = ConfigLoader::with_path(&config_path).unwrap();
         let config = loader.load().await.unwrap();
 
         assert!(!config.commands.contains_key("test"));
