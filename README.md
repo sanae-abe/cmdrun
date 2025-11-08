@@ -43,7 +43,7 @@
 #### System Requirements
 
 - **Operating System**: Linux, macOS, Windows, FreeBSD
-- **Rust**: 1.70+ (MSRV)
+- **Rust**: 1.75+ (MSRV)
 
 #### Install Rust Toolchain
 

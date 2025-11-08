@@ -43,7 +43,7 @@
 #### システム要件
 
 - **オペレーティングシステム**: Linux、macOS、Windows、FreeBSD
-- **Rust**: 1.70以上（MSRV）
+- **Rust**: 1.75以上（MSRV）
 
 #### Rustツールチェーンのインストール
 
