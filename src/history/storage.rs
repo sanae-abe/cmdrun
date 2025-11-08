@@ -38,7 +38,7 @@ pub struct HistoryEntry {
 impl HistoryEntry {
     /// Get the start time as a DateTime
     pub fn start_time_as_datetime(&self) -> DateTime<Utc> {
-        DateTime::from_timestamp_millis(self.start_time).unwrap_or_else(|| Utc::now())
+        DateTime::from_timestamp_millis(self.start_time).unwrap_or_else(Utc::now)
     }
 
     /// Get execution duration as a formatted string

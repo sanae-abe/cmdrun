@@ -38,7 +38,7 @@ pub struct PluginMetadata {
 }
 
 /// Plugin capabilities
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PluginCapabilities {
     /// Can hook into pre-execution
     pub pre_execute: bool,
@@ -54,18 +54,6 @@ pub struct PluginCapabilities {
 
     /// Can modify configuration
     pub config_modification: bool,
-}
-
-impl Default for PluginCapabilities {
-    fn default() -> Self {
-        Self {
-            pre_execute: false,
-            post_execute: false,
-            on_error: false,
-            custom_commands: false,
-            config_modification: false,
-        }
-    }
 }
 
 /// Command execution result

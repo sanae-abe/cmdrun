@@ -58,12 +58,9 @@ pub async fn handle_template_add(name: Option<String>, config_path: Option<PathB
 
     println!();
     println!(
-        "{} {}",
+        "{} Template '{}' created successfully",
         "✓".green().bold(),
-        format!(
-            "Template '{}' created successfully",
-            template_name.cyan().bold()
-        )
+        template_name.cyan().bold()
     );
     println!(
         "  {} {}",
@@ -116,13 +113,10 @@ pub async fn handle_template_use(name: String, output: Option<PathBuf>) -> Resul
 
     println!();
     println!(
-        "{} {}",
+        "{} Applied template '{}' to {}",
         "✓".green().bold(),
-        format!(
-            "Applied template '{}' to {}",
-            name.cyan().bold(),
-            output_path.display().to_string().bright_white().bold()
-        )
+        name.cyan().bold(),
+        output_path.display().to_string().bright_white().bold()
     );
     println!(
         "  {} {} commands",
@@ -229,9 +223,9 @@ pub async fn handle_template_remove(name: String, force: bool) -> Result<()> {
 
     println!();
     println!(
-        "{} {}",
+        "{} Template '{}' removed successfully",
         "✓".green().bold(),
-        format!("Template '{}' removed successfully", name.cyan().bold())
+        name.cyan().bold()
     );
     println!();
 
@@ -249,13 +243,10 @@ pub async fn handle_template_export(name: String, output: PathBuf) -> Result<()>
 
     println!();
     println!(
-        "{} {}",
+        "{} Template '{}' exported to {}",
         "✓".green().bold(),
-        format!(
-            "Template '{}' exported to {}",
-            name.cyan().bold(),
-            output.display().to_string().bright_white().bold()
-        )
+        name.cyan().bold(),
+        output.display().to_string().bright_white().bold()
     );
     println!();
 
@@ -273,12 +264,9 @@ pub async fn handle_template_import(file: PathBuf) -> Result<()> {
 
     println!();
     println!(
-        "{} {}",
+        "{} Template '{}' imported successfully",
         "✓".green().bold(),
-        format!(
-            "Template '{}' imported successfully",
-            template_name.cyan().bold()
-        )
+        template_name.cyan().bold()
     );
     println!(
         "  {} {}",

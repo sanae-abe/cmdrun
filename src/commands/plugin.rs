@@ -98,11 +98,9 @@ pub async fn handle_plugin_list(
     }
 
     println!(
-        "\n{}: {} / {} {}",
-        "Summary",
+        "\nSummary: {} / {} enabled",
         manager.enabled_count().to_string().green(),
-        manager.plugin_count(),
-        "enabled"
+        manager.plugin_count()
     );
 
     Ok(())

@@ -35,8 +35,8 @@ enum ExecutionMode {
     /// Execute cmdrun command
     Cmdrun {
         command_name: String,
-        command_def: Command,
-        executor: CmdrunExecutor,
+        command_def: Box<Command>,
+        executor: Box<CmdrunExecutor>,
     },
 }
 
@@ -88,8 +88,8 @@ impl WatchRunner {
             debouncer,
             execution_mode: ExecutionMode::Cmdrun {
                 command_name,
-                command_def,
-                executor,
+                command_def: Box::new(command_def),
+                executor: Box::new(executor),
             },
         })
     }

@@ -14,9 +14,11 @@ use std::path::{Path, PathBuf};
 use tracing::{debug, info, warn};
 
 #[cfg(feature = "plugin-system")]
+#[allow(improper_ctypes_definitions)]
 type PluginCreate = unsafe extern "C" fn() -> *mut dyn Plugin;
 
 #[cfg(feature = "plugin-system")]
+#[allow(improper_ctypes_definitions)]
 type PluginDestroy = unsafe extern "C" fn(*mut dyn Plugin);
 
 /// Plugin loader

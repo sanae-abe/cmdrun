@@ -501,7 +501,7 @@ impl CommandExecutor {
         let path_parts: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
         if let Some(last) = path_parts.last() {
             // ホームディレクトリ展開を除去
-            let name = last.replace('~', "").replace('.', "");
+            let name = last.replace(['~', '.'], "");
             // 最初の3文字を取得（cdt, cdc など）
             let short = name.chars().take(3).collect::<String>();
             if !short.is_empty() {
