@@ -282,24 +282,34 @@ Commands:
 
 ---
 
-## 🎨 4. v1.0.0新機能確認（TUI・Typo Detection・多言語）
+## 🎨 4. v1.0.0新機能確認（Shell Completion・Typo Detection・多言語）
 
-### 4.1 Interactive Mode (TUI)
+### 4.1 Shell Completion
 ```bash
-# TUI起動
-cmdrun interactive
-# または
-cmdrun -i
+# Zsh補完テスト
+eval "$(cmdrun completion zsh)"
+cmdrun run [Tab]  # 1回目のTabで説明文付きメニュー選択
 
-# 期待: インタラクティブUIが起動、fuzzy finder動作
-# 操作: ↑↓/j/k で移動、Enter で実行、Esc/q で終了
+# Bash補完テスト
+bash -c 'eval "$(cmdrun completion bash)"; complete -p cmdrun'
+# cmdrun run [Tab][Tab] でコマンドリスト表示
+
+# Fish補完テスト（Fishインストール済みの場合）
+fish -c 'source (cmdrun completion fish | psub); complete -C"cmdrun run "'
+
+# 期待: 各シェルで適切な補完動作
 ```
-- [ ] TUI起動成功
-- [ ] Fuzzy finder動作
-- [ ] コマンド実行可能
-- [ ] キーボード操作正常
+- [x] Zsh補完動作（1回目Tabからメニュー選択）
+- [x] Bash補完動作（コマンドリスト表示）
+- [x] Fish補完動作（説明文付きリスト表示）
+- [x] グローバル設定からコマンド読み込み
+- [x] `cmdrun run` と `cmdrun info` で補完動作
 
-ユーザー確認結果：（未確認）
+ユーザー確認結果：✅ (2025-11-09実装完了)
+  - Zsh: 1回目のTabから説明文付きメニュー選択可能
+  - Bash: コマンドリスト表示（説明文なしはBashの制限）
+  - Fish: 説明文付きリスト表示
+  - グローバル設定フォールバック実装済み
 
 ### 4.2 Typo Detection
 ```bash
@@ -569,7 +579,7 @@ to proceed despite this and include the uncommitted changes, pass the `--allow-d
 - [x] パフォーマンス目標達成（起動10ms以下、メモリ15MB以下）
 - [x] **セキュリティバリデーション完全実装**（危険コマンド全て拒否、厳格モード有効）
 - [x] **プラグインシステム完全実装**（Cargo.toml default features に追加、全コマンド動作確認済み）
-- [ ] TUI動作確認（実装済み、動作確認待ち）
+- [x] **Shell Completion完全実装**（Zsh/Bash/Fish対応、グローバル設定フォールバック）
 - [ ] Typo Detection動作確認（実装済み、動作確認待ち）
 - [ ] 多言語対応動作確認（4言語実装済み、動作確認待ち）
 
