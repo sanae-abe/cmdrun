@@ -677,15 +677,27 @@ cargo publish --dry-run
 - [x] dry-run成功
 - [x] パッケージサイズ適切
 
-ユーザー確認結果：❌ エラーが出る
+ユーザー確認結果：✅ **dry-run成功** (2025-11-09実施)
 
+**テスト結果**:
+```
 ❯ cargo publish --dry-run
     Updating crates.io index
-error: 1 files in the working directory contain changes that were not yet committed into git:
+   Packaging cmdrun v1.0.0 (/Users/sanae.abe/projects/cmdrun)
+    Updating crates.io index
+    Packaged 172 files, 1.7MiB (535.1KiB compressed)
+   Verifying cmdrun v1.0.0 (/Users/sanae.abe/projects/cmdrun/target/package/cmdrun-1.0.0)
+   Compiling cmdrun v1.0.0 (/Users/sanae.abe/projects/cmdrun/target/package/cmdrun-1.0.0)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.62s
+   Uploading cmdrun v1.0.0 (/Users/sanae.abe/projects/cmdrun)
+warning: aborting upload due to dry run
+```
 
-PRE_RELEASE_CHECKLIST.md
-
-to proceed despite this and include the uncommitted changes, pass the `--allow-dirty` flag
+**パッケージ詳細**:
+- ファイル数: 172ファイル
+- サイズ: 1.7MiB（圧縮後535.1KiB）
+- コンパイル時間: 8.62s
+- 結果: 正常終了（dry-runのため実際にはアップロードなし）
 
 ---
 
@@ -711,8 +723,32 @@ git log --oneline -5
 
 # 期待: クリーンな状態、適切なコミット履歴
 ```
-- [ ] 作業ツリークリーン
-- [ ] コミット履歴適切
+- [x] 作業ツリークリーン
+- [x] コミット履歴適切
+
+ユーザー確認結果：✅ (2025-11-09確認)
+
+**テスト結果**:
+```
+❯ git status
+On branch main
+Your branch is ahead of 'origin/main' by 2 commits.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+
+❯ git log --oneline -5
+94a3e5c test: Verify History and Shell Detection functionality
+a12c54c test: Complete Typo Detection and i18n verification (4 languages)
+8ed4a1b feat: Add i18n support for error messages
+a39f2ad fix: Add i18n support for list command messages
+5b0c9b6 feat: Add language name validation in config set command
+```
+
+**Git状態**:
+- ✅ 作業ツリー完全にクリーン
+- ✅ コミット履歴適切（機能追加・テスト完了の履歴）
+- ℹ️ origin/mainより2コミット進んでいる（push可能状態）
 
 ---
 
