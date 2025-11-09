@@ -285,10 +285,21 @@ async fn run_command(
                 if global_path.exists() {
                     ConfigLoader::with_path(global_path)?.load().await?
                 } else {
-                    anyhow::bail!("No configuration file found. Run 'cmdrun init' to create one.");
+                    // Use default language (English) for error message when config not found
+                    use cmdrun::config::Language;
+                    use cmdrun::i18n::{get_message, MessageKey};
+                    anyhow::bail!(
+                        "{}",
+                        get_message(MessageKey::ErrorNoConfigFileFound, Language::English)
+                    );
                 }
             } else {
-                anyhow::bail!("Cannot determine config directory");
+                use cmdrun::config::Language;
+                use cmdrun::i18n::{get_message, MessageKey};
+                anyhow::bail!(
+                    "{}",
+                    get_message(MessageKey::ErrorCannotDetermineConfigDir, Language::English)
+                );
             }
         }
     };
@@ -443,7 +454,12 @@ async fn run_command(
                         result.exit_code,
                         false,
                     );
-                    anyhow::bail!("Command failed with exit code {}", result.exit_code);
+                    use cmdrun::i18n::{get_message, MessageKey};
+                    anyhow::bail!(
+                        "{} {}",
+                        get_message(MessageKey::ErrorCommandExecutionFailed, config.config.language),
+                        result.exit_code
+                    );
                 }
             }
         }
@@ -500,7 +516,12 @@ async fn run_command(
                 result.duration.as_secs_f64()
             );
         } else {
-            anyhow::bail!("Command failed with exit code {}", result.exit_code);
+            use cmdrun::i18n::{get_message, MessageKey};
+            anyhow::bail!(
+                "{} {}",
+                get_message(MessageKey::ErrorCommandExecutionFailed, config.config.language),
+                result.exit_code
+            );
         }
     }
 

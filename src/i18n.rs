@@ -95,6 +95,9 @@ pub enum MessageKey {
     ErrorUnknownConfigKey,
     ErrorAliasTargetNotFound,
     ErrorInvalidLanguage,
+    ErrorNoConfigFileFound,
+    ErrorCannotDetermineConfigDir,
+    ErrorCommandExecutionFailed,
 
     // ====== ヘルプテキスト ======
     HelpAddCommand,
@@ -332,6 +335,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorUnknownConfigKey => "Unknown configuration key",
             ErrorAliasTargetNotFound => "Alias target not found",
             ErrorInvalidLanguage => "Invalid language. Valid options: english, japanese, chinese_simplified, chinese_traditional",
+            ErrorNoConfigFileFound => "No configuration file found. Run 'cmdrun init' to create one.",
+            ErrorCannotDetermineConfigDir => "Cannot determine config directory",
+            ErrorCommandExecutionFailed => "Command failed with exit code",
 
             // ====== ヘルプテキスト ======
             HelpAddCommand => "Add a new command to the configuration",
@@ -563,6 +569,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorUnknownConfigKey => "不明な設定キーです",
             ErrorAliasTargetNotFound => "エイリアス先が見つかりません",
             ErrorInvalidLanguage => "無効な言語です。有効な選択肢: english, japanese, chinese_simplified, chinese_traditional",
+            ErrorNoConfigFileFound => "設定ファイルが見つかりません。'cmdrun init' を実行して作成してください。",
+            ErrorCannotDetermineConfigDir => "設定ディレクトリを特定できません",
+            ErrorCommandExecutionFailed => "コマンドが失敗しました（終了コード",
 
             // ====== ヘルプテキスト ======
             HelpAddCommand => "設定に新しいコマンドを追加",
@@ -794,6 +803,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorUnknownConfigKey => "未知配置键",
             ErrorAliasTargetNotFound => "找不到别名目标",
             ErrorInvalidLanguage => "无效语言。有效选项: english, japanese, chinese_simplified, chinese_traditional",
+            ErrorNoConfigFileFound => "找不到配置文件。运行 'cmdrun init' 创建配置文件。",
+            ErrorCannotDetermineConfigDir => "无法确定配置目录",
+            ErrorCommandExecutionFailed => "命令执行失败，退出代码",
 
             // ====== 帮助文本 ======
             HelpAddCommand => "向配置中添加新命令",
@@ -1025,6 +1037,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorUnknownConfigKey => "未知配置鍵",
             ErrorAliasTargetNotFound => "找不到別名目標",
             ErrorInvalidLanguage => "無效語言。有效選項: english, japanese, chinese_simplified, chinese_traditional",
+            ErrorNoConfigFileFound => "找不到配置檔案。執行 'cmdrun init' 建立配置檔案。",
+            ErrorCannotDetermineConfigDir => "無法確定配置目錄",
+            ErrorCommandExecutionFailed => "命令執行失敗，結束代碼",
 
             // ====== 說明文字 ======
             HelpAddCommand => "向配置中新增命令",
