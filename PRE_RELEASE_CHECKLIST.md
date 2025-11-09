@@ -156,28 +156,76 @@ Watch Configuration
 
 ### 3.1 環境管理
 ```bash
-# 環境作成
+# テスト用ディレクトリ作成
+mkdir -p /tmp/cmdrun-env-test
+cd /tmp/cmdrun-env-test
+
+# 初期設定作成
+cmdrun init
+
+# ステップ1: 環境作成
 cmdrun env create dev --description "開発環境"
+cmdrun env create staging --description "ステージング環境"
 cmdrun env create prod --description "本番環境"
 
-# 環境一覧
+# ステップ2: 環境一覧確認
 cmdrun env list
+# 期待出力:
+#   Available environments:
+#     dev - 開発環境
+#     staging - ステージング環境
+#     prod - 本番環境
 
-# 環境切り替え
+# ステップ3: 環境切り替えテスト
 cmdrun env use dev
 cmdrun env current
+# 期待出力: Current environment: dev
 
-# 環境変数設定
-cmdrun env set API_URL https://api.dev.com
+# ステップ4: 環境変数設定
+cmdrun env set API_URL https://api.dev.example.com
+cmdrun env set DB_HOST localhost
+cmdrun env set DEBUG true
 
-# 期待: 各操作正常、環境分離動作
+# ステップ5: 環境変数確認
+cmdrun env info dev
+# 期待出力:
+#   Environment: dev
+#   Description: 開発環境
+#   Variables:
+#     API_URL=https://api.dev.example.com
+#     DB_HOST=localhost
+#     DEBUG=true
+
+# ステップ6: 環境別設定ファイル確認
+ls -la ~/.config/cmdrun/commands.*.toml
+# 期待: commands.dev.toml, commands.staging.toml, commands.prod.toml存在
+
+cat ~/.config/cmdrun/commands.dev.toml
+# 期待: [config.env]セクションに環境変数が記載されている
+
+# ステップ7: 環境切り替え動作確認
+cmdrun env use prod
+cmdrun env set API_URL https://api.prod.example.com
+cmdrun env info prod
+# 期待: prodの環境変数が正しく設定されている
+
+cmdrun env use dev
+cmdrun env info dev
+# 期待: devの環境変数が保持されている（prodと分離）
+
+# クリーンアップ
+cd ~
+rm -rf /tmp/cmdrun-env-test
 ```
-- [x] 環境作成成功
-- [x] 環境一覧表示
-- [x] 環境切り替え動作
-- [x] 変数設定成功
+- [ ] **環境作成成功**（dev/staging/prod）
+- [ ] **環境一覧表示**（3環境表示）
+- [ ] **環境切り替え動作**（use/current）
+- [ ] **環境変数設定成功**（set）
+- [ ] **環境変数確認**（info）
+- [ ] **設定ファイル分離**（commands.{env}.toml）
+- [ ] **環境間分離**（dev/prod変数が独立）
 
-ユーザー確認結果：✅ (2025-11-08修正完了: commands.{env}.toml対応、ENVIRONMENT.mdガイド作成)
+ユーザー確認結果：⚠️ **実テスト推奨** (2025-11-08実装完了、実テスト詳細記録なし)
 
 
 ### 3.2 履歴・ログ
@@ -247,26 +295,85 @@ History Statistics
 
 ### 3.3 テンプレート
 ```bash
-# テンプレート一覧
+# テスト用ディレクトリ作成
+mkdir -p /tmp/cmdrun-template-test
+cd /tmp/cmdrun-template-test
+
+# ステップ1: 組み込みテンプレート一覧確認
 cmdrun template list
+# 期待出力:
+#   Available templates:
+#     rust-cli - Rust CLI development
+#     nodejs-web - Node.js web development
+#     python-data - Python data science
+#     react-app - React application
 
-# テンプレート使用
-cmdrun template use nodejs-web -o /tmp/test-nodejs.toml
+# ステップ2: 各テンプレート使用テスト
+# 2-1: rust-cli テンプレート
+cmdrun template use rust-cli -o rust-cli-test.toml
+cat rust-cli-test.toml
+# 期待: build, test, clippy, fmt, run, watch, clean コマンドが定義されている
 
-# カスタムテンプレート作成
-cmdrun template add my-template
+# 2-2: nodejs-web テンプレート
+cmdrun template use nodejs-web -o nodejs-web-test.toml
+cat nodejs-web-test.toml
+# 期待: dev, build, test, lint, format コマンドが定義されている
 
-# テンプレートエクスポート
-cmdrun template export rust-cli /tmp/rust-cli.toml
+# 2-3: python-data テンプレート
+cmdrun template use python-data -o python-data-test.toml
+cat python-data-test.toml
+# 期待: jupyter, test, lint, format, install コマンドが定義されている
 
-# 期待: 4種組み込みテンプレート、カスタム作成・エクスポート動作
+# 2-4: react-app テンプレート
+cmdrun template use react-app -o react-app-test.toml
+cat react-app-test.toml
+# 期待: dev, build, test, storybook, lint コマンドが定義されている
+
+# ステップ3: カスタムテンプレート作成
+cmdrun template add my-custom-template
+# 対話的プロンプトでコマンド追加
+# 例: build "make build" "Build the project"
+# 例: deploy "make deploy" "Deploy to production"
+
+# ステップ4: カスタムテンプレート確認
+cmdrun template list
+# 期待: my-custom-template が一覧に表示される
+
+# ステップ5: テンプレートエクスポート
+cmdrun template export rust-cli rust-cli-export.toml
+cat rust-cli-export.toml
+# 期待: rust-cliの内容がTOML形式で出力されている
+
+cmdrun template export my-custom-template my-custom-export.toml
+cat my-custom-export.toml
+# 期待: カスタムテンプレートの内容が出力されている
+
+# ステップ6: テンプレートインポート
+cmdrun template import my-imported-template rust-cli-export.toml
+cmdrun template list
+# 期待: my-imported-template が一覧に表示される
+
+# ステップ7: テンプレート削除
+cmdrun template remove my-custom-template
+cmdrun template remove my-imported-template
+cmdrun template list
+# 期待: カスタムテンプレートが削除され、組み込み4種のみ表示
+
+# クリーンアップ
+cd ~
+rm -rf /tmp/cmdrun-template-test
 ```
-- [x] 組み込みテンプレート4種確認
-- [x] テンプレート使用成功
-- [x] カスタム作成動作
-- [x] エクスポート成功
+- [ ] **組み込みテンプレート4種確認**（rust-cli/nodejs-web/python-data/react-app）
+- [ ] **rust-cli テンプレート使用**（build/test/clippy等7コマンド）
+- [ ] **nodejs-web テンプレート使用**（dev/build/test等5コマンド）
+- [ ] **python-data テンプレート使用**（jupyter/test等5コマンド）
+- [ ] **react-app テンプレート使用**（dev/build/storybook等5コマンド）
+- [ ] **カスタムテンプレート作成**（add）
+- [ ] **テンプレートエクスポート**（export TOML出力）
+- [ ] **テンプレートインポート**（import）
+- [ ] **テンプレート削除**（remove）
 
-ユーザー確認結果：✅
+ユーザー確認結果：⚠️ **実テスト推奨** (実装完了、実テスト詳細記録なし)
 
 ### 3.4 プラグイン（基本）
 ```bash
@@ -616,6 +723,49 @@ hyperfine --warmup 5 --min-runs 20 'cmdrun --version'
 - [x] メモリ使用量15MB以下
 
 ユーザー確認結果：✅
+
+### 8.3 パフォーマンス実測値（詳細）
+```bash
+# hyperfineによる正確な起動時間測定
+hyperfine --warmup 10 --min-runs 50 'cmdrun --version'
+
+# メモリ使用量詳細測定（macOS）
+/usr/bin/time -l cmdrun list 2>&1 | grep "maximum resident set size"
+
+# 期待: 起動時間 < 10ms、メモリ < 15MB
+```
+- [x] 起動時間測定完了
+- [x] メモリ使用量測定完了
+- [x] README記載値との整合性確認
+
+ユーザー確認結果：✅ **実測完了** (TODO.md Section 9.1より)
+
+**実測値**:
+```
+起動時間:
+  - 平均: 6.5ms
+  - 最小: 4.6ms
+  - 最大: 9.2ms
+
+メモリ使用量:
+  - アイドル時: 4.5MB
+  - list実行時: 6.2MB
+  - run実行時: 7.8MB
+
+TOMLパース:
+  - 平均: 0.215ms
+  - 標準的な設定ファイル（20コマンド）
+```
+
+**評価**:
+- ✅ 起動時間目標10ms以下達成（6.5ms平均）
+- ✅ メモリ目標15MB以下達成（4.5MB、目標比70%削減）
+- ✅ TOMLパース目標1ms以下達成（0.215ms、目標比78%削減）
+
+**README記載との対応**:
+- README記載: 起動時間6.5ms（平均）← 実測値と一致 ✅
+- README記載: メモリ4.5MB ← 実測値と一致 ✅
+- README記載: 17倍高速 (115ms ÷ 6.5ms = 17.7倍) ← 計算正確 ✅
 
 ---
 

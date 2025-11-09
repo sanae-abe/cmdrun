@@ -23,9 +23,9 @@
 ## Why cmdrun?
 
 ### 🚀 Performance
-- **~29x faster startup** than Node.js-based task runners
-- **4ms startup time** vs 115ms+ for npm/yarn
-- **10MB memory footprint** vs 200MB+ for Node.js
+- **~17x faster startup** than Node.js-based task runners
+- **6.5ms startup time (average)** vs 115ms+ for npm/yarn
+- **4.5MB memory footprint** vs 200MB+ for Node.js
 
 ### 🔒 Security
 - **Zero Rust `eval()`** - No dynamic code generation in application code
@@ -45,7 +45,7 @@
 ### 🎯 What Makes cmdrun Special
 
 **Unique combination of features:**
-- 🔒 Zero Rust eval() with fuzzing (373,423 tests, 0 vulnerabilities)
+- 🔒 Zero Rust eval() with fuzzing (373,423 tests, 0 crashes)
 - 🌍 4-language support (EN/JA/ZH-CN/ZH-TW)
 - 🎨 Shell completion (Zsh/Bash/Fish)
 - 📊 SQLite-based execution history
