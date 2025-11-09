@@ -434,7 +434,6 @@ pub enum Commands {
         #[command(subcommand)]
         action: PluginAction,
     },
-
 }
 
 /// Configuration management actions

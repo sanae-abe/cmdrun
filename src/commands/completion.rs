@@ -28,7 +28,8 @@ pub fn handle_completion(shell: Shell) {
 fn add_custom_completions(shell: Shell) {
     match shell {
         Shell::Bash => {
-            println!(r#"
+            println!(
+                r#"
 # Custom completion for 'cmdrun run' and 'cmdrun info' with descriptions
 _cmdrun_complete_commands() {{
     local IFS=$'\n'
@@ -90,10 +91,12 @@ _cmdrun_wrap_completion() {{
 
 # Execute the wrapper after this script loads
 _cmdrun_wrap_completion
-"#);
+"#
+            );
         }
         Shell::Zsh => {
-            println!(r#"
+            println!(
+                r#"
 # Custom completion for 'cmdrun run' and 'cmdrun info' with descriptions
 _cmdrun_commands_with_desc() {{
     local -a commands
@@ -132,17 +135,20 @@ _cmdrun() {{
 
 # Configure completion style for cmdrun to show menu immediately
 zstyle ':completion:*:*:cmdrun:*' menu yes select
-"#);
+"#
+            );
         }
         Shell::Fish => {
-            println!(r#"
+            println!(
+                r#"
 # Custom completion for 'cmdrun run' and 'cmdrun info' with descriptions
 complete -c cmdrun -n "__fish_seen_subcommand_from run; and not __fish_seen_subcommand_from (cmdrun completion-list 2>/dev/null | string replace -r ':.*' '')" -f -a "
 (cmdrun completion-list 2>/dev/null | string replace ':' \t)"
 
 complete -c cmdrun -n "__fish_seen_subcommand_from info; and not __fish_seen_subcommand_from (cmdrun completion-list 2>/dev/null | string replace -r ':.*' '')" -f -a "
 (cmdrun completion-list 2>/dev/null | string replace ':' \t)"
-"#);
+"#
+            );
         }
         _ => {
             // Other shells don't have good support for descriptions in completions

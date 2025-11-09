@@ -28,6 +28,9 @@ pub struct LoggerConfig {
 
     /// ファイル出力先
     pub log_file: Option<String>,
+
+    /// ANSI色付き出力を使用
+    pub use_colors: bool,
 }
 
 /// ログレベル
@@ -61,6 +64,7 @@ impl LoggerConfig {
             show_timestamps: true,
             show_target: false,
             log_file: None,
+            use_colors: true,
         }
     }
 
@@ -91,6 +95,12 @@ impl LoggerConfig {
     /// ファイル出力を設定
     pub fn with_log_file(mut self, path: String) -> Self {
         self.log_file = Some(path);
+        self
+    }
+
+    /// 色付き出力を設定
+    pub fn with_colors(mut self, enabled: bool) -> Self {
+        self.use_colors = enabled;
         self
     }
 }
@@ -130,7 +140,8 @@ pub fn init_logger_with_config(config: LoggerConfig) -> Result<()> {
                 fmt::layer()
                     .json()
                     .with_span_events(FmtSpan::CLOSE)
-                    .with_current_span(false),
+                    .with_current_span(false)
+                    .with_ansi(config.use_colors),
             )
             .try_init()
             .map_err(|e| anyhow::anyhow!("Failed to initialize logger: {}", e))?;
@@ -143,7 +154,8 @@ pub fn init_logger_with_config(config: LoggerConfig) -> Result<()> {
                     fmt::layer()
                         .with_target(config.show_target)
                         .with_span_events(FmtSpan::NONE)
-                        .with_timer(fmt::time::uptime()),
+                        .with_timer(fmt::time::uptime())
+                        .with_ansi(config.use_colors),
                 )
                 .try_init()
                 .map_err(|e| anyhow::anyhow!("Failed to initialize logger: {}", e))?;
@@ -154,7 +166,8 @@ pub fn init_logger_with_config(config: LoggerConfig) -> Result<()> {
                     fmt::layer()
                         .with_target(config.show_target)
                         .with_span_events(FmtSpan::NONE)
-                        .without_time(),
+                        .without_time()
+                        .with_ansi(config.use_colors),
                 )
                 .try_init()
                 .map_err(|e| anyhow::anyhow!("Failed to initialize logger: {}", e))?;

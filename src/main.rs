@@ -7,8 +7,7 @@ use clap::Parser;
 #[cfg(feature = "plugin-system")]
 use cmdrun::cli::PluginAction;
 use cmdrun::cli::{
-    Cli, ColorChoice, Commands, ConfigAction, EnvAction, GraphFormat, HistoryAction,
-    TemplateAction,
+    Cli, ColorChoice, Commands, ConfigAction, EnvAction, GraphFormat, HistoryAction, TemplateAction,
 };
 use cmdrun::command::dependency::DependencyGraph;
 use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
@@ -29,7 +28,7 @@ async fn main() {
 
     // Initialize logging (skip for CompletionList to avoid polluting shell completion)
     if !matches!(cli.command, Commands::CompletionList) {
-        init_logging(cli.verbose);
+        init_logging(cli.verbose, cli.color);
     }
 
     // Run command
@@ -457,7 +456,10 @@ async fn run_command(
                     use cmdrun::i18n::{get_message, MessageKey};
                     anyhow::bail!(
                         "{} {}",
-                        get_message(MessageKey::ErrorCommandExecutionFailed, config.config.language),
+                        get_message(
+                            MessageKey::ErrorCommandExecutionFailed,
+                            config.config.language
+                        ),
                         result.exit_code
                     );
                 }
@@ -519,7 +521,10 @@ async fn run_command(
             use cmdrun::i18n::{get_message, MessageKey};
             anyhow::bail!(
                 "{} {}",
-                get_message(MessageKey::ErrorCommandExecutionFailed, config.config.language),
+                get_message(
+                    MessageKey::ErrorCommandExecutionFailed,
+                    config.config.language
+                ),
                 result.exit_code
             );
         }
@@ -690,7 +695,8 @@ async fn show_dependency_graph(
 }
 
 /// Initialize logging
-fn init_logging(verbose: u8) {
+fn init_logging(verbose: u8, color_choice: ColorChoice) {
+    use std::io::IsTerminal;
     use tracing_subscriber::fmt::format::FmtSpan;
 
     let level = match verbose {
@@ -699,8 +705,23 @@ fn init_logging(verbose: u8) {
         _ => "trace",
     };
 
-    tracing_subscriber::fmt()
+    // Determine if colors should be used
+    let use_colors = match color_choice {
+        ColorChoice::Never => false,
+        ColorChoice::Always => true,
+        ColorChoice::Auto => {
+            // Auto mode: use colors if NO_COLOR is not set and stderr is a TTY
+            std::env::var("NO_COLOR").is_err() && std::io::stderr().is_terminal()
+        }
+    };
+
+    let result = tracing_subscriber::fmt()
         .with_env_filter(level)
         .with_span_events(FmtSpan::CLOSE)
-        .init();
+        .with_ansi(use_colors)
+        .try_init();
+
+    if let Err(e) = result {
+        eprintln!("Warning: Failed to initialize logging: {}", e);
+    }
 }

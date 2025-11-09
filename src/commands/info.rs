@@ -238,9 +238,12 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
         if let Ok(stats) = get_command_statistics(storage, &id).await {
             println!(
                 "{}",
-                format!("{}:", get_message(MessageKey::InfoExecutionStatistics, lang))
-                    .white()
-                    .bold()
+                format!(
+                    "{}:",
+                    get_message(MessageKey::InfoExecutionStatistics, lang)
+                )
+                .white()
+                .bold()
             );
             println!(
                 "  {} {}",
@@ -321,15 +324,12 @@ async fn get_command_statistics(
     // Convert Unix timestamp to human-readable format
     let last_run_time = entries.first().map(|e| {
         let datetime = chrono::DateTime::from_timestamp(e.start_time / 1000, 0)
-            .unwrap_or_else(|| chrono::Utc::now());
+            .unwrap_or_else(chrono::Utc::now);
         datetime.format("%Y-%m-%d %H:%M:%S").to_string()
     });
 
     let avg_duration = if !entries.is_empty() {
-        let total_duration: i64 = entries
-            .iter()
-            .filter_map(|e| e.duration_ms)
-            .sum();
+        let total_duration: i64 = entries.iter().filter_map(|e| e.duration_ms).sum();
         let count = entries.iter().filter(|e| e.duration_ms.is_some()).count();
         if count > 0 {
             Some(total_duration as f64 / count as f64 / 1000.0) // Convert ms to seconds

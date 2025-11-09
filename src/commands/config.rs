@@ -66,7 +66,12 @@ pub async fn handle_set(key: &str, value: &str, config_file_path: Option<PathBuf
     match key {
         "language" => {
             // Validate language value
-            let valid_languages = ["english", "japanese", "chinese_simplified", "chinese_traditional"];
+            let valid_languages = [
+                "english",
+                "japanese",
+                "chinese_simplified",
+                "chinese_traditional",
+            ];
             if !valid_languages.contains(&value) {
                 anyhow::bail!("{}", get_message(MessageKey::ErrorInvalidLanguage, lang));
             }
