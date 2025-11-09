@@ -47,7 +47,7 @@
 **独自の機能の組み合わせ:**
 - 🔒 evalゼロのセキュリティとfuzzing（373,423テスト、0脆弱性）
 - 🌍 4言語サポート（英・日・簡体中・繁体中）
-- 🎨 Fuzzy finder付きインタラクティブTUI
+- 🎨 シェル補完（Zsh/Bash/Fish）
 - 📊 SQLiteベース実行履歴
 - 🔌 動的プラグインシステム
 - 🎯 インテリジェントtypo検出
@@ -405,34 +405,44 @@ cmdrun watch dev --path src --path lib
 
 詳細は[Watch Modeガイド](docs/user-guide/WATCH_MODE.md)を参照してください。
 
-### インタラクティブモード（TUI）
+### シェル補完
 
-Fuzzy finderを使った対話的なターミナルUIを起動できます。
+cmdrunはZsh、Bash、Fishシェル向けにインテリジェントなシェル補完を提供し、コマンドの説明表示とグローバル設定フォールバックに対応しています。
+
+**設定:**
 
 ```bash
-# インタラクティブモード起動
-cmdrun interactive
-# または
-cmdrun -i
+# Zsh - ~/.zshrc に追加
+eval "$(cmdrun completion zsh)"
+
+# Bash - ~/.bashrc に追加
+eval "$(cmdrun completion bash)"
+
+# Fish - ~/.config/fish/config.fish に追加
+cmdrun completion fish | source
 ```
 
 **機能:**
-- 🔍 **Fuzzy Finder**: 全コマンドのインクリメンタルサーチ
-- ⚡ **クイック実行**: Enterキーでコマンド実行
-- 📊 **ライブプレビュー**: コマンド詳細、依存関係、実行履歴を表示
-- ⌨️ **キーボードナビゲーション**:
-  - `↑`/`↓` または `j`/`k`: コマンド選択
-  - `Enter`: 選択したコマンドを実行
-  - `Ctrl+U`: 検索入力をクリア
-  - `Ctrl+W`: 単語を後方削除
-  - `Esc` または `q`: 終了
+- 🎯 **スマート補完**: グローバル・ローカル設定両方からコマンド名を自動補完
+- 📝 **説明表示**: コマンドの説明を表示（Zsh/Fish）またはコマンドリスト（Bash）
+- 🌍 **グローバルフォールバック**: ローカル `commands.toml` がなくてもグローバル設定から動作
+- ⚡ **高速**: 最小限のオーバーヘッド、速度最適化済み
 
-**プレビューパネル:**
-- コマンドの説明と実際のコマンド文字列
-- 環境変数展開後のプレビュー
-- 実行統計（実行回数、最終実行時刻）
+**シェル別機能:**
 
-詳細は [TUI実装サマリー](docs/TUI_IMPLEMENTATION_SUMMARY.md) を参照してください。
+**Zsh:**
+- `Tab` を1回押下: 説明付きメニュー選択を表示
+- 矢印キーまたは `Tab`/`Shift+Tab` でナビゲート
+- 各コマンドの完全な説明を表示
+
+**Bash:**
+- `Tab` を2回押下: コマンド名リストを表示
+- 説明なし（Bashの制限）
+
+**Fish:**
+- `Tab` 押下: 説明付きコマンドリストを表示
+- 矢印キーでナビゲート
+- 入力に応じて自動フィルタリング
 
 ### Typo検出
 
@@ -468,9 +478,10 @@ auto_correct = false      # trueで自動修正
 
 cmdrunは4言語をサポート: **英語、日本語、簡体中国語（简体中文）、繁体中国語（繁體中文）**
 
-**自動言語検出:**
-- `LANG` 環境変数を読み取り
-- サポート: `en`, `ja`, `zh_CN`, `zh_TW`, `zh_HK`
+**言語設定:**
+- 設定ファイル（`commands.toml`）で言語を設定
+- 言語変更: `cmdrun config set language <言語名>`
+- サポート値: `english`, `japanese`, `chinese_simplified`, `chinese_traditional`
 
 **ローカライズ済みコマンド（9個）:**
 - `cmdrun add`, `search`, `init`, `remove`, `info`
@@ -480,7 +491,19 @@ cmdrunは4言語をサポート: **英語、日本語、簡体中国語（简体
 **設定:**
 ```toml
 [config]
-language = "japanese"  # または "english", "chinese-simplified", "chinese-traditional"
+language = "japanese"  # または "english", "chinese_simplified", "chinese_traditional"
+```
+
+**言語変更:**
+```bash
+# 日本語に設定
+cmdrun config set language japanese
+
+# 簡体中国語に設定
+cmdrun config set language chinese_simplified
+
+# 繁体中国語に設定
+cmdrun config set language chinese_traditional
 ```
 
 **例（日本語）:**
