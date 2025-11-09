@@ -94,6 +94,7 @@ pub enum MessageKey {
     ErrorCommandFailed,
     ErrorUnknownConfigKey,
     ErrorAliasTargetNotFound,
+    ErrorInvalidLanguage,
 
     // ====== ヘルプテキスト ======
     HelpAddCommand,
@@ -330,6 +331,7 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorCommandFailed => "Command failed",
             ErrorUnknownConfigKey => "Unknown configuration key",
             ErrorAliasTargetNotFound => "Alias target not found",
+            ErrorInvalidLanguage => "Invalid language. Valid options: english, japanese, chinese_simplified, chinese_traditional",
 
             // ====== ヘルプテキスト ======
             HelpAddCommand => "Add a new command to the configuration",
@@ -560,6 +562,7 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorCommandFailed => "コマンドが失敗しました",
             ErrorUnknownConfigKey => "不明な設定キーです",
             ErrorAliasTargetNotFound => "エイリアス先が見つかりません",
+            ErrorInvalidLanguage => "無効な言語です。有効な選択肢: english, japanese, chinese_simplified, chinese_traditional",
 
             // ====== ヘルプテキスト ======
             HelpAddCommand => "設定に新しいコマンドを追加",
@@ -790,6 +793,7 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorCommandFailed => "命令执行失败",
             ErrorUnknownConfigKey => "未知配置键",
             ErrorAliasTargetNotFound => "找不到别名目标",
+            ErrorInvalidLanguage => "无效语言。有效选项: english, japanese, chinese_simplified, chinese_traditional",
 
             // ====== 帮助文本 ======
             HelpAddCommand => "向配置中添加新命令",
@@ -1020,6 +1024,7 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorCommandFailed => "命令執行失敗",
             ErrorUnknownConfigKey => "未知配置鍵",
             ErrorAliasTargetNotFound => "找不到別名目標",
+            ErrorInvalidLanguage => "無效語言。有效選項: english, japanese, chinese_simplified, chinese_traditional",
 
             // ====== 說明文字 ======
             HelpAddCommand => "向配置中新增命令",
