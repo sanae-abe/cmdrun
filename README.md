@@ -47,7 +47,7 @@
 **Unique combination of features:**
 - 🔒 Zero-eval security with fuzzing (373,423 tests, 0 vulnerabilities)
 - 🌍 4-language support (EN/JA/ZH-CN/ZH-TW)
-- 🎨 Interactive TUI with fuzzy finder
+- 🎨 Shell completion (Zsh/Bash/Fish)
 - 📊 SQLite-based execution history
 - 🔌 Dynamic plugin system
 - 🎯 Intelligent typo detection
@@ -418,34 +418,44 @@ cmdrun watch dev --path src --path lib
 
 See [Watch Mode Guide](docs/user-guide/WATCH_MODE.md) for details.
 
-### Interactive Mode (TUI)
+### Shell Completion
 
-Launch an interactive terminal UI for fuzzy finding and executing commands.
+cmdrun provides intelligent shell completion for Zsh, Bash, and Fish shells with command descriptions and global configuration fallback.
+
+**Setup:**
 
 ```bash
-# Start interactive mode
-cmdrun interactive
-# or
-cmdrun -i
+# Zsh - Add to ~/.zshrc
+eval "$(cmdrun completion zsh)"
+
+# Bash - Add to ~/.bashrc
+eval "$(cmdrun completion bash)"
+
+# Fish - Add to ~/.config/fish/config.fish
+cmdrun completion fish | source
 ```
 
 **Features:**
-- 🔍 **Fuzzy Finder**: Incremental search across all commands
-- ⚡ **Quick Execution**: Run commands with Enter key
-- 📊 **Live Preview**: View command details, dependencies, and execution history
-- ⌨️ **Keyboard Navigation**:
-  - `↑`/`↓` or `j`/`k`: Navigate commands
-  - `Enter`: Execute selected command
-  - `Ctrl+U`: Clear search input
-  - `Ctrl+W`: Delete word backward
-  - `Esc` or `q`: Quit
+- 🎯 **Smart Completion**: Auto-completes command names from both global and local configurations
+- 📝 **Descriptions**: Shows command descriptions (Zsh/Fish) or command list (Bash)
+- 🌍 **Global Fallback**: Works even without local `commands.toml` by using global config
+- ⚡ **Fast**: Minimal overhead, optimized for speed
 
-**Preview Panel:**
-- Command description and actual command string
-- Environment variables expansion preview
-- Execution statistics (run count, last execution time)
+**Shell-Specific Features:**
 
-See [TUI Implementation Summary](docs/TUI_IMPLEMENTATION_SUMMARY.md) for details.
+**Zsh:**
+- Press `Tab` once: Opens menu selection with descriptions
+- Navigate with arrow keys or `Tab`/`Shift+Tab`
+- Full description display for each command
+
+**Bash:**
+- Press `Tab` twice: Shows command name list
+- No descriptions (Bash limitation)
+
+**Fish:**
+- Press `Tab`: Shows command list with descriptions
+- Navigate with arrow keys
+- Automatic filtering as you type
 
 ### Typo Detection
 
@@ -481,9 +491,10 @@ auto_correct = false      # Set to true for automatic correction
 
 cmdrun supports 4 languages: **English, Japanese, Simplified Chinese (简体中文), Traditional Chinese (繁體中文)**.
 
-**Automatic Language Detection:**
-- Reads `LANG` environment variable
-- Supports: `en`, `ja`, `zh_CN`, `zh_TW`, `zh_HK`
+**Language Configuration:**
+- Uses configuration file setting (`commands.toml`)
+- Change language: `cmdrun config set language <language>`
+- Supported values: `english`, `japanese`, `chinese_simplified`, `chinese_traditional`
 
 **Localized Commands (9 commands):**
 - `cmdrun add`, `search`, `init`, `remove`, `info`
@@ -493,7 +504,19 @@ cmdrun supports 4 languages: **English, Japanese, Simplified Chinese (简体中�
 **Configuration:**
 ```toml
 [config]
-language = "english"  # or "japanese", "chinese-simplified", "chinese-traditional"
+language = "english"  # or "japanese", "chinese_simplified", "chinese_traditional"
+```
+
+**Change Language:**
+```bash
+# Set to Japanese
+cmdrun config set language japanese
+
+# Set to Chinese (Simplified)
+cmdrun config set language chinese_simplified
+
+# Set to Chinese (Traditional)
+cmdrun config set language chinese_traditional
 ```
 
 **Example (Chinese - Simplified):**
