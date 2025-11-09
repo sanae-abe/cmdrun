@@ -167,7 +167,7 @@ cmdrun remove dev
 cmdrun config show
 
 # 更改语言
-cmdrun config set language chinese-simplified
+cmdrun config set language chinese_simplified
 
 # 使用自定义配置文件
 cmdrun --config ~/work/commands.toml list
