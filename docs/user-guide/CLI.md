@@ -25,6 +25,7 @@ cmdrunコマンドラインインターフェースの完全なリファレン�
   - [validate](#validate) - 設定を検証
   - [config](#config) - 設定管理
   - [completion](#completion) - シェル補完スクリプト生成
+  - [typo](#typo) - タイポ検出機能
 - [終了コード](#終了コード)
 - [設定ファイル](#設定ファイル)
 
@@ -137,7 +138,7 @@ cmdrun init [OPTIONS]
 #### オプション
 
 - `--template <TEMPLATE>` - 使用するテンプレート（rust, nodejs, python, react等）
-- `--language <LANG>` - 言語設定（japanese/english、デフォルト: english）
+- `--language <LANG>` - 言語設定（english/japanese/chinese_simplified/chinese_traditional、デフォルト: english）
 
 #### 使用例
 
@@ -150,6 +151,9 @@ cmdrun init --template rust-cli
 
 # 日本語設定で初期化
 cmdrun init --language japanese --template nodejs-web
+
+# 簡体中国語設定で初期化
+cmdrun init --language chinese_simplified --template react-app
 ```
 
 ---
@@ -277,10 +281,12 @@ cmdrun retry
 
 ```bash
 # 失敗したテストを修正後に再実行
-npm run test  # 失敗
+cmdrun run test  # 失敗
 # ... コードを修正 ...
-cmdrun retry  # 同じテストコマンドを再実行
+cmdrun retry  # 最後に失敗したcmdrunコマンドを再実行
 ```
+
+**注意**: `cmdrun retry`は、**cmdrunで実行したコマンド**の履歴から最後に失敗したものを再実行します。シェルで直接実行したコマンド（`npm test`等）は対象外です。
 
 ---
 
@@ -992,8 +998,13 @@ cmdrun completion zsh
 # Fish補完スクリプト生成
 cmdrun completion fish
 
-# Bash補完のインストール (Linux)
+# Bash補完のインストール (Linux - system-wide)
+# 注意: system-wideインストールにはroot権限が必要です
 cmdrun completion bash | sudo tee /etc/bash_completion.d/cmdrun
+
+# Bash補完のインストール (Linux - ユーザー固有、sudo不要)
+mkdir -p ~/.local/share/bash-completion/completions
+cmdrun completion bash > ~/.local/share/bash-completion/completions/cmdrun
 
 # Zsh補完のインストール
 cmdrun completion zsh > "${fpath[1]}/_cmdrun"
@@ -1001,6 +1012,119 @@ cmdrun completion zsh > "${fpath[1]}/_cmdrun"
 # Fish補完のインストール
 cmdrun completion fish > ~/.config/fish/completions/cmdrun.fish
 ```
+
+**セキュリティ注意:**
+- system-wideインストール（`/etc/bash_completion.d/`）はroot権限が必要です
+- ユーザー固有インストールも可能です（sudo不要、上記参照）
+- 信頼できないスクリプトに対してsudoを使用しないでください
+
+#### Shell別の機能
+
+cmdrunのShell Completionは、各シェルの特性に応じた最適な補完体験を提供します。
+
+**Zsh:**
+- `Tab`を1回押下: 説明付きメニュー選択を表示
+- 矢印キーまたは`Tab`/`Shift+Tab`でナビゲート
+- 各コマンドの完全な説明を表示
+
+**Bash:**
+- `Tab`を2回押下: コマンド名リストを表示
+- 説明なし（Bashの制限）
+
+**Fish:**
+- `Tab`押下: 説明付きコマンドリストを表示
+- 矢印キーでナビゲート
+- 入力に応じて自動フィルタリング
+
+#### グローバル設定フォールバック
+
+ローカル`commands.toml`がなくても、グローバル設定ファイル（`~/.config/cmdrun/commands.toml`）からコマンドを補完します。
+プロジェクト外でもcmdrunの登録コマンドを利用可能です。
+
+```bash
+# ローカル設定がない場合でも動作
+cd /tmp
+cmdrun run [Tab]  # グローバル設定から補完
+```
+
+---
+
+### typo
+
+タイポ検出機能により、コマンド名の誤りを自動検出して修正候補を提示します。
+
+#### 構文
+
+この機能は自動的に動作します。設定で有効/無効を切り替えられます。
+
+#### 説明
+
+cmdrunは入力されたコマンド名の誤りを自動検出し、類似したコマンドを修正候補として提示します。
+Levenshtein距離アルゴリズムにより、タイプミスや綴り間違いを検出します。
+
+#### 動作例
+
+```bash
+$ cmdrun seach docker
+Error: Unknown command 'seach'
+
+もしかして:
+  → search (distance: 1)
+  → watch (distance: 2)
+
+利用可能なコマンドは 'cmdrun --help' で確認してください。
+```
+
+```bash
+$ cmdrun run biuld
+Unknown command 'biuld'
+
+💡 Did you mean one of these?
+  → build (distance: 2)
+
+Run 'cmdrun --help' for available commands.
+```
+
+#### 設定
+
+```toml
+[config]
+typo_detection = true        # タイポ検出を有効化（デフォルト: true）
+typo_threshold = 2           # 最大Levenshtein距離（デフォルト: 2）
+auto_correct = false         # 自動修正（デフォルト: false）
+```
+
+**設定項目:**
+
+- `typo_detection`: タイポ検出機能の有効/無効
+- `typo_threshold`: 修正候補を提示する最大編集距離（1-3推奨）
+- `auto_correct`: `true`の場合、候補が1つだけならば自動的に実行（注意して使用）
+
+#### 多言語対応
+
+エラーメッセージは設定言語に応じて表示されます:
+
+- **英語**: "Did you mean 'X'?"
+- **日本語**: "もしかして: 'X' ですか?"
+- **簡体中文**: "您是否想输入 'X'?"
+- **繁體中文**: "您是否想輸入 'X'?"
+
+#### 重要な注意事項
+
+**タイポ検出の対象範囲:**
+
+タイポ検出は`cmdrun run <コマンド名>`で実行するコマンド名に対してのみ機能します。
+
+```bash
+# タイポ検出が動作する例
+cmdrun run biuld    # → "build"を提案
+
+# タイポ検出が動作しない例
+cmdrun seach docker # サブコマンド "seach" 自体のタイポは検出しない
+```
+
+サブコマンド自体（search, remove, add等）のタイポは検出されません。
+`cmdrun --help`で正しいサブコマンドを確認してください。
 
 ---
 
@@ -1048,11 +1172,26 @@ cmdrunはグローバル設定ファイルを使用します:
 
 ### 言語設定
 
-cmdrunは日本語と英語をサポートしています。設定ファイルで言語を指定できます:
+cmdrunは4言語をサポートしています: **英語、日本語、簡体中国語（简体中文）、繁体中国語（繁體中文）**。
+
+設定ファイルで言語を指定できます:
 
 ```toml
 [config]
-language = "japanese"  # または "english" (デフォルト)
+language = "japanese"  # english / japanese / chinese_simplified / chinese_traditional (デフォルト: english)
+```
+
+**設定方法:**
+
+```bash
+# 日本語に設定
+cmdrun config set language japanese
+
+# 簡体中国語に設定
+cmdrun config set language chinese_simplified
+
+# 繁体中国語に設定
+cmdrun config set language chinese_traditional
 ```
 
 ### 環境変数
