@@ -313,17 +313,37 @@ fish -c 'source (cmdrun completion fish | psub); complete -C"cmdrun run "'
 
 ### 4.2 Typo Detection
 ```bash
-# 意図的なタイポでテスト
-cmdrun seach test    # "search" のタイポ
-cmdrun rmove test    # "remove" のタイポ
+# まずコマンドを追加（テスト用）
+cmdrun add build "cargo build" "Build the project"
+cmdrun add test "cargo test" "Run tests"
 
-# 期待: "Did you mean...?" 提案表示
+# 意図的なタイポでテスト（cmdrun run でコマンド名のタイポ）
+cmdrun run biuld    # "build" のタイポ
+# 期待（英語）: "Unknown command 'biuld'"
+#             "💡 Did you mean one of these?"
+#             "  → build (distance: 2)"
+
+cmdrun run tset     # "test" のタイポ
+# 期待（英語）: "→ test (distance: 2)" が提案される
+
+# 日本語でもテスト
+cmdrun config set language japanese
+cmdrun run biuld
+# 期待（日本語）: "不明なコマンド 'biuld'"
+#                 "💡 もしかして:"
+#                 "  → build (distance: 2)"
+
+# 英語に戻す
+cmdrun config set language english
 ```
-- [ ] タイポ検出動作
-- [ ] 修正候補提示
-- [ ] 多言語メッセージ対応（英語・日本語・中国語）
+- [ ] タイポ検出動作（英語）
+- [ ] 修正候補提示（distance表示あり）
+- [ ] 多言語メッセージ対応（日本語でも動作確認）
 
 ユーザー確認結果：（未確認）
+
+**注意**: Typo Detectionは `cmdrun run <コマンド名>` でのみ機能します。
+サブコマンド自体（search, remove等）のタイポは検出しません。
 
 ### 4.3 多言語対応（4言語）
 ```bash
@@ -331,13 +351,30 @@ cmdrun rmove test    # "remove" のタイポ
 cmdrun config show
 
 # 日本語テスト
-LANG=ja_JP.UTF-8 cmdrun add test-ja "echo テスト" "テストコマンド"
+cmdrun config set language japanese
+cmdrun add test-ja "echo テスト" "テストコマンド"
+# 期待: "コマンドを追加しました" と表示
+cmdrun list
+# 期待: "利用可能なコマンド" と表示
 
 # 中国語（簡体字）テスト
-LANG=zh_CN.UTF-8 cmdrun add test-cn "echo 测试" "测试命令"
+cmdrun config set language chinese_simplified
+cmdrun add test-cn "echo 测试" "测试命令"
+# 期待: "成功添加命令" と表示
+cmdrun list
+# 期待: "可用命令" と表示
 
 # 中国語（繁体字）テスト
-LANG=zh_TW.UTF-8 cmdrun add test-tw "echo 測試" "測試命令"
+cmdrun config set language chinese_traditional
+cmdrun add test-tw "echo 測試" "測試命令"
+# 期待: "成功新增命令" と表示
+cmdrun list
+# 期待: "可用命令" と表示
+
+# 英語に戻す
+cmdrun config set language english
+cmdrun list
+# 期待: "Available commands" と表示
 
 # 期待: 各言語でメッセージが正しく表示される
 ```
@@ -348,6 +385,9 @@ LANG=zh_TW.UTF-8 cmdrun add test-tw "echo 測試" "測試命令"
 - [ ] 9コマンドの多言語対応確認（add, search, init, remove, info, config, watch, validate, edit）
 
 ユーザー確認結果：（未確認）
+
+**重要**: cmdrunは環境変数LANGではなく、設定ファイル（commands.toml）の `language` 設定を使用します。
+`cmdrun config set language <言語名>` コマンドで言語を切り替えてください。
 
 ---
 
