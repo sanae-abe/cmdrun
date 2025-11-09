@@ -14,7 +14,6 @@ pub mod platform;
 pub mod plugin;
 pub mod security;
 pub mod template;
-pub mod tui;
 pub mod utils;
 pub mod watch;
 

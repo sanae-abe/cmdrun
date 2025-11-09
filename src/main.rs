@@ -7,7 +7,8 @@ use clap::Parser;
 #[cfg(feature = "plugin-system")]
 use cmdrun::cli::PluginAction;
 use cmdrun::cli::{
-    Cli, Commands, ConfigAction, EnvAction, GraphFormat, HistoryAction, TemplateAction,
+    Cli, ColorChoice, Commands, ConfigAction, EnvAction, GraphFormat, HistoryAction,
+    TemplateAction,
 };
 use cmdrun::command::dependency::DependencyGraph;
 use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
@@ -23,13 +24,41 @@ async fn main() {
     // Parse CLI arguments
     let cli = Cli::parse();
 
-    // Initialize logging
-    init_logging(cli.verbose);
+    // Configure color output (must be done before any colored output)
+    configure_color_output(cli.color);
+
+    // Initialize logging (skip for CompletionList to avoid polluting shell completion)
+    if !matches!(cli.command, Commands::CompletionList) {
+        init_logging(cli.verbose);
+    }
 
     // Run command
     if let Err(e) = run(cli).await {
         eprintln!("{} {}", "Error:".red().bold(), e);
         process::exit(1);
+    }
+}
+
+/// Configure colored output based on CLI arguments and environment
+fn configure_color_output(color_choice: ColorChoice) {
+    use colored::control;
+
+    match color_choice {
+        ColorChoice::Never => {
+            // Force disable colored output
+            control::set_override(false);
+        }
+        ColorChoice::Always => {
+            // Force enable colored output (even when piping)
+            control::set_override(true);
+        }
+        ColorChoice::Auto => {
+            // Respect NO_COLOR environment variable
+            if std::env::var("NO_COLOR").is_ok() {
+                control::set_override(false);
+            }
+            // Otherwise, let colored crate auto-detect (TTY/pipe)
+        }
     }
 }
 
@@ -223,18 +252,6 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_plugin_disable(&name, config_path).await?;
             }
         },
-        Commands::Interactive => {
-            // Load configuration
-            let config_loader = if let Some(ref path) = config_path {
-                ConfigLoader::with_path(path.clone())?
-            } else {
-                ConfigLoader::new()
-            };
-            let config = config_loader.load_with_environment().await?;
-
-            // Launch interactive mode
-            cmdrun::tui::run_interactive(config, config_path).await?;
-        }
     }
 
     Ok(())
@@ -257,7 +274,24 @@ async fn run_command(
     } else {
         ConfigLoader::new()
     };
-    let config = config_loader.load_with_environment().await?;
+
+    // Try to load config (with environment), fallback to global-only if no local config
+    let config = match config_loader.load_with_environment().await {
+        Ok(cfg) => cfg,
+        Err(_) => {
+            // If local config not found, try loading from global config
+            if let Some(global_dir) = dirs::config_dir() {
+                let global_path = global_dir.join("cmdrun").join("commands.toml");
+                if global_path.exists() {
+                    ConfigLoader::with_path(global_path)?.load().await?
+                } else {
+                    anyhow::bail!("No configuration file found. Run 'cmdrun init' to create one.");
+                }
+            } else {
+                anyhow::bail!("Cannot determine config directory");
+            }
+        }
+    };
 
     // Find command
     let command = match config.commands.get(name) {
@@ -522,18 +556,41 @@ async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -
     Ok(())
 }
 
-/// List command names for shell completion
+/// List command names for shell completion (with descriptions)
 async fn list_completion(config_path: Option<std::path::PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)?
     } else {
         ConfigLoader::new()
     };
-    let config = config_loader.load_with_environment().await?;
 
-    // Output command names one per line for shell completion
-    for name in config.commands.keys() {
-        println!("{}", name);
+    // Try to load config (with environment), fallback to global-only if no local config
+    let config = match config_loader.load_with_environment().await {
+        Ok(cfg) => cfg,
+        Err(_) => {
+            // If local config not found, try loading from global config
+            if let Some(global_dir) = dirs::config_dir() {
+                let global_path = global_dir.join("cmdrun").join("commands.toml");
+                if global_path.exists() {
+                    match ConfigLoader::with_path(global_path)?.load().await {
+                        Ok(cfg) => cfg,
+                        Err(_) => return Ok(()), // Global config invalid, return empty
+                    }
+                } else {
+                    return Ok(()); // No global config, return empty
+                }
+            } else {
+                return Ok(()); // Can't determine config directory, return empty
+            }
+        }
+    };
+
+    // Output command names with descriptions (format: "name:description")
+    // This format is compatible with bash/zsh completion systems
+    for (name, cmd) in config.commands.iter() {
+        // Escape colons in description to avoid parsing issues
+        let desc = cmd.description.replace(':', "\\:");
+        println!("{}:{}", name, desc);
     }
 
     Ok(())

@@ -1,0 +1,410 @@
+# Rust-Specific Concerns for cmdrun
+# Rustエコシステム特有の技術的課題とベストプラクティス
+
+meta:
+  version: "1.0.0"
+  project: "cmdrun"
+  msrv: "1.75+"
+
+# 生涯パラメータ・所有権の設計
+ownership_lifetime_design:
+  principles:
+    - "prefer owned types over references in public APIs"
+    - "use Cow<str> for flexible string handling"
+    - "avoid lifetime proliferation in complex types"
+
+  common_patterns:
+    command_config:
+      bad: |
+        pub struct Command<'a> {
+            name: &'a str,
+            args: Vec<&'a str>,
+        }
+      good: |
+        pub struct Command {
+            name: String,
+            args: Vec<String>,
+        }
+      rationale: "Public API should not expose lifetimes unnecessarily"
+
+    temporary_data:
+      use: |
+        use std::borrow::Cow;
+        pub fn process(data: Cow<str>) -> Result<String> {
+            // Can accept &str or String efficiently
+        }
+
+  agent_guidance:
+    rust-engineer:
+      review_checklist:
+        - "Minimize lifetime parameters in public APIs"
+        - "Use references internally, owned types at boundaries"
+        - "Prefer 'static lifetime for long-lived data"
+        - "Document non-obvious lifetime constraints"
+
+# マクロ・proc-macroの扱い
+macro_strategy:
+  declarative_macros:
+    use_cases:
+      - "Repetitive error handling patterns"
+      - "Test case generation"
+    example: |
+      macro_rules! assert_command_output {
+          ($cmd:expr, $expected:expr) => {
+              assert_eq!(run_command($cmd).unwrap(), $expected);
+          };
+      }
+
+  procedural_macros:
+    current_usage:
+      - crate: "clap"
+        feature: "derive"
+        purpose: "CLI argument parsing"
+
+    future_considerations:
+      - "Custom derive for command serialization"
+      - "Attribute macros for plugin registration"
+
+    complexity_warning: |
+      proc-macros増加 → コンパイル時間増加
+      必要性を慎重に検討すべき
+
+    agent: "rust-engineer"
+    review_criteria:
+      - "proc-macro is truly necessary (not just convenient)"
+      - "compile-time cost is acceptable"
+      - "alternative runtime solutions considered"
+
+# no_std対応の将来性
+no_std_support:
+  current_status: "not supported"
+  future_phase: "phase_5_embedded"
+
+  challenges:
+    - dependency: "tokio requires std"
+    - dependency: "clap requires std"
+    - solution: "separate no_std core library"
+
+  architecture_proposal:
+    cmdrun_core:
+      features: ["no_std", "alloc"]
+      responsibilities:
+        - "Command definition and parsing (minimal)"
+        - "Dependency resolution algorithm"
+        - "Core data structures"
+
+    cmdrun_cli:
+      features: ["std"]
+      dependencies: ["cmdrun_core", "tokio", "clap"]
+      responsibilities:
+        - "CLI interface"
+        - "File I/O"
+        - "Async execution"
+
+  agent: "embedded-systems"
+  trigger: "when embedded use cases emerge"
+
+# エラーハンドリングパターン
+error_handling_patterns:
+  library_vs_application:
+    library_crates:
+      use: "thiserror"
+      pattern: |
+        use thiserror::Error;
+
+        #[derive(Error, Debug)]
+        pub enum CommandError {
+            #[error("Command not found: {0}")]
+            NotFound(String),
+
+            #[error("Execution failed")]
+            ExecutionFailed(#[from] std::io::Error),
+        }
+
+    application_code:
+      use: "anyhow"
+      pattern: |
+        use anyhow::{Context, Result};
+
+        fn main() -> Result<()> {
+            run_command("test")
+                .context("Failed to run test command")?;
+            Ok(())
+        }
+
+  error_context_best_practices:
+    - "Always add context when propagating errors"
+    - "Include relevant debugging information"
+    - "User-friendly error messages at boundaries"
+    - "Developer-friendly error chains in logs"
+
+  agent: "error-handling-specialist"
+
+# 非同期プログラミングパターン
+async_programming_patterns:
+  tokio_runtime_selection:
+    cli_tool_recommendation: "current_thread"
+    rationale: |
+      CLIツールは通常I/Oバウンド + 短命なプロセス
+      multi_thread ランタイムは起動オーバーヘッド大
+
+    current: "rt-multi-thread"
+    recommended: |
+      #[tokio::main(flavor = "current_thread")]
+      async fn main() -> Result<()> {
+          // Faster startup for CLI
+      }
+
+    agent: "async-runtime-specialist"
+
+  blocking_operations:
+    problem: "Blocking tokio threads kills performance"
+    solution: |
+      use tokio::task::spawn_blocking;
+
+      async fn process_file(path: &Path) -> Result<String> {
+          let path = path.to_owned();
+          spawn_blocking(move || {
+              std::fs::read_to_string(path)
+          })
+          .await?
+      }
+
+    agent: "async-runtime-specialist"
+
+  async_trait_objects:
+    use_case: "Plugin system with async methods"
+    solution: |
+      use async_trait::async_trait;
+
+      #[async_trait]
+      pub trait Plugin: Send + Sync {
+          async fn execute(&self, cmd: &Command) -> Result<Output>;
+      }
+
+    agent: "rust-engineer"
+
+# 並行性・並列性パターン
+concurrency_patterns:
+  channels:
+    mpsc:
+      use_case: "Task queue, producer-consumer"
+      example: |
+        let (tx, mut rx) = tokio::sync::mpsc::channel(100);
+        tokio::spawn(async move {
+            while let Some(msg) = rx.recv().await {
+                // process
+            }
+        });
+
+    broadcast:
+      use_case: "Event broadcasting to multiple listeners"
+
+    watch:
+      use_case: "Configuration reloading"
+
+  parallel_execution:
+    use: "tokio::spawn + JoinSet"
+    example: |
+      use tokio::task::JoinSet;
+
+      let mut set = JoinSet::new();
+      for cmd in commands {
+          set.spawn(execute_command(cmd));
+      }
+      while let Some(res) = set.join_next().await {
+          // handle result
+      }
+
+    agent: "async-runtime-specialist"
+
+  race_conditions:
+    detection: "tokio-console for runtime inspection"
+    prevention: "Mutex, RwLock, atomic types"
+    agent: "rust-engineer"
+
+# 型システム活用
+type_system_advanced:
+  newtype_pattern:
+    use_case: "Type-safe IDs, validated strings"
+    example: |
+      #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+      pub struct CommandId(String);
+
+      impl CommandId {
+          pub fn new(id: impl Into<String>) -> Result<Self> {
+              let id = id.into();
+              if id.is_empty() {
+                  return Err(anyhow!("CommandId cannot be empty"));
+              }
+              Ok(Self(id))
+          }
+      }
+
+    agent: "rust-engineer"
+
+  phantom_types:
+    use_case: "Compile-time state machine"
+    example: |
+      pub struct Command<State> {
+          name: String,
+          _state: PhantomData<State>,
+      }
+
+      pub struct Validated;
+      pub struct Unvalidated;
+
+      impl Command<Unvalidated> {
+          pub fn validate(self) -> Result<Command<Validated>> {
+              // validation logic
+          }
+      }
+
+      impl Command<Validated> {
+          pub fn execute(self) -> Result<Output> {
+              // only validated commands can execute
+          }
+      }
+
+    agent: "rust-engineer"
+
+  trait_objects_vs_generics:
+    static_dispatch:
+      use: "Generics with trait bounds"
+      pros: ["Zero-cost abstraction", "Monomorphization"]
+      cons: ["Code bloat", "Compile time increase"]
+
+    dynamic_dispatch:
+      use: "dyn Trait"
+      pros: ["Smaller binary", "Runtime flexibility"]
+      cons: ["Virtual dispatch overhead"]
+
+    guidance: |
+      - Performance-critical paths: static dispatch
+      - Plugin systems: dynamic dispatch
+      - Internal APIs: prefer generics
+      - Public APIs: consider both
+
+    agent: "rust-engineer"
+
+# unsafe コードレビュー
+unsafe_code_review:
+  policy: "Avoid unless absolutely necessary"
+
+  justifiable_use_cases:
+    - "FFI to system libraries"
+    - "Performance-critical inner loops (after profiling)"
+    - "Memory layout guarantees"
+
+  documentation_template: |
+    /// # Safety
+    ///
+    /// This function is safe to call if and only if:
+    /// 1. The pointer `ptr` is valid and properly aligned
+    /// 2. The pointed-to data outlives this function call
+    /// 3. No other mutable references to the data exist
+    ///
+    /// # Verification
+    ///
+    /// - Tested with Miri: `cargo +nightly miri test`
+    /// - Fuzz tested with proptest for 10,000 iterations
+    /// - Manually reviewed by @reviewer on YYYY-MM-DD
+
+  agent: "unsafe-code-auditor"
+
+  audit_tools:
+    - name: "miri"
+      command: "cargo +nightly miri test"
+      purpose: "Detect undefined behavior"
+
+    - name: "valgrind"
+      command: "valgrind --leak-check=full target/debug/cmdrun"
+      purpose: "Memory leak detection"
+
+    - name: "address-sanitizer"
+      command: "RUSTFLAGS=-Zsanitizer=address cargo +nightly build"
+      purpose: "Memory safety violations"
+
+# コンパイル時間最適化
+compile_time_optimization:
+  strategies:
+    sccache:
+      install: "cargo install sccache"
+      config: |
+        # .cargo/config.toml
+        [build]
+        rustc-wrapper = "sccache"
+
+    lld_linker:
+      config: |
+        # .cargo/config.toml
+        [target.x86_64-unknown-linux-gnu]
+        linker = "clang"
+        rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+
+    incremental_compilation:
+      dev_profile: |
+        [profile.dev]
+        incremental = true
+
+    workspace_optimization:
+      strategy: "Share dependencies across workspace members"
+
+  measurement:
+    tool: "cargo build --timings"
+    output: "cargo-timing.html"
+
+  agent: "cargo-specialist"
+
+# Feature Flags戦略
+feature_flags_strategy:
+  design_principles:
+    - "default = minimal feature set"
+    - "additive only (no mutually exclusive features)"
+    - "clear documentation for each feature"
+
+  example_structure: |
+    [features]
+    default = ["cli", "config-toml"]
+
+    # Core features
+    cli = ["dep:clap"]
+    config-toml = ["dep:toml"]
+    config-yaml = ["dep:serde_yaml"]
+
+    # Optional features
+    watch = ["dep:notify"]
+    server = ["dep:tonic", "dep:tokio/full"]
+    plugins = ["dep:libloading"]
+
+    # Performance features
+    fast-hash = ["dep:ahash"]
+    small-vec = ["dep:smallvec"]
+
+    # Security features
+    audit = []  # enables extra security checks
+
+  agent: "cargo-specialist"
+
+# クロスコンパイル戦略
+cross_compilation:
+  targets:
+    tier_1:
+      - "x86_64-unknown-linux-gnu"
+      - "x86_64-apple-darwin"
+      - "x86_64-pc-windows-msvc"
+
+    tier_2:
+      - "aarch64-unknown-linux-gnu"  # ARM64 Linux
+      - "aarch64-apple-darwin"        # Apple Silicon
+      - "x86_64-unknown-linux-musl"   # Static binary
+
+  tools:
+    - name: "cross"
+      install: "cargo install cross"
+      usage: "cross build --target aarch64-unknown-linux-gnu"
+
+  ci_integration:
+    strategy: "Build matrix for all tier-1 targets"
+
+  agent: "cargo-specialist"

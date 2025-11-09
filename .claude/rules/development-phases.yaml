@@ -1,0 +1,363 @@
+# Development Phases for cmdrun
+# Rustプロジェクトのライフサイクルに合わせた段階的開発計画
+
+meta:
+  version: "1.0.0"
+  project: "cmdrun"
+  methodology: "rust-iterative-delivery"
+
+# Phase 0: Foundation (完了想定)
+phase_0_foundation:
+  status: "completed"
+  milestone: "v0.1.0"
+  deliverables:
+    - "Core CLI with clap"
+    - "TOML configuration parsing"
+    - "Basic command execution"
+    - "tokio async runtime integration"
+
+# Phase 1: Stabilization & Security (現在)
+phase_1_stabilization:
+  status: "in_progress"
+  milestone: "v1.0.0"
+  duration: "2-3 months"
+
+  objectives:
+    - "Production-ready security"
+    - "Performance targets achieved"
+    - "Comprehensive test coverage"
+    - "API stability"
+
+  agents_primary:
+    - "rust-engineer"
+    - "security-auditor"
+    - "unsafe-code-auditor"
+    - "performance-engineer"
+    - "dependency-auditor"
+    - "test-automator"
+
+  tasks:
+    security:
+      - task: "Implement cargo-audit in CI"
+        agent: "dependency-auditor"
+        priority: "P0"
+
+      - task: "Add cargo-deny configuration"
+        agent: "dependency-auditor"
+        priority: "P0"
+
+      - task: "Shell injection fuzzing with cargo-fuzz"
+        agent: "security-auditor"
+        priority: "P0"
+
+      - task: "Audit all unsafe blocks (if any) with miri"
+        agent: "unsafe-code-auditor"
+        priority: "P1"
+
+      - task: "secrets-handling audit with secrecy crate"
+        agent: "security-auditor"
+        priority: "P1"
+
+    performance:
+      - task: "Achieve 4ms startup time"
+        agent: "performance-engineer"
+        priority: "P0"
+
+      - task: "Memory footprint <= 10MB"
+        agent: "performance-engineer"
+        priority: "P0"
+
+      - task: "Setup criterion benchmarks"
+        agent: "performance-engineer"
+        priority: "P1"
+
+      - task: "Configure LTO, codegen optimizations"
+        agent: "cargo-specialist"
+        priority: "P1"
+
+      - task: "Binary size <= 5MB (stripped)"
+        agent: "performance-engineer"
+        priority: "P2"
+
+    testing:
+      - task: "Test coverage >= 80%"
+        agent: "test-automator"
+        priority: "P1"
+
+      - task: "Property-based testing with proptest"
+        agent: "test-automator"
+        priority: "P1"
+
+      - task: "Integration test suite"
+        agent: "test-automator"
+        priority: "P1"
+
+    api_stability:
+      - task: "Public API review and freeze"
+        agent: "rust-engineer"
+        priority: "P0"
+
+      - task: "Semantic versioning policy"
+        agent: "cargo-specialist"
+        priority: "P1"
+
+  success_criteria:
+    - "cargo audit: no vulnerabilities"
+    - "cargo deny: all checks passing"
+    - "startup time: < 4ms"
+    - "memory: < 10MB"
+    - "test coverage: >= 80%"
+    - "clippy: no warnings"
+    - "API: documented and stable"
+
+# Phase 2: Extensibility & Performance
+phase_2_extensibility:
+  status: "planned"
+  milestone: "v1.5.0"
+  duration: "3-4 months"
+  depends_on: "phase_1_stabilization"
+
+  objectives:
+    - "Plugin system for extensibility"
+    - "Advanced performance optimizations"
+    - "Enhanced developer experience"
+
+  agents_primary:
+    - "rust-engineer"
+    - "cargo-specialist"
+    - "performance-engineer"
+    - "async-runtime-specialist"
+
+  tasks:
+    plugin_system:
+      - task: "Design safe plugin API"
+        agent: "rust-engineer"
+        priority: "P0"
+        details: |
+          - abi_stable or dynamic loading via libloading
+          - Sandboxing via WebAssembly (wasmtime)?
+          - Trait-based plugin interface
+
+      - task: "Plugin discovery and loading"
+        agent: "cargo-specialist"
+        priority: "P1"
+
+      - task: "Plugin security audit"
+        agent: "security-auditor"
+        priority: "P0"
+
+    performance_v2:
+      - task: "Parallel task execution optimization"
+        agent: "async-runtime-specialist"
+        priority: "P1"
+
+      - task: "Incremental computation caching"
+        agent: "performance-engineer"
+        priority: "P1"
+
+      - task: "SIMD optimizations (if applicable)"
+        agent: "performance-engineer"
+        priority: "P2"
+
+    developer_experience:
+      - task: "Watch mode with smart rebuilds"
+        agent: "rust-engineer"
+        priority: "P1"
+
+      - task: "Interactive mode with dialoguer"
+        agent: "cli-developer"
+        priority: "P1"
+
+      - task: "Shell completions (bash, zsh, fish)"
+        agent: "cli-developer"
+        priority: "P2"
+
+  success_criteria:
+    - "Plugin API stable and documented"
+    - "At least 3 example plugins"
+    - "Performance regression: 0%"
+    - "DX survey: >= 4.5/5"
+
+# Phase 3: Advanced Features
+phase_3_advanced:
+  status: "future"
+  milestone: "v2.0.0"
+  duration: "4-6 months"
+  depends_on: "phase_2_extensibility"
+
+  objectives:
+    - "Distributed execution (optional server mode)"
+    - "Advanced workflow orchestration"
+    - "Cloud-native integrations"
+
+  agents_primary:
+    - "rust-engineer"
+    - "microservices-architect"
+    - "async-runtime-specialist"
+    - "sre-engineer"
+
+  tasks:
+    server_mode:
+      - task: "Design client-server protocol"
+        agent: "microservices-architect"
+        priority: "P0"
+        details: |
+          - gRPC with tonic
+          - or HTTP/2 with hyper
+          - Authentication and authorization
+
+      - task: "Implement server daemon"
+        agent: "rust-engineer"
+        priority: "P1"
+
+      - task: "Client-server security audit"
+        agent: "security-auditor"
+        priority: "P0"
+
+    advanced_orchestration:
+      - task: "DAG visualization and debugging"
+        agent: "workflow-orchestrator"
+        priority: "P1"
+
+      - task: "Remote task execution"
+        agent: "async-runtime-specialist"
+        priority: "P1"
+
+      - task: "Task result caching and deduplication"
+        agent: "performance-engineer"
+        priority: "P2"
+
+  success_criteria:
+    - "Server mode stable and production-ready"
+    - "Multi-machine orchestration working"
+    - "Security audit passed"
+
+# Phase 4: Ecosystem & AI
+phase_4_ecosystem:
+  status: "future"
+  milestone: "v2.5.0"
+  duration: "6-12 months"
+  depends_on: "phase_3_advanced"
+
+  objectives:
+    - "Kubernetes operator"
+    - "AI-driven command suggestions"
+    - "Observability and monitoring"
+
+  agents_primary:
+    - "kubernetes-specialist"
+    - "llm-architect"
+    - "sre-engineer"
+    - "observability-engineer"
+
+  tasks:
+    kubernetes:
+      - task: "Kubernetes operator with kube-rs"
+        agent: "kubernetes-specialist"
+        priority: "P1"
+
+      - task: "Helm charts for deployment"
+        agent: "kubernetes-specialist"
+        priority: "P2"
+
+    ai_integration:
+      - task: "Natural language command generation"
+        agent: "llm-architect"
+        priority: "P2"
+
+      - task: "Smart command completion"
+        agent: "llm-architect"
+        priority: "P2"
+
+    observability:
+      - task: "OpenTelemetry integration"
+        agent: "sre-engineer"
+        priority: "P1"
+
+      - task: "Prometheus metrics export"
+        agent: "sre-engineer"
+        priority: "P1"
+
+# Phase 5: Embedded & Extreme Optimization
+phase_5_embedded:
+  status: "future"
+  milestone: "v3.0.0"
+  depends_on: "phase_2_extensibility"
+  optional: true
+
+  objectives:
+    - "no_std support for embedded systems"
+    - "Extreme binary size reduction (<1MB)"
+    - "Cross-compilation for all targets"
+
+  agents_primary:
+    - "embedded-systems"
+    - "rust-engineer"
+    - "performance-engineer"
+
+  tasks:
+    - task: "no_std compatibility layer"
+      agent: "embedded-systems"
+      priority: "P1"
+
+    - task: "Minimal runtime with no allocator"
+      agent: "embedded-systems"
+      priority: "P1"
+
+    - task: "Cross-compile to ARM, RISC-V, WASM"
+      agent: "cargo-specialist"
+      priority: "P2"
+
+# Continuous Activities (全フェーズ共通)
+continuous_activities:
+  maintenance:
+    - activity: "Dependency updates"
+      agent: "dependency-auditor"
+      frequency: "weekly"
+
+    - activity: "Security audits"
+      agent: "security-auditor"
+      frequency: "monthly"
+
+    - activity: "Performance monitoring"
+      agent: "performance-engineer"
+      frequency: "per-release"
+
+    - activity: "Documentation updates"
+      agent: "documentation-engineer"
+      frequency: "per-feature"
+
+  sre:
+    - activity: "Incident response"
+      agent: "sre-engineer"
+      trigger: "on-demand"
+
+    - activity: "Reliability improvements"
+      agent: "sre-engineer"
+      frequency: "quarterly"
+
+# Agent活用マトリクス
+agent_usage_matrix:
+  phase_1:
+    critical: ["rust-engineer", "security-auditor", "performance-engineer"]
+    high: ["dependency-auditor", "test-automator", "unsafe-code-auditor"]
+    medium: ["cargo-specialist", "cli-developer"]
+
+  phase_2:
+    critical: ["rust-engineer", "cargo-specialist"]
+    high: ["performance-engineer", "async-runtime-specialist"]
+    medium: ["security-auditor", "cli-developer"]
+
+  phase_3:
+    critical: ["rust-engineer", "microservices-architect"]
+    high: ["async-runtime-specialist", "security-auditor"]
+    medium: ["sre-engineer"]
+
+  phase_4:
+    critical: ["kubernetes-specialist", "sre-engineer"]
+    high: ["llm-architect", "observability-engineer"]
+    medium: ["rust-engineer"]
+
+  phase_5:
+    critical: ["embedded-systems", "rust-engineer"]
+    high: ["performance-engineer", "cargo-specialist"]

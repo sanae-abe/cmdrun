@@ -1,0 +1,280 @@
+# Rust Security Standards for cmdrun
+# Rustエコシステム特有のセキュリティ基準とツール統合
+
+meta:
+  version: "1.0.0"
+  project: "cmdrun"
+  compliance: ["OWASP Top 10", "Rust Security WG"]
+
+# Rustセキュリティ階層
+security_layers:
+  layer_1_language_safety:
+    focus: "Rust型システムによるメモリ安全性"
+    checks:
+      unsafe_code:
+        policy: "minimize"
+        audit_tool: "miri"
+        documentation: "mandatory for all unsafe blocks"
+        rationale: |
+          unsafeは必要最小限に。
+          各unsafeブロックに安全性の証明コメントを記載。
+
+      memory_safety:
+        violations: "compile-time-prevented"
+        runtime_checks: "debug assertions"
+
+      lifetime_correctness:
+        enforced_by: "rust-compiler"
+
+    agent: "unsafe-code-auditor"
+
+  layer_2_dependency_security:
+    focus: "依存クレートの脆弱性管理"
+    tools:
+      cargo_audit:
+        description: "RustSec Advisory Database チェック"
+        frequency: "daily"
+        ci_integration: true
+        fail_on: "vulnerabilities"
+        command: "cargo audit"
+
+      cargo_deny:
+        description: "依存関係・ライセンス・ソースの検証"
+        config_file: "deny.toml"
+        checks:
+          advisories:
+            enabled: true
+            severity_threshold: "medium"
+
+          licenses:
+            enabled: true
+            allowed: ["MIT", "Apache-2.0", "BSD-3-Clause"]
+            denied: ["GPL-3.0", "AGPL-3.0"]
+
+          bans:
+            enabled: true
+            multiple_versions: "deny"
+            wildcards: "deny"
+
+          sources:
+            enabled: true
+            allowed_sources: ["crates.io"]
+
+        command: "cargo deny check"
+        ci_integration: true
+
+      cargo_outdated:
+        description: "古い依存関係の検出"
+        frequency: "weekly"
+        command: "cargo outdated --root-deps-only"
+
+    agent: "dependency-auditor"
+
+  layer_3_application_security:
+    focus: "アプリケーションレベルのセキュリティ"
+    threats:
+      shell_injection:
+        risk: "critical"
+        mitigation:
+          tool: "shell-words"
+          validation: "all user input must be escaped"
+          test_coverage: "100% for interpolation.rs"
+
+        agent: "security-auditor"
+
+      path_traversal:
+        risk: "high"
+        mitigation:
+          validation: "canonicalize paths, check prefix"
+          test_cases:
+            - "../../../etc/passwd"
+            - "~/.ssh/id_rsa"
+            - "file:///etc/passwd"
+
+        agent: "security-auditor"
+
+      secrets_exposure:
+        risk: "high"
+        mitigation:
+          tool: "secrecy crate"
+          policy: "never log secrets, zero on drop"
+          test: "ensure secrets not in debug output"
+
+        agent: "security-auditor"
+
+      command_injection:
+        risk: "critical"
+        mitigation:
+          approach: "avoid shell, use Command::new() directly"
+          validation: "whitelist allowed commands"
+
+        agent: "security-auditor"
+
+  layer_4_build_supply_chain:
+    focus: "ビルドプロセスのセキュリティ"
+    checks:
+      reproducible_builds:
+        enabled: "future"
+        tool: "cargo-auditable"
+
+      sbom_generation:
+        enabled: true
+        tool: "cargo-sbom"
+        format: "SPDX"
+
+      vendor_verification:
+        enabled: true
+        tool: "cargo vendor"
+        policy: "all deps must be from crates.io"
+
+    agent: "compliance-auditor"
+
+# セキュリティテスト
+security_tests:
+  fuzzing:
+    tool: "cargo-fuzz"
+    targets:
+      - "src/command/interpolation.rs"
+      - "src/security/validation.rs"
+    frequency: "weekly"
+    agent: "test-automator"
+
+  property_based_testing:
+    tool: "proptest"
+    focus:
+      - "shell-words escaping correctness"
+      - "path validation edge cases"
+    agent: "test-automator"
+
+  penetration_testing:
+    manual: true
+    frequency: "pre-release"
+    checklist:
+      - "attempt shell injection via all input vectors"
+      - "test path traversal with malicious paths"
+      - "verify secrets are zeroed on drop"
+      - "check for timing attacks in auth logic"
+    agent: "security-auditor"
+
+# CI/CD統合
+ci_security_checks:
+  required_checks:
+    - name: "cargo audit"
+      command: "cargo audit"
+      fail_on_error: true
+
+    - name: "cargo deny"
+      command: "cargo deny check"
+      fail_on_error: true
+
+    - name: "clippy security lints"
+      command: "cargo clippy -- -D warnings -W clippy::all -W clippy::pedantic -W clippy::nursery"
+      fail_on_error: true
+
+  optional_checks:
+    - name: "miri (unsafe code audit)"
+      command: "cargo +nightly miri test"
+      enabled_if: "unsafe code present"
+      fail_on_error: true
+
+    - name: "cargo fuzz"
+      command: "cargo fuzz run interpolation -- -max_total_time=300"
+      frequency: "weekly"
+      fail_on_error: false
+
+# Agent自動起動ルール
+agent_auto_invoke:
+  unsafe-code-auditor:
+    trigger:
+      - "PR contains 'unsafe' keyword"
+      - "miri test failure"
+    tasks:
+      - "review unsafe justification"
+      - "verify safety invariants documented"
+      - "run miri on affected code"
+
+  dependency-auditor:
+    trigger:
+      - "Cargo.toml modified"
+      - "cargo audit reports vulnerability"
+    tasks:
+      - "check for known vulnerabilities"
+      - "verify license compliance"
+      - "minimize transitive dependencies"
+
+  security-auditor:
+    trigger:
+      - "interpolation.rs modified"
+      - "security/ directory modified"
+      - "shell-words usage added"
+    tasks:
+      - "review for injection vulnerabilities"
+      - "verify input validation"
+      - "check secrets handling"
+
+# セキュリティドキュメント要件
+documentation_requirements:
+  unsafe_blocks:
+    mandatory: true
+    format: |
+      /// # Safety
+      ///
+      /// This unsafe block is safe because:
+      /// 1. [具体的な不変条件]
+      /// 2. [メモリ安全性の証明]
+      /// 3. [テストによる検証]
+
+  threat_model:
+    location: "docs/security/THREAT_MODEL.md"
+    sections:
+      - "Attack Surface"
+      - "Trust Boundaries"
+      - "Mitigation Strategies"
+
+  security_advisories:
+    location: "SECURITY.md"
+    includes:
+      - "Vulnerability reporting process"
+      - "Security update policy"
+
+# 脆弱性スキャナー設定
+scanners:
+  cargo_audit:
+    config_file: "audit.toml"
+    ignored_advisories: []  # 無視する既知の脆弱性IDリスト
+
+  cargo_deny:
+    config_file: "deny.toml"
+
+  trivy:
+    enabled: false  # Dockerコンテナ使用時に有効化
+    command: "trivy image cmdrun:latest"
+
+# コンプライアンス
+compliance_standards:
+  owasp_top_10:
+    - "A01:2021 - Broken Access Control"
+    - "A02:2021 - Cryptographic Failures"
+    - "A03:2021 - Injection"
+    - "A04:2021 - Insecure Design"
+    - "A05:2021 - Security Misconfiguration"
+    - "A06:2021 - Vulnerable and Outdated Components"
+    - "A07:2021 - Identification and Authentication Failures"
+    - "A08:2021 - Software and Data Integrity Failures"
+    - "A09:2021 - Security Logging and Monitoring Failures"
+    - "A10:2021 - Server-Side Request Forgery (SSRF)"
+
+  rust_security_wg:
+    advisory_db: "https://github.com/RustSec/advisory-db"
+    participation: "monitor advisories"
+
+# リリース前セキュリティチェックリスト
+release_security_checklist:
+  - "cargo audit passing"
+  - "cargo deny passing"
+  - "no unsafe code without documentation"
+  - "miri tests passing (if unsafe present)"
+  - "fuzzing run completed"
+  - "penetration testing completed"
+  - "SECURITY.md up to date"
+  - "threat model reviewed"

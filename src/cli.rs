@@ -3,6 +3,17 @@
 use clap::{Parser, Subcommand, ValueEnum};
 use std::path::PathBuf;
 
+/// Color output control
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum ColorChoice {
+    /// Never use colored output
+    Never,
+    /// Automatically detect (TTY/pipe detection)
+    Auto,
+    /// Always use colored output
+    Always,
+}
+
 #[derive(Parser, Debug)]
 #[command(
     name = "cmdrun",
@@ -29,6 +40,17 @@ pub struct Cli {
     /// purposes (work, personal, projects, environments, etc.)
     #[arg(short, long, value_name = "FILE", global = true)]
     pub config: Option<PathBuf>,
+
+    /// Control colored output
+    ///
+    /// Choose when to use colored output. The default is 'auto', which
+    /// automatically enables color when outputting to a terminal and disables
+    /// it when piping to another command. Use 'never' to disable colors
+    /// completely, or 'always' to force colors even when piping.
+    ///
+    /// Respects the NO_COLOR environment variable (https://no-color.org/).
+    #[arg(long, value_enum, default_value = "auto", global = true)]
+    pub color: ColorChoice,
 
     /// Subcommand to execute
     #[command(subcommand)]
@@ -413,24 +435,6 @@ pub enum Commands {
         action: PluginAction,
     },
 
-    /// Interactive mode - fuzzy finder for command selection
-    ///
-    /// Launch an interactive terminal UI with fuzzy search for selecting
-    /// and executing commands. This provides a user-friendly way to explore
-    /// available commands and see detailed information before execution.
-    ///
-    /// Features:
-    ///   - Incremental fuzzy search
-    ///   - Real-time command preview
-    ///   - Keyboard navigation (↑↓ or j/k)
-    ///   - Execution statistics from history
-    ///
-    /// Examples:
-    ///   cmdrun interactive
-    ///   cmdrun interactive -c path/to/commands.toml
-    ///   cmdrun -i               # Short alias
-    #[command(visible_alias = "i")]
-    Interactive,
 }
 
 /// Configuration management actions

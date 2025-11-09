@@ -595,6 +595,73 @@ cmd.windows = "start http://localhost:3000"
 cmd.linux = "xdg-open http://localhost:3000"
 ```
 
+## Color Output Control
+
+cmdrun automatically detects whether it's outputting to a terminal and adjusts color output accordingly.
+
+### Controlling Color Output
+
+**Method 1: Using `--color` flag (recommended)**
+
+```bash
+# Disable colored output
+cmdrun list --color=never
+
+# Force colored output (even when piping)
+cmdrun list --color=always | less -R
+
+# Automatic detection (default)
+cmdrun list --color=auto
+```
+
+**Method 2: Using `NO_COLOR` environment variable**
+
+```bash
+# Disable colored output for a single command
+NO_COLOR=1 cmdrun list
+
+# Disable colored output globally
+export NO_COLOR=1
+cmdrun list
+```
+
+**Method 3: Automatic detection (default behavior)**
+
+```bash
+# Colors enabled when outputting to terminal
+cmdrun list
+
+# Colors automatically disabled when piping
+cmdrun list | grep build
+cmdrun list > commands.txt
+```
+
+### CI/CD Usage
+
+For CI/CD environments, you can disable colors to keep logs clean:
+
+```yaml
+# GitHub Actions
+- name: Run tests
+  run: cmdrun run test --color=never
+  # or
+  env:
+    NO_COLOR: 1
+  run: cmdrun run test
+
+# GitLab CI
+script:
+  - cmdrun run deploy --color=never
+```
+
+### Priority Order
+
+1. `--color` flag (highest priority)
+2. `NO_COLOR` environment variable
+3. Automatic TTY/pipe detection (default)
+
+For more details, see the [CLI Reference](docs/user-guide/CLI.md).
+
 ## Documentation
 
 ### User Guide

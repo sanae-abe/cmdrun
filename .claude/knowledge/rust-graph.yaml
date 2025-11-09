@@ -1,0 +1,456 @@
+# cmdrun Rust Knowledge Graph
+# Rust エコシステム特化の依存関係・ツール・パターンのグラフ表現
+
+meta:
+  version: "1.0.0"
+  project: "cmdrun"
+  language: "rust"
+  msrv: "1.75+"
+  last_update: "2025-11-09"
+
+# ノード定義
+nodes:
+  # Crates（依存関係）
+  - id: "crate-tokio"
+    type: "Crate"
+    name: "tokio"
+    category: "async-runtime"
+    version_requirement: "^1.0"
+    features: ["full", "rt-multi-thread"]
+    performance_impact: "high"
+    startup_cost_ms: 1.5
+    memory_footprint_kb: 2048
+
+  - id: "crate-clap"
+    type: "Crate"
+    name: "clap"
+    category: "cli"
+    version_requirement: "^4.0"
+    features: ["derive", "env"]
+    performance_impact: "medium"
+    startup_cost_ms: 0.8
+
+  - id: "crate-toml"
+    type: "Crate"
+    name: "toml"
+    category: "config"
+    version_requirement: "^0.8"
+    performance_impact: "medium"
+    alternatives: ["toml_edit", "serde_toml"]
+
+  - id: "crate-shell-words"
+    type: "Crate"
+    name: "shell-words"
+    category: "security"
+    version_requirement: "^1.1"
+    security_critical: true
+
+  - id: "crate-secrecy"
+    type: "Crate"
+    name: "secrecy"
+    category: "security"
+    version_requirement: "^0.8"
+    security_critical: true
+
+  - id: "crate-anyhow"
+    type: "Crate"
+    name: "anyhow"
+    category: "error-handling"
+    version_requirement: "^1.0"
+    use_case: "application-level"
+
+  - id: "crate-thiserror"
+    type: "Crate"
+    name: "thiserror"
+    category: "error-handling"
+    version_requirement: "^1.0"
+    use_case: "library-level"
+
+  - id: "crate-ahash"
+    type: "Crate"
+    name: "ahash"
+    category: "performance"
+    version_requirement: "^0.8"
+    optimization: "hash-algorithm"
+
+  - id: "crate-smallvec"
+    type: "Crate"
+    name: "smallvec"
+    category: "performance"
+    version_requirement: "^1.11"
+    optimization: "stack-allocation"
+
+  - id: "crate-notify"
+    type: "Crate"
+    name: "notify"
+    category: "file-watch"
+    version_requirement: "^6.0"
+
+  - id: "crate-criterion"
+    type: "Crate"
+    name: "criterion"
+    category: "benchmarking"
+    version_requirement: "^0.5"
+    dev_dependency: true
+
+  - id: "crate-proptest"
+    type: "Crate"
+    name: "proptest"
+    category: "testing"
+    version_requirement: "^1.4"
+    dev_dependency: true
+
+  # Tools（開発ツール）
+  - id: "tool-cargo"
+    type: "Tool"
+    name: "cargo"
+    category: "build-system"
+    essential: true
+
+  - id: "tool-rustfmt"
+    type: "Tool"
+    name: "rustfmt"
+    category: "formatter"
+    essential: true
+    config_file: "rustfmt.toml"
+
+  - id: "tool-clippy"
+    type: "Tool"
+    name: "clippy"
+    category: "linter"
+    essential: true
+    lint_level: "pedantic"
+
+  - id: "tool-cargo-audit"
+    type: "Tool"
+    name: "cargo-audit"
+    category: "security"
+    essential: true
+    frequency: "daily"
+
+  - id: "tool-cargo-deny"
+    type: "Tool"
+    name: "cargo-deny"
+    category: "security"
+    essential: true
+    checks: ["advisories", "licenses", "bans", "sources"]
+
+  - id: "tool-miri"
+    type: "Tool"
+    name: "miri"
+    category: "unsafe-audit"
+    essential: false
+    use_case: "unsafe-code-present"
+
+  - id: "tool-cargo-flamegraph"
+    type: "Tool"
+    name: "cargo-flamegraph"
+    category: "profiling"
+    essential: false
+    use_case: "performance-optimization"
+
+  - id: "tool-cargo-bloat"
+    type: "Tool"
+    name: "cargo-bloat"
+    category: "binary-size"
+    essential: false
+    use_case: "binary-size-optimization"
+
+  - id: "tool-sccache"
+    type: "Tool"
+    name: "sccache"
+    category: "build-cache"
+    essential: false
+    build_time_reduction: "50-70%"
+
+  - id: "tool-lld"
+    type: "Tool"
+    name: "lld"
+    category: "linker"
+    essential: false
+    link_time_reduction: "2-5x"
+
+  # Agents
+  - id: "agent-rust-engineer"
+    type: "Agent"
+    name: "rust-engineer"
+    specialization: "rust-general"
+
+  - id: "agent-cargo-specialist"
+    type: "Agent"
+    name: "cargo-specialist"
+    specialization: "cargo-ecosystem"
+
+  - id: "agent-async-specialist"
+    type: "Agent"
+    name: "async-runtime-specialist"
+    specialization: "tokio-async"
+
+  - id: "agent-unsafe-auditor"
+    type: "Agent"
+    name: "unsafe-code-auditor"
+    specialization: "unsafe-memory-safety"
+
+  - id: "agent-security-auditor"
+    type: "Agent"
+    name: "security-auditor"
+    specialization: "security-general"
+
+  - id: "agent-performance-engineer"
+    type: "Agent"
+    name: "performance-engineer"
+    specialization: "performance-optimization"
+
+  - id: "agent-dependency-auditor"
+    type: "Agent"
+    name: "dependency-auditor"
+    specialization: "dependency-management"
+
+  # Modules（ソースコードモジュール）
+  - id: "mod-executor"
+    type: "Module"
+    path: "src/command/executor.rs"
+    concerns: ["async", "performance", "error-handling"]
+
+  - id: "mod-interpolation"
+    type: "Module"
+    path: "src/command/interpolation.rs"
+    concerns: ["security", "shell-injection"]
+
+  - id: "mod-watcher"
+    type: "Module"
+    path: "src/watch/watcher.rs"
+    concerns: ["async", "file-system"]
+
+  - id: "mod-cli"
+    type: "Module"
+    path: "src/cli.rs"
+    concerns: ["ux", "clap-design"]
+
+# エッジ定義（関係性）
+edges:
+  # Crate Dependencies
+  - from: "mod-executor"
+    to: "crate-tokio"
+    type: "USES"
+    strength: "critical"
+    performance_sensitive: true
+
+  - from: "mod-cli"
+    to: "crate-clap"
+    type: "USES"
+    strength: "critical"
+
+  - from: "mod-interpolation"
+    to: "crate-shell-words"
+    type: "USES"
+    strength: "critical"
+    security_critical: true
+
+  - from: "mod-interpolation"
+    to: "crate-secrecy"
+    type: "USES"
+    strength: "high"
+    security_critical: true
+
+  - from: "mod-executor"
+    to: "crate-anyhow"
+    type: "USES"
+    strength: "high"
+
+  # Agent Expertise
+  - from: "agent-rust-engineer"
+    to: "mod-executor"
+    type: "REVIEWS"
+    priority: 1
+
+  - from: "agent-async-specialist"
+    to: "mod-executor"
+    type: "REVIEWS"
+    priority: 1
+    focus: "tokio-patterns"
+
+  - from: "agent-security-auditor"
+    to: "mod-interpolation"
+    type: "REVIEWS"
+    priority: 1
+    focus: "shell-injection"
+
+  - from: "agent-cargo-specialist"
+    to: "tool-cargo"
+    type: "MASTERS"
+
+  - from: "agent-unsafe-auditor"
+    to: "tool-miri"
+    type: "USES"
+
+  - from: "agent-performance-engineer"
+    to: "tool-cargo-flamegraph"
+    type: "USES"
+
+  - from: "agent-dependency-auditor"
+    to: "tool-cargo-audit"
+    type: "USES"
+    frequency: "daily"
+
+  - from: "agent-dependency-auditor"
+    to: "tool-cargo-deny"
+    type: "USES"
+    frequency: "ci-pipeline"
+
+  # Tool Recommendations
+  - from: "crate-tokio"
+    to: "agent-async-specialist"
+    type: "REQUIRES_EXPERT"
+
+  - from: "crate-criterion"
+    to: "agent-performance-engineer"
+    type: "REQUIRES_EXPERT"
+
+  # Performance Optimizations
+  - from: "crate-ahash"
+    to: "mod-executor"
+    type: "OPTIMIZES"
+    impact: "hash-performance"
+
+  - from: "crate-smallvec"
+    to: "mod-executor"
+    type: "OPTIMIZES"
+    impact: "memory-allocation"
+
+  - from: "tool-sccache"
+    to: "tool-cargo"
+    type: "ACCELERATES"
+    phase: "build"
+
+  - from: "tool-lld"
+    to: "tool-cargo"
+    type: "ACCELERATES"
+    phase: "link"
+
+  # Security Chain
+  - from: "tool-cargo-audit"
+    to: "agent-dependency-auditor"
+    type: "AUTOMATED_BY"
+
+  - from: "tool-cargo-deny"
+    to: "agent-dependency-auditor"
+    type: "AUTOMATED_BY"
+
+  - from: "crate-shell-words"
+    to: "agent-security-auditor"
+    type: "VALIDATED_BY"
+
+# クエリテンプレート
+query_templates:
+  find_agents_for_module:
+    cypher: |
+      MATCH (a:Agent)-[r:REVIEWS]->(m:Module {path: $module_path})
+      RETURN a.name, r.priority, r.focus
+      ORDER BY r.priority ASC
+    description: "特定モジュールのレビュー担当Agentを取得"
+
+  find_tools_for_agent:
+    cypher: |
+      MATCH (a:Agent {name: $agent_name})-[r:USES|MASTERS]->(t:Tool)
+      RETURN t.name, t.category, r.frequency
+    description: "Agentが使用するツールを取得"
+
+  find_security_critical_crates:
+    cypher: |
+      MATCH (c:Crate)
+      WHERE c.security_critical = true
+      RETURN c.name, c.category
+    description: "セキュリティクリティカルなクレートを取得"
+
+  find_performance_sensitive_modules:
+    cypher: |
+      MATCH (m:Module)-[r:USES {performance_sensitive: true}]->(c:Crate)
+      RETURN m.path, c.name, c.startup_cost_ms
+      ORDER BY c.startup_cost_ms DESC
+    description: "パフォーマンスセンシティブなモジュールを取得"
+
+  find_optimization_candidates:
+    cypher: |
+      MATCH (opt:Crate)-[r:OPTIMIZES]->(m:Module)
+      RETURN m.path, opt.name, r.impact
+    description: "最適化候補のクレートを取得"
+
+  find_build_accelerators:
+    cypher: |
+      MATCH (t:Tool)-[r:ACCELERATES]->(cargo:Tool {name: 'cargo'})
+      RETURN t.name, r.phase, t.build_time_reduction
+    description: "ビルド高速化ツールを取得"
+
+# パフォーマンス目標
+performance_targets:
+  startup_time_ms:
+    target: 4
+    current: null  # ベンチマーク後に更新
+    breakdown:
+      tokio_runtime_init: 1.5
+      clap_parsing: 0.8
+      toml_parsing: 1.0
+      application_logic: 0.7
+
+  memory_footprint_kb:
+    target: 10240  # 10MB
+    current: null
+    breakdown:
+      tokio_runtime: 2048
+      clap_data: 512
+      toml_data: 256
+      application_data: 7424
+
+  binary_size_kb:
+    target: 5120  # 5MB (stripped)
+    current: null
+    optimization:
+      lto: true
+      opt_level: "z"
+      strip: true
+      codegen_units: 1
+
+# セキュリティ基準
+security_standards:
+  owasp_compliance: true
+
+  rust_specific:
+    unsafe_audit:
+      enabled: true
+      tool: "miri"
+      frequency: "pre-release"
+
+    dependency_audit:
+      enabled: true
+      tools: ["cargo-audit", "cargo-deny"]
+      frequency: "daily"
+
+    shell_injection:
+      protection: "shell-words"
+      validation: "mandatory"
+
+    secrets_protection:
+      crate: "secrecy"
+      validation: "mandatory"
+
+# ビルド設定推奨
+build_configuration:
+  profile_release:
+    lto: "fat"
+    opt_level: "z"  # size optimization
+    codegen_units: 1
+    strip: true
+    panic: "abort"
+
+  profile_dev:
+    opt_level: 0
+    debug: true
+
+  rustflags:
+    - "-C target-cpu=native"  # local builds
+    - "-C link-arg=-fuse-ld=lld"  # fast linker
+
+  cargo_config:
+    build:
+      rustc_wrapper: "sccache"  # build cache

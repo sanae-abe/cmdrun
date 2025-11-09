@@ -1,0 +1,487 @@
+# Rust Ecosystem Tools & Crates Registry for cmdrun
+# Rustプロジェクトに推奨されるツールとクレートの包括的リスト
+
+meta:
+  version: "1.0.0"
+  project: "cmdrun"
+  category: "rust-ecosystem"
+
+# ビルド・開発ツール
+build_tools:
+  cargo:
+    category: "build-system"
+    essential: true
+    description: "Rust公式ビルドシステム"
+    agent: "cargo-specialist"
+
+  sccache:
+    category: "build-cache"
+    essential: false
+    priority: "high"
+    install: "cargo install sccache"
+    config: |
+      # .cargo/config.toml
+      [build]
+      rustc-wrapper = "sccache"
+    benefit: "ビルド時間50-70%削減"
+    agent: "cargo-specialist"
+
+  lld:
+    category: "linker"
+    essential: false
+    priority: "high"
+    install: "system package manager"
+    config: |
+      # .cargo/config.toml
+      [target.x86_64-unknown-linux-gnu]
+      linker = "clang"
+      rustflags = ["-C", "link-arg=-fuse-ld=lld"]
+    benefit: "リンク時間2-5x高速化"
+    agent: "cargo-specialist"
+
+  cargo_watch:
+    category: "development"
+    essential: false
+    priority: "medium"
+    install: "cargo install cargo-watch"
+    usage: "cargo watch -x test"
+    description: "ファイル変更時の自動再実行"
+    agent: "rust-engineer"
+
+  cargo_expand:
+    category: "debugging"
+    essential: false
+    priority: "low"
+    install: "cargo install cargo-expand"
+    usage: "cargo expand --lib"
+    description: "マクロ展開結果の表示"
+    agent: "rust-engineer"
+
+# コード品質ツール
+quality_tools:
+  rustfmt:
+    category: "formatter"
+    essential: true
+    install: "rustup component add rustfmt"
+    config_file: "rustfmt.toml"
+    usage: "cargo fmt"
+    agent: "rust-engineer"
+
+  clippy:
+    category: "linter"
+    essential: true
+    install: "rustup component add clippy"
+    usage: "cargo clippy -- -D warnings"
+    recommended_lints: |
+      -W clippy::all
+      -W clippy::pedantic
+      -W clippy::nursery
+      -W clippy::cargo
+    agent: "rust-engineer"
+
+  cargo_deny:
+    category: "security"
+    essential: true
+    priority: "critical"
+    install: "cargo install cargo-deny"
+    config_file: "deny.toml"
+    checks: ["advisories", "licenses", "bans", "sources"]
+    usage: "cargo deny check"
+    agent: "dependency-auditor"
+
+  cargo_audit:
+    category: "security"
+    essential: true
+    priority: "critical"
+    install: "cargo install cargo-audit"
+    usage: "cargo audit"
+    description: "RustSec Advisory Database チェック"
+    frequency: "daily"
+    agent: "dependency-auditor"
+
+  cargo_outdated:
+    category: "dependency-management"
+    essential: false
+    priority: "medium"
+    install: "cargo install cargo-outdated"
+    usage: "cargo outdated --root-deps-only"
+    frequency: "weekly"
+    agent: "dependency-auditor"
+
+# セキュリティ・監査ツール
+security_tools:
+  miri:
+    category: "unsafe-audit"
+    essential: false
+    priority: "high"
+    install: "rustup +nightly component add miri"
+    usage: "cargo +nightly miri test"
+    description: "未定義動作の検出"
+    when: "unsafe code present"
+    agent: "unsafe-code-auditor"
+
+  cargo_fuzz:
+    category: "fuzzing"
+    essential: false
+    priority: "medium"
+    install: "cargo install cargo-fuzz"
+    usage: "cargo fuzz run target_name"
+    description: "ファジングテスト"
+    agent: "security-auditor"
+
+  cargo_geiger:
+    category: "unsafe-detection"
+    essential: false
+    priority: "low"
+    install: "cargo install cargo-geiger"
+    usage: "cargo geiger"
+    description: "unsafeコードの検出と統計"
+    agent: "unsafe-code-auditor"
+
+# パフォーマンスツール
+performance_tools:
+  criterion:
+    category: "benchmarking"
+    essential: false
+    priority: "high"
+    crate: "criterion = \"0.5\""
+    dev_dependency: true
+    description: "統計的ベンチマークフレームワーク"
+    agent: "performance-engineer"
+
+  cargo_flamegraph:
+    category: "profiling"
+    essential: false
+    priority: "high"
+    install: "cargo install flamegraph"
+    usage: "cargo flamegraph --bin cmdrun"
+    output: "flamegraph.svg"
+    description: "パフォーマンスプロファイリング"
+    agent: "performance-engineer"
+
+  cargo_bloat:
+    category: "binary-size"
+    essential: false
+    priority: "medium"
+    install: "cargo install cargo-bloat"
+    usage: "cargo bloat --release"
+    description: "バイナリサイズの分析"
+    agent: "performance-engineer"
+
+  hyperfine:
+    category: "benchmarking"
+    essential: false
+    priority: "high"
+    install: "cargo install hyperfine"
+    usage: "hyperfine 'target/release/cmdrun --version'"
+    description: "コマンドライン実行時間計測"
+    agent: "performance-engineer"
+
+  valgrind:
+    category: "profiling"
+    essential: false
+    priority: "medium"
+    install: "system package manager"
+    usage: "valgrind --tool=massif target/release/cmdrun"
+    description: "メモリ使用量プロファイリング"
+    agent: "performance-engineer"
+
+  perf:
+    category: "profiling"
+    essential: false
+    priority: "medium"
+    install: "system package manager (Linux)"
+    usage: "perf record -g target/release/cmdrun"
+    platform: "linux-only"
+    agent: "performance-engineer"
+
+# テストツール
+testing_tools:
+  proptest:
+    category: "testing"
+    essential: false
+    priority: "high"
+    crate: "proptest = \"1.4\""
+    dev_dependency: true
+    description: "プロパティベーステスティング"
+    agent: "test-automator"
+
+  quickcheck:
+    category: "testing"
+    essential: false
+    priority: "low"
+    crate: "quickcheck = \"1.0\""
+    dev_dependency: true
+    description: "プロパティベーステスティング（代替）"
+    note: "proptestの方が現代的"
+    agent: "test-automator"
+
+  mockall:
+    category: "testing"
+    essential: false
+    priority: "medium"
+    crate: "mockall = \"0.12\""
+    dev_dependency: true
+    description: "モックライブラリ"
+    agent: "test-automator"
+
+  tarpaulin:
+    category: "coverage"
+    essential: false
+    priority: "medium"
+    install: "cargo install cargo-tarpaulin"
+    usage: "cargo tarpaulin --out Html"
+    platform: "linux-only"
+    description: "コードカバレッジ測定"
+    agent: "test-automator"
+
+  nextest:
+    category: "testing"
+    essential: false
+    priority: "high"
+    install: "cargo install cargo-nextest"
+    usage: "cargo nextest run"
+    description: "高速なテストランナー"
+    benefit: "テスト実行時間短縮、並列実行改善"
+    agent: "test-automator"
+
+# ドキュメントツール
+documentation_tools:
+  cargo_doc:
+    category: "documentation"
+    essential: true
+    usage: "cargo doc --no-deps --open"
+    description: "API ドキュメント生成"
+    agent: "documentation-engineer"
+
+  mdbook:
+    category: "documentation"
+    essential: false
+    priority: "low"
+    install: "cargo install mdbook"
+    usage: "mdbook serve"
+    description: "ユーザーガイド作成"
+    agent: "documentation-engineer"
+
+# クロスコンパイルツール
+cross_compilation_tools:
+  cross:
+    category: "cross-compilation"
+    essential: false
+    priority: "medium"
+    install: "cargo install cross"
+    usage: "cross build --target aarch64-unknown-linux-gnu"
+    description: "クロスコンパイル簡易化"
+    agent: "cargo-specialist"
+
+  cargo_deb:
+    category: "packaging"
+    essential: false
+    priority: "low"
+    install: "cargo install cargo-deb"
+    usage: "cargo deb"
+    description: "Debianパッケージ作成"
+    platform: "debian-based"
+    agent: "cargo-specialist"
+
+  cargo_rpm:
+    category: "packaging"
+    essential: false
+    priority: "low"
+    install: "cargo install cargo-rpm"
+    usage: "cargo rpm build"
+    description: "RPMパッケージ作成"
+    platform: "rpm-based"
+    agent: "cargo-specialist"
+
+# ユーティリティツール
+utility_tools:
+  cargo_edit:
+    category: "utility"
+    essential: false
+    priority: "high"
+    install: "cargo install cargo-edit"
+    commands: ["cargo add", "cargo rm", "cargo upgrade"]
+    description: "依存関係の簡易追加・削除"
+    agent: "cargo-specialist"
+
+  cargo_tree:
+    category: "utility"
+    essential: true
+    builtin: true
+    usage: "cargo tree --depth 3"
+    description: "依存関係ツリー表示"
+    agent: "dependency-auditor"
+
+  cargo_metadata:
+    category: "utility"
+    essential: false
+    usage: "cargo metadata --format-version 1"
+    description: "プロジェクトメタデータ取得"
+    agent: "cargo-specialist"
+
+# 推奨クレート（依存関係）
+recommended_crates:
+  # 非同期ランタイム
+  tokio:
+    category: "async-runtime"
+    version: "^1.0"
+    features: ["rt", "macros", "time", "fs"]
+    note: "CLIなら current_thread ランタイム推奨"
+    agent: "async-runtime-specialist"
+
+  # CLI
+  clap:
+    category: "cli"
+    version: "^4.0"
+    features: ["derive", "env"]
+    agent: "cli-developer"
+
+  # エラーハンドリング
+  anyhow:
+    category: "error-handling"
+    version: "^1.0"
+    use_case: "application-level"
+    agent: "error-handling-specialist"
+
+  thiserror:
+    category: "error-handling"
+    version: "^1.0"
+    use_case: "library-level"
+    agent: "error-handling-specialist"
+
+  # シリアライゼーション
+  serde:
+    category: "serialization"
+    version: "^1.0"
+    features: ["derive"]
+    agent: "rust-engineer"
+
+  toml:
+    category: "config"
+    version: "^0.8"
+    agent: "rust-engineer"
+
+  # セキュリティ
+  shell_words:
+    category: "security"
+    version: "^1.1"
+    description: "シェルコマンド安全なエスケープ"
+    agent: "security-auditor"
+
+  secrecy:
+    category: "security"
+    version: "^0.8"
+    description: "機密情報のメモリ安全な扱い"
+    agent: "security-auditor"
+
+  # パフォーマンス
+  ahash:
+    category: "performance"
+    version: "^0.8"
+    description: "高速ハッシュアルゴリズム"
+    agent: "performance-engineer"
+
+  smallvec:
+    category: "performance"
+    version: "^1.11"
+    description: "小さいベクタのスタック割り当て"
+    agent: "performance-engineer"
+
+  # ロギング
+  tracing:
+    category: "logging"
+    version: "^0.1"
+    description: "構造化ログ・トレーシング"
+    agent: "rust-engineer"
+
+  tracing_subscriber:
+    category: "logging"
+    version: "^0.3"
+    description: "tracing サブスクライバー"
+    agent: "rust-engineer"
+
+  # ファイル監視
+  notify:
+    category: "file-watch"
+    version: "^6.0"
+    agent: "rust-engineer"
+
+  # 並行性
+  parking_lot:
+    category: "concurrency"
+    version: "^0.12"
+    description: "tokio Mutex/RwLockより高速"
+    agent: "async-runtime-specialist"
+
+  # ユーティリティ
+  once_cell:
+    category: "utility"
+    version: "^1.19"
+    description: "遅延初期化（lazy_static 後継）"
+    note: "Rust 1.80+ では std::sync::OnceLock 推奨"
+    agent: "rust-engineer"
+
+  rayon:
+    category: "parallelism"
+    version: "^1.8"
+    description: "データ並列処理"
+    use_case: "CPU密集タスク"
+    agent: "performance-engineer"
+
+# Agent別ツール推奨マトリクス
+agent_tool_matrix:
+  cargo-specialist:
+    essential: ["cargo", "rustfmt", "clippy"]
+    recommended: ["sccache", "lld", "cargo-edit", "cargo-tree"]
+
+  rust-engineer:
+    essential: ["cargo", "rustfmt", "clippy"]
+    recommended: ["cargo-watch", "cargo-expand"]
+
+  security-auditor:
+    essential: ["cargo-audit", "cargo-deny"]
+    recommended: ["cargo-fuzz", "cargo-geiger"]
+
+  unsafe-code-auditor:
+    essential: ["miri"]
+    recommended: ["valgrind", "cargo-geiger"]
+
+  performance-engineer:
+    essential: ["criterion", "hyperfine"]
+    recommended: ["cargo-flamegraph", "cargo-bloat", "perf", "valgrind"]
+
+  test-automator:
+    essential: ["cargo test"]
+    recommended: ["nextest", "tarpaulin", "proptest", "mockall"]
+
+  dependency-auditor:
+    essential: ["cargo-audit", "cargo-deny", "cargo-tree"]
+    recommended: ["cargo-outdated"]
+
+  async-runtime-specialist:
+    essential: ["tokio"]
+    recommended: ["tokio-console"]
+
+# ツール導入優先順位
+implementation_priority:
+  phase_1_immediate:
+    - "cargo-audit"
+    - "cargo-deny"
+    - "sccache"
+    - "lld"
+    - "hyperfine"
+    - "criterion"
+
+  phase_2_short_term:
+    - "cargo-flamegraph"
+    - "cargo-bloat"
+    - "nextest"
+    - "proptest"
+    - "cargo-watch"
+
+  phase_3_future:
+    - "miri"
+    - "cargo-fuzz"
+    - "tarpaulin"
+    - "cross"

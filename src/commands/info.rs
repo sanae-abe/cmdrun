@@ -19,6 +19,9 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
     let config = &loaded.config;
     let lang = config.config.language;
 
+    // Load history for statistics
+    let history_storage = crate::history::HistoryStorage::new().ok();
+
     // Get command ID (from argument or interactive selection)
     let id = if let Some(id) = command_id {
         id
@@ -230,7 +233,122 @@ pub async fn handle_info(command_id: Option<String>, config_path: Option<PathBuf
     );
     println!();
 
+    // Execution statistics from history
+    if let Some(storage) = &history_storage {
+        if let Ok(stats) = get_command_statistics(storage, &id).await {
+            println!(
+                "{}",
+                format!("{}:", get_message(MessageKey::InfoExecutionStatistics, lang))
+                    .white()
+                    .bold()
+            );
+            println!(
+                "  {} {}",
+                format!("{}:", get_message(MessageKey::InfoTotalExecutions, lang)).dimmed(),
+                stats.total_count.to_string().bright_white()
+            );
+            println!(
+                "  {} {}",
+                format!("{}:", get_message(MessageKey::InfoSuccessfulRuns, lang)).dimmed(),
+                format!("{} ({}%)", stats.success_count, stats.success_rate).green()
+            );
+            println!(
+                "  {} {}",
+                format!("{}:", get_message(MessageKey::InfoFailedRuns, lang)).dimmed(),
+                format!("{} ({}%)", stats.failed_count, stats.failure_rate).red()
+            );
+            if let Some(last_run) = &stats.last_run_time {
+                println!(
+                    "  {} {}",
+                    format!("{}:", get_message(MessageKey::InfoLastRun, lang)).dimmed(),
+                    last_run.bright_white()
+                );
+            }
+            if let Some(avg_duration) = stats.avg_duration {
+                println!(
+                    "  {} {:.2}s",
+                    format!("{}:", get_message(MessageKey::InfoAverageDuration, lang)).dimmed(),
+                    avg_duration
+                );
+            }
+            println!();
+        }
+    }
+
     Ok(())
+}
+
+/// Statistics for a command's execution history
+struct CommandStatistics {
+    total_count: i64,
+    success_count: i64,
+    failed_count: i64,
+    success_rate: i64,
+    failure_rate: i64,
+    last_run_time: Option<String>,
+    avg_duration: Option<f64>,
+}
+
+/// Get execution statistics for a command from history
+async fn get_command_statistics(
+    storage: &crate::history::HistoryStorage,
+    command_name: &str,
+) -> Result<CommandStatistics> {
+    let entries = storage.search(command_name, None)?;
+
+    if entries.is_empty() {
+        return Ok(CommandStatistics {
+            total_count: 0,
+            success_count: 0,
+            failed_count: 0,
+            success_rate: 0,
+            failure_rate: 0,
+            last_run_time: None,
+            avg_duration: None,
+        });
+    }
+
+    let total_count = entries.len() as i64;
+    let success_count = entries.iter().filter(|e| e.success).count() as i64;
+    let failed_count = total_count - success_count;
+    let success_rate = if total_count > 0 {
+        (success_count * 100) / total_count
+    } else {
+        0
+    };
+    let failure_rate = 100 - success_rate;
+
+    // Convert Unix timestamp to human-readable format
+    let last_run_time = entries.first().map(|e| {
+        let datetime = chrono::DateTime::from_timestamp(e.start_time / 1000, 0)
+            .unwrap_or_else(|| chrono::Utc::now());
+        datetime.format("%Y-%m-%d %H:%M:%S").to_string()
+    });
+
+    let avg_duration = if !entries.is_empty() {
+        let total_duration: i64 = entries
+            .iter()
+            .filter_map(|e| e.duration_ms)
+            .sum();
+        let count = entries.iter().filter(|e| e.duration_ms.is_some()).count();
+        if count > 0 {
+            Some(total_duration as f64 / count as f64 / 1000.0) // Convert ms to seconds
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
+    Ok(CommandStatistics {
+        total_count,
+        success_count,
+        failed_count,
+        success_rate,
+        failure_rate,
+        last_run_time,
+        avg_duration,
+    })
 }
 
 /// Select a command interactively from the list

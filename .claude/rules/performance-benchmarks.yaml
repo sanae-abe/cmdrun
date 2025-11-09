@@ -1,0 +1,156 @@
+# Performance Benchmarking Rules for cmdrun
+# criterion、hyperfine、プロファイリングツールの統合ルール
+
+meta:
+  version: "1.0.0"
+  project: "cmdrun"
+  focus: "startup-time-memory-optimization"
+
+# ベンチマーク種別
+benchmark_types:
+  startup_time:
+    tool: "hyperfine"
+    target_metric: 4ms
+    command: "hyperfine --warmup 10 --min-runs 100 'target/release/cmdrun --version'"
+    frequency: "pre-release"
+    agent: "performance-engineer"
+
+  memory_footprint:
+    tool: "valgrind-massif"
+    target_metric: "10MB"
+    command: "valgrind --tool=massif --massif-out-file=massif.out target/release/cmdrun run example"
+    frequency: "weekly"
+    agent: "performance-engineer"
+
+  microbenchmarks:
+    tool: "criterion"
+    location: "benches/"
+    focus:
+      - "TOML parsing speed"
+      - "dependency resolution algorithm"
+      - "variable interpolation performance"
+    frequency: "per-commit"
+    agent: "performance-engineer"
+
+  profiling:
+    tool: "cargo-flamegraph"
+    command: "cargo flamegraph --bin cmdrun -- run example"
+    output: "flamegraph.svg"
+    frequency: "on-performance-regression"
+    agent: "performance-engineer"
+
+# パフォーマンスリグレッション検出
+regression_detection:
+  enabled: true
+  threshold:
+    startup_time: "+10%"  # 4ms -> 4.4ms で警告
+    memory: "+15%"        # 10MB -> 11.5MB で警告
+    binary_size: "+20%"   # 5MB -> 6MB で警告
+
+  actions:
+    - "CI failure on threshold breach"
+    - "automatic Agent(performance-engineer) notification"
+    - "flamegraph generation"
+
+# Agent統合
+agent_triggers:
+  performance-engineer:
+    auto_invoke_if:
+      - "benchmark regression detected"
+      - "startup_time > 4.4ms"
+      - "memory_footprint > 11.5MB"
+
+    tasks:
+      - "identify bottleneck using flamegraph"
+      - "review dependency tree (cargo tree)"
+      - "suggest optimization (LTO, codegen settings)"
+
+  rust-engineer:
+    collaborate_with: "performance-engineer"
+    tasks:
+      - "implement optimization"
+      - "verify correctness"
+      - "re-run benchmarks"
+
+# CI/CD統合
+ci_integration:
+  github_actions:
+    benchmark_job:
+      name: "Performance Benchmarks"
+      runs_on: "ubuntu-latest"
+      steps:
+        - name: "Install hyperfine"
+          run: "cargo install hyperfine"
+
+        - name: "Build release"
+          run: "cargo build --release"
+
+        - name: "Benchmark startup time"
+          run: |
+            hyperfine --warmup 10 --min-runs 100 \
+              --export-json bench-results.json \
+              'target/release/cmdrun --version'
+
+        - name: "Check regression"
+          run: |
+            python scripts/check-performance-regression.py \
+              --baseline bench-baseline.json \
+              --current bench-results.json \
+              --threshold 0.10
+
+        - name: "Upload results"
+          uses: "actions/upload-artifact@v3"
+          with:
+            name: "benchmark-results"
+            path: "bench-results.json"
+
+# プロファイリングツール設定
+profiling_tools:
+  cargo_flamegraph:
+    install: "cargo install flamegraph"
+    command: "cargo flamegraph --bin cmdrun -- run example"
+    output: "flamegraph.svg"
+
+  perf:
+    command: "perf record -g target/release/cmdrun run example"
+    analyze: "perf report"
+
+  cargo_bloat:
+    install: "cargo install cargo-bloat"
+    command: "cargo bloat --release"
+    focus: "identify binary size culprits"
+
+  cargo_tree:
+    command: "cargo tree --edges normal --depth 3"
+    focus: "dependency analysis"
+
+# 最適化チェックリスト
+optimization_checklist:
+  binary_size:
+    - "lto = 'fat' enabled"
+    - "opt-level = 'z' for size"
+    - "strip = true"
+    - "codegen-units = 1"
+    - "panic = 'abort'"
+    - "cargo bloat analysis done"
+
+  startup_time:
+    - "lazy initialization used"
+    - "minimal static constructors"
+    - "sccache configured"
+    - "lld linker used"
+    - "hyperfine benchmark < 4ms"
+
+  memory:
+    - "smallvec for small collections"
+    - "ahash for hash maps"
+    - "minimize clone()"
+    - "valgrind massif check done"
+    - "memory footprint < 10MB"
+
+# ベンチマークデータ保存
+benchmark_storage:
+  location: "bench-results/"
+  format: "JSON"
+  retention: "last 100 runs"
+  visualization: "plotly dashboard (future)"

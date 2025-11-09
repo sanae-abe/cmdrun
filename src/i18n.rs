@@ -140,6 +140,12 @@ pub enum MessageKey {
     InfoGlobalConfigPath,
     InfoLocalConfigPath,
     InfoActualWorkingDirectory,
+    InfoExecutionStatistics,
+    InfoTotalExecutions,
+    InfoSuccessfulRuns,
+    InfoFailedRuns,
+    InfoLastRun,
+    InfoAverageDuration,
 
     // ====== Config コマンド ======
     ConfigSet,
@@ -370,6 +376,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             InfoGlobalConfigPath => "Global config",
             InfoLocalConfigPath => "Local config",
             InfoActualWorkingDirectory => "Actual working directory",
+            InfoExecutionStatistics => "Execution Statistics",
+            InfoTotalExecutions => "Total executions",
+            InfoSuccessfulRuns => "Successful runs",
+            InfoFailedRuns => "Failed runs",
+            InfoLastRun => "Last run",
+            InfoAverageDuration => "Average duration",
 
             // ====== Config コマンド ======
             ConfigSet => "Set",
@@ -594,6 +606,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             InfoGlobalConfigPath => "グローバル設定",
             InfoLocalConfigPath => "ローカル設定",
             InfoActualWorkingDirectory => "実際の作業ディレクトリ",
+            InfoExecutionStatistics => "実行統計",
+            InfoTotalExecutions => "総実行回数",
+            InfoSuccessfulRuns => "成功回数",
+            InfoFailedRuns => "失敗回数",
+            InfoLastRun => "最終実行",
+            InfoAverageDuration => "平均実行時間",
 
             // ====== Config コマンド ======
             ConfigSet => "設定しました",
@@ -818,6 +836,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             InfoGlobalConfigPath => "全局配置",
             InfoLocalConfigPath => "本地配置",
             InfoActualWorkingDirectory => "实际工作目录",
+            InfoExecutionStatistics => "执行统计",
+            InfoTotalExecutions => "总执行次数",
+            InfoSuccessfulRuns => "成功次数",
+            InfoFailedRuns => "失败次数",
+            InfoLastRun => "最后执行",
+            InfoAverageDuration => "平均执行时间",
 
             // ====== Config 命令 ======
             ConfigSet => "已设置",
@@ -1042,6 +1066,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             InfoGlobalConfigPath => "全域配置",
             InfoLocalConfigPath => "本機配置",
             InfoActualWorkingDirectory => "實際工作目錄",
+            InfoExecutionStatistics => "執行統計",
+            InfoTotalExecutions => "總執行次數",
+            InfoSuccessfulRuns => "成功次數",
+            InfoFailedRuns => "失敗次數",
+            InfoLastRun => "最後執行",
+            InfoAverageDuration => "平均執行時間",
 
             // ====== Config 命令 ======
             ConfigSet => "已設定",
