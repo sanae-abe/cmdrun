@@ -515,13 +515,23 @@ async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -
         ConfigLoader::new()
     };
     let config = config_loader.load_with_environment().await?;
+    let lang = config.config.language;
 
     if config.commands.is_empty() {
-        println!("{}", "No commands defined".yellow());
+        println!(
+            "{}",
+            cmdrun::i18n::get_message(cmdrun::i18n::MessageKey::ListNoCommandsDefined, lang)
+                .yellow()
+        );
         return Ok(());
     }
 
-    println!("{}", "Available commands:".cyan().bold());
+    println!(
+        "{}",
+        cmdrun::i18n::get_message(cmdrun::i18n::MessageKey::ListAvailableCommands, lang)
+            .cyan()
+            .bold()
+    );
     println!();
 
     let mut commands: Vec<_> = config.commands.iter().collect();
@@ -530,7 +540,10 @@ async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -
     for (name, cmd) in commands {
         if verbose {
             println!("  {} - {}", name.green().bold(), cmd.description);
-            println!("    {}", "Command:".dimmed());
+            println!(
+                "    {}",
+                cmdrun::i18n::get_message(cmdrun::i18n::MessageKey::LabelCommand, lang).dimmed()
+            );
             match &cmd.cmd {
                 cmdrun::config::schema::CommandSpec::Single(c) => {
                     println!("      {}", c);
@@ -545,7 +558,12 @@ async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -
                 }
             }
             if !cmd.deps.is_empty() {
-                println!("    {} {:?}", "Dependencies:".dimmed(), cmd.deps);
+                println!(
+                    "    {} {:?}",
+                    cmdrun::i18n::get_message(cmdrun::i18n::MessageKey::LabelDependencies, lang)
+                        .dimmed(),
+                    cmd.deps
+                );
             }
             println!();
         } else {
