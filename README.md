@@ -28,7 +28,7 @@
 - **10MB memory footprint** vs 200MB+ for Node.js
 
 ### 🔒 Security
-- **Zero `eval()`** - No dynamic code execution
+- **Zero Rust `eval()`** - No dynamic code generation in application code
 - **Safe variable expansion** - No shell injection vulnerabilities
 - **Dependency audit** - Built-in security scanning
 
@@ -45,7 +45,7 @@
 ### 🎯 What Makes cmdrun Special
 
 **Unique combination of features:**
-- 🔒 Zero-eval security with fuzzing (373,423 tests, 0 vulnerabilities)
+- 🔒 Zero Rust eval() with fuzzing (373,423 tests, 0 vulnerabilities)
 - 🌍 4-language support (EN/JA/ZH-CN/ZH-TW)
 - 🎨 Shell completion (Zsh/Bash/Fish)
 - 📊 SQLite-based execution history
