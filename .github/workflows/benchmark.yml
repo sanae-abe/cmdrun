@@ -55,7 +55,7 @@ jobs:
       - name: Run command execution benchmarks
         run: |
           echo "⚡ Running command execution benchmarks..."
-          cargo bench --bench command_execution -- --output-format json > command_benchmarks.json || echo "Command benchmarks completed with warnings"
+          cargo bench --bench command_execution --message-format=json > command_benchmarks.json || echo "Command benchmarks completed with warnings"
 
       - name: Measure binary size
         run: |
