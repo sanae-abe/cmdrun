@@ -52,6 +52,11 @@ jobs:
           echo "📄 Running TOML parsing benchmarks..."
           cargo bench --bench toml_parsing -- --output-format json > toml_benchmarks.json || echo "TOML benchmarks completed with warnings"
 
+      - name: Run startup time benchmarks
+        run: |
+          echo "🚀 Running startup time benchmarks..."
+          cargo bench --bench startup_time -- --output-format json > startup_benchmarks.json || echo "Startup benchmarks completed with warnings"
+
       - name: Run command execution benchmarks
         run: |
           echo "⚡ Running command execution benchmarks..."

@@ -62,7 +62,7 @@ fn bench_startup_time(c: &mut Criterion) {
 /// Benchmark cold vs warm startup (with config file)
 fn bench_cold_warm_startup(c: &mut Criterion) {
     use std::io::Write;
-    use tempfile::{NamedTempFile, TempDir};
+    use tempfile::TempDir;
 
     let mut group = c.benchmark_group("cold_warm_startup");
     group.measurement_time(Duration::from_secs(8));
