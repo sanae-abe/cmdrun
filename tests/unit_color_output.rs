@@ -85,12 +85,30 @@ mod integration {
         path
     }
 
+    // Create a temporary config file for testing
+    fn create_temp_config() -> (tempfile::TempDir, std::path::PathBuf) {
+        let temp_dir = tempfile::TempDir::new().expect("Failed to create temp dir");
+        let config_path = temp_dir.path().join("commands.toml");
+
+        std::fs::write(
+            &config_path,
+            r#"[commands]
+test = { description = "Test command", cmd = "echo test" }
+"#,
+        )
+        .expect("Failed to write temp config");
+
+        (temp_dir, config_path)
+    }
+
     #[test]
     fn test_color_flag_never() {
         let cmdrun_bin = get_cmdrun_binary();
+        let (_temp_dir, config_path) = create_temp_config();
 
         let output = Command::new(&cmdrun_bin)
-            .args(["list", "--color=never"])
+            .args(["list", "--color=never", "-c"])
+            .arg(&config_path)
             .env("NO_COLOR", "0") // Make sure NO_COLOR doesn't interfere
             .env_remove("NO_COLOR")
             .output()
@@ -108,9 +126,11 @@ mod integration {
     #[test]
     fn test_color_flag_always() {
         let cmdrun_bin = get_cmdrun_binary();
+        let (_temp_dir, config_path) = create_temp_config();
 
         let output = Command::new(&cmdrun_bin)
-            .args(["list", "--color=always"])
+            .args(["list", "--color=always", "-c"])
+            .arg(&config_path)
             .output()
             .expect("Failed to execute command");
 
@@ -118,8 +138,6 @@ mod integration {
         let stderr = String::from_utf8_lossy(&output.stderr);
 
         // With --color=always, output should contain color codes even when not a TTY
-        // Note: This test might need adjustment based on actual implementation
-        // For now, we just check the command doesn't error
         if !output.status.success() {
             eprintln!("Command failed with exit code: {:?}", output.status.code());
             eprintln!("stdout: {}", stdout);
