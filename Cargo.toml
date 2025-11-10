@@ -169,6 +169,30 @@ name = "history"
 path = "tests/integration/history.rs"
 
 [[test]]
+name = "completion_commands"
+path = "tests/integration/completion_commands.rs"
+
+[[test]]
+name = "plugin_commands"
+path = "tests/integration/plugin_commands.rs"
+
+[[test]]
+name = "executor_errors"
+path = "tests/integration/executor_errors.rs"
+
+[[test]]
+name = "watch_advanced"
+path = "tests/integration/watch_advanced.rs"
+
+[[test]]
+name = "cli_main"
+path = "tests/integration/cli_main.rs"
+
+[[test]]
+name = "cross_platform"
+path = "tests/integration/cross_platform.rs"
+
+[[test]]
 name = "security_injection"
 path = "tests/security/injection.rs"
 
@@ -178,6 +202,10 @@ harness = false
 
 [[bench]]
 name = "toml_parsing"
+harness = false
+
+[[bench]]
+name = "startup_time"
 harness = false
 
 [features]

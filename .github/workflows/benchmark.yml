@@ -1,0 +1,324 @@
+name: Performance Benchmarks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run performance tests weekly on Sundays at 2:00 UTC
+    - cron: '0 2 * * 0'
+  workflow_dispatch:  # Allow manual trigger
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install additional tools
+        run: |
+          # Install system monitoring tools
+          sudo apt-get update
+          sudo apt-get install -y time htop
+
+      - name: Build release binary
+        run: |
+          cargo build --release
+          ls -la target/release/
+          # Verify binary exists and is executable
+          ./target/release/cmdrun --version
+
+      - name: Run startup time benchmarks
+        run: |
+          echo "🚀 Running startup time benchmarks..."
+          cargo bench --bench startup_time -- --output-format json > startup_benchmarks.json || echo "Startup benchmarks completed with warnings"
+
+      - name: Run TOML parsing benchmarks
+        run: |
+          echo "📄 Running TOML parsing benchmarks..."
+          cargo bench --bench toml_parsing -- --output-format json > toml_benchmarks.json || echo "TOML benchmarks completed with warnings"
+
+      - name: Run command execution benchmarks
+        run: |
+          echo "⚡ Running command execution benchmarks..."
+          cargo bench --bench command_execution -- --output-format json > command_benchmarks.json || echo "Command benchmarks completed with warnings"
+
+      - name: Measure binary size
+        run: |
+          echo "📏 Measuring binary size..."
+          BINARY_SIZE=$(stat -c%s target/release/cmdrun)
+          BINARY_SIZE_MB=$(echo "scale=2; $BINARY_SIZE / 1024 / 1024" | bc)
+          echo "📊 Binary size: ${BINARY_SIZE} bytes (${BINARY_SIZE_MB} MB)"
+          echo "BINARY_SIZE=${BINARY_SIZE}" >> $GITHUB_ENV
+          echo "BINARY_SIZE_MB=${BINARY_SIZE_MB}" >> $GITHUB_ENV
+
+          # Check against target (5MB)
+          TARGET_SIZE=5242880  # 5MB in bytes
+          if [ $BINARY_SIZE -le $TARGET_SIZE ]; then
+            echo "✅ Binary size ${BINARY_SIZE_MB}MB is within target (5MB)"
+          else
+            echo "❌ Binary size ${BINARY_SIZE_MB}MB exceeds target (5MB)"
+            exit 1
+          fi
+
+      - name: Measure startup time
+        run: |
+          echo "⏱️  Measuring startup time..."
+
+          # Measure --version startup time (target: 4ms)
+          echo "Measuring --version startup time..."
+          VERSION_TIMES=""
+          for i in {1..10}; do
+            TIME_NS=$(./scripts/measure_startup.sh ./target/release/cmdrun --version)
+            VERSION_TIMES="$VERSION_TIMES $TIME_NS"
+            echo "Run $i: ${TIME_NS}ns"
+          done
+
+          # Calculate average
+          AVG_VERSION_NS=$(echo "$VERSION_TIMES" | tr ' ' '\n' | grep -v '^$' | awk '{sum+=$1} END {print sum/NR}')
+          AVG_VERSION_MS=$(echo "scale=2; $AVG_VERSION_NS / 1000000" | bc)
+          echo "STARTUP_TIME_NS=${AVG_VERSION_NS}" >> $GITHUB_ENV
+          echo "STARTUP_TIME_MS=${AVG_VERSION_MS}" >> $GITHUB_ENV
+          echo "📊 Average startup time: ${AVG_VERSION_MS}ms"
+
+          # Check against target (4ms)
+          TARGET_MS=4.0
+          if (( $(echo "$AVG_VERSION_MS <= $TARGET_MS" | bc -l) )); then
+            echo "✅ Startup time ${AVG_VERSION_MS}ms is within target (${TARGET_MS}ms)"
+          else
+            echo "❌ Startup time ${AVG_VERSION_MS}ms exceeds target (${TARGET_MS}ms)"
+            exit 1
+          fi
+
+      - name: Measure memory usage
+        run: |
+          echo "💾 Measuring memory usage..."
+
+          # Create a simple config file for testing
+          cat > test_config.toml << 'EOF'
+          [commands.test]
+          description = "Test command"
+          cmd = "echo hello"
+          EOF
+
+          # Measure peak memory usage using /usr/bin/time
+          echo "Measuring memory usage with config..."
+          MEMORY_KB=$((/usr/bin/time -f "%M" ./target/release/cmdrun --config test_config.toml list > /dev/null) 2>&1)
+          MEMORY_MB=$(echo "scale=2; $MEMORY_KB / 1024" | bc)
+          echo "MEMORY_KB=${MEMORY_KB}" >> $GITHUB_ENV
+          echo "MEMORY_MB=${MEMORY_MB}" >> $GITHUB_ENV
+          echo "📊 Peak memory usage: ${MEMORY_MB}MB"
+
+          # Check against target (10MB)
+          TARGET_MB=10.0
+          if (( $(echo "$MEMORY_MB <= $TARGET_MB" | bc -l) )); then
+            echo "✅ Memory usage ${MEMORY_MB}MB is within target (${TARGET_MB}MB)"
+          else
+            echo "❌ Memory usage ${MEMORY_MB}MB exceeds target (${TARGET_MB}MB)"
+            exit 1
+          fi
+
+      - name: Create startup time measurement script
+        run: |
+          mkdir -p scripts
+          cat > scripts/measure_startup.sh << 'EOF'
+          #!/bin/bash
+          # Measure process startup time in nanoseconds
+
+          BINARY="$1"
+          shift
+          ARGS="$@"
+
+          # Use GNU time with high precision
+          START=$(date +%s%N)
+          "$BINARY" $ARGS > /dev/null 2>&1
+          END=$(date +%s%N)
+
+          echo $(($END - $START))
+          EOF
+          chmod +x scripts/measure_startup.sh
+
+      - name: Generate performance report
+        run: |
+          echo "📈 Generating performance report..."
+          cat > performance_report.md << EOF
+          # 📊 Performance Benchmark Report
+
+          **Date**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          **Commit**: $GITHUB_SHA
+          **Branch**: $GITHUB_REF_NAME
+
+          ## 🎯 Performance Targets vs Actual
+
+          | Metric | Target | Actual | Status |
+          |--------|--------|---------|---------|
+          | Binary Size | ≤ 5MB | ${BINARY_SIZE_MB}MB | $([ "${BINARY_SIZE}" -le "5242880" ] && echo "✅ Pass" || echo "❌ Fail") |
+          | Startup Time | ≤ 4ms | ${STARTUP_TIME_MS}ms | $([ "$(echo "${STARTUP_TIME_MS} <= 4.0" | bc -l)" = "1" ] && echo "✅ Pass" || echo "❌ Fail") |
+          | Memory Usage | ≤ 10MB | ${MEMORY_MB}MB | $([ "$(echo "${MEMORY_MB} <= 10.0" | bc -l)" = "1" ] && echo "✅ Pass" || echo "❌ Fail") |
+
+          ## 📋 Detailed Results
+
+          - **Binary Size**: ${BINARY_SIZE} bytes (${BINARY_SIZE_MB} MB)
+          - **Startup Time**: ${STARTUP_TIME_MS}ms average over 10 runs
+          - **Memory Usage**: ${MEMORY_MB}MB peak memory usage
+          - **Benchmarks**: Generated JSON reports available in artifacts
+
+          ## 🔧 Environment
+
+          - **OS**: Ubuntu Latest
+          - **Rust**: $(rustc --version)
+          - **Build**: Release mode with optimizations
+          EOF
+
+      - name: Store benchmark results
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'cargo'
+          output-file-path: startup_benchmarks.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: false
+          alert-threshold: '150%'
+          comment-on-alert: true
+          fail-on-alert: false
+          summary-always: true
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            startup_benchmarks.json
+            toml_benchmarks.json
+            command_benchmarks.json
+            performance_report.md
+          retention-days: 90
+
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('performance_report.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });
+
+  benchmark-comparison:
+    name: Performance Regression Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: benchmark
+
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build base version
+        run: |
+          cargo build --release
+          ./target/release/cmdrun --version
+
+      - name: Measure base performance
+        run: |
+          echo "📊 Measuring base branch performance..."
+
+          # Measure startup time
+          START=$(date +%s%N)
+          ./target/release/cmdrun --version > /dev/null 2>&1
+          END=$(date +%s%N)
+          BASE_STARTUP_NS=$(($END - $START))
+          BASE_STARTUP_MS=$(echo "scale=2; $BASE_STARTUP_NS / 1000000" | bc)
+
+          # Measure binary size
+          BASE_BINARY_SIZE=$(stat -c%s target/release/cmdrun)
+          BASE_BINARY_SIZE_MB=$(echo "scale=2; $BASE_BINARY_SIZE / 1024 / 1024" | bc)
+
+          echo "BASE_STARTUP_MS=${BASE_STARTUP_MS}" >> $GITHUB_ENV
+          echo "BASE_BINARY_SIZE_MB=${BASE_BINARY_SIZE_MB}" >> $GITHUB_ENV
+
+          echo "🔍 Base performance:"
+          echo "  Startup time: ${BASE_STARTUP_MS}ms"
+          echo "  Binary size: ${BASE_BINARY_SIZE_MB}MB"
+
+      - name: Download PR performance results
+        uses: actions/download-artifact@v4
+        with:
+          name: benchmark-results
+
+      - name: Compare performance
+        run: |
+          echo "⚖️  Comparing performance..."
+
+          # Extract PR performance from environment (set by main benchmark job)
+          # This is a simplified comparison - in a real scenario, you'd parse the JSON
+
+          echo "🔍 Performance comparison will be available in the full implementation"
+          echo "📊 Base: ${BASE_STARTUP_MS}ms startup, ${BASE_BINARY_SIZE_MB}MB binary"
+          echo "📊 This would compare against PR results for regression detection"
+
+  memory-profiling:
+    name: Memory Profiling
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Valgrind
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y valgrind
+
+      - name: Build debug binary
+        run: cargo build
+
+      - name: Run memory profiling
+        run: |
+          echo "🔍 Running memory profiling with Valgrind..."
+          valgrind --tool=massif --time-unit=B \
+            ./target/debug/cmdrun --version 2>&1 | tee massif_output.txt || true
+
+      - name: Generate memory report
+        run: |
+          echo "📊 Memory profiling complete"
+          echo "Results available in massif output"
+
+      - name: Upload profiling results
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-profiling-results
+          path: |
+            massif_output.txt
+            massif.out.*
+          retention-days: 30

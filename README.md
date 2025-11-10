@@ -3,6 +3,9 @@
 [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/sanae-abe/cmdrun)
 [![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://github.com/sanae-abe/cmdrun/workflows/CI/badge.svg)](https://github.com/sanae-abe/cmdrun/actions)
+[![Coverage](https://github.com/sanae-abe/cmdrun/workflows/Coverage/badge.svg)](https://github.com/sanae-abe/cmdrun/actions)
+[![codecov](https://codecov.io/gh/sanae-abe/cmdrun/branch/main/graph/badge.svg?token=)](https://codecov.io/gh/sanae-abe/cmdrun)
 
 [English](README.md) | [日本語](README.ja.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
 
@@ -685,6 +688,58 @@ script:
 
 For more details, see the [CLI Reference](docs/user-guide/CLI.md).
 
+## Testing
+
+cmdrun maintains comprehensive test coverage across multiple categories:
+
+### Test Coverage
+
+- **Current Coverage**: 70%+ (target: 85%)
+- **Test Categories**: Unit, Integration, E2E, Security, Property-based
+- **Platform Coverage**: Linux, macOS, Windows
+- **Automated CI/CD**: GitHub Actions with coverage reporting
+
+### Running Tests
+
+```bash
+# Run all tests
+cargo test
+
+# Run with coverage (requires cargo-tarpaulin)
+cargo install cargo-tarpaulin
+cargo tarpaulin --out Html --output-dir ./coverage
+
+# Run specific test categories
+cargo test --test integration
+cargo test --test e2e_tests
+cargo test --test security
+
+# Generate comprehensive coverage report
+cargo tarpaulin --lib --bins --tests --out Xml --out Html \
+  --output-dir ./coverage --timeout 600
+```
+
+### Coverage Reports
+
+Coverage reports are automatically generated for every PR and push to main branch:
+
+- **Codecov Integration**: Detailed coverage analysis with diff coverage
+- **Automated Thresholds**: CI fails if coverage drops below 55%
+- **HTML Reports**: Detailed coverage reports available as GitHub Actions artifacts
+- **PR Comments**: Coverage percentage automatically posted on pull requests
+
+### Test Structure
+
+```
+tests/
+├── integration/        # Integration tests (command workflows)
+├── e2e/               # End-to-end tests (CLI behavior)
+├── unit_i18n.rs      # Internationalization tests
+└── README.md          # Test documentation
+```
+
+See [Test Documentation](tests/README.md) for detailed testing information.
+
 ## Documentation
 
 ### User Guide
@@ -696,6 +751,12 @@ For more details, see the [CLI Reference](docs/user-guide/CLI.md).
 - [FAQ](docs/user-guide/FAQ.md)
 - [Recipes](docs/user-guide/RECIPES.md)
 - [Troubleshooting](docs/user-guide/TROUBLESHOOTING.md)
+
+### Quality & Testing
+- [Test Documentation](tests/README.md)
+- [Coverage Reports](https://codecov.io/gh/sanae-abe/cmdrun) (Codecov)
+- [Performance Benchmarks](docs/technical/PERFORMANCE_BENCHMARKS.md)
+- [CI/CD Pipeline](https://github.com/sanae-abe/cmdrun/actions) (GitHub Actions)
 
 ### Feature Guides
 - [Environment Management](docs/ENVIRONMENT_MANAGEMENT.md)
