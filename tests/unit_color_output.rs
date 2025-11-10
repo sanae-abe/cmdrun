@@ -58,10 +58,39 @@ fn test_color_choice_invalid() {
 mod integration {
     use std::process::Command;
 
+    // Helper function to get the cmdrun binary path
+    fn get_cmdrun_binary() -> std::path::PathBuf {
+        // Try to use the test binary path first (for `cargo test`)
+        if let Ok(bin_path) = std::env::var("CARGO_BIN_EXE_cmdrun") {
+            return std::path::PathBuf::from(bin_path);
+        }
+
+        // Fallback: build the path manually
+        let mut path = std::env::current_exe()
+            .expect("Failed to get current exe path")
+            .parent()
+            .expect("Failed to get parent dir")
+            .to_path_buf();
+
+        // Go up to target/debug or target/release
+        if path.ends_with("deps") {
+            path.pop();
+        }
+
+        path.push("cmdrun");
+        if cfg!(windows) {
+            path.set_extension("exe");
+        }
+
+        path
+    }
+
     #[test]
     fn test_color_flag_never() {
-        let output = Command::new("cargo")
-            .args(["run", "--quiet", "--", "list", "--color=never"])
+        let cmdrun_bin = get_cmdrun_binary();
+
+        let output = Command::new(&cmdrun_bin)
+            .args(["list", "--color=never"])
             .env("NO_COLOR", "0") // Make sure NO_COLOR doesn't interfere
             .env_remove("NO_COLOR")
             .output()
@@ -78,23 +107,38 @@ mod integration {
 
     #[test]
     fn test_color_flag_always() {
-        let output = Command::new("cargo")
-            .args(["run", "--quiet", "--", "list", "--color=always"])
+        let cmdrun_bin = get_cmdrun_binary();
+
+        let output = Command::new(&cmdrun_bin)
+            .args(["list", "--color=always"])
             .output()
             .expect("Failed to execute command");
 
         let stdout = String::from_utf8_lossy(&output.stdout);
+        let stderr = String::from_utf8_lossy(&output.stderr);
 
         // With --color=always, output should contain color codes even when not a TTY
         // Note: This test might need adjustment based on actual implementation
         // For now, we just check the command doesn't error
-        assert!(output.status.success() || !stdout.is_empty());
+        if !output.status.success() {
+            eprintln!("Command failed with exit code: {:?}", output.status.code());
+            eprintln!("stdout: {}", stdout);
+            eprintln!("stderr: {}", stderr);
+        }
+        assert!(
+            output.status.success(),
+            "Command should succeed, but failed with stdout: {}, stderr: {}",
+            stdout,
+            stderr
+        );
     }
 
     #[test]
     fn test_help_shows_color_option() {
-        let output = Command::new("cargo")
-            .args(["run", "--quiet", "--", "--help"])
+        let cmdrun_bin = get_cmdrun_binary();
+
+        let output = Command::new(&cmdrun_bin)
+            .args(["--help"])
             .output()
             .expect("Failed to execute command");
 
