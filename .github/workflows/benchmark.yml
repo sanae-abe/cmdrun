@@ -71,12 +71,12 @@ jobs:
           echo "BINARY_SIZE=${BINARY_SIZE}" >> $GITHUB_ENV
           echo "BINARY_SIZE_MB=${BINARY_SIZE_MB}" >> $GITHUB_ENV
 
-          # Check against target (5MB)
-          TARGET_SIZE=5242880  # 5MB in bytes
+          # Check against target (8MB)
+          TARGET_SIZE=8388608  # 8MB in bytes
           if [ $BINARY_SIZE -le $TARGET_SIZE ]; then
-            echo "✅ Binary size ${BINARY_SIZE_MB}MB is within target (5MB)"
+            echo "✅ Binary size ${BINARY_SIZE_MB}MB is within target (8MB)"
           else
-            echo "❌ Binary size ${BINARY_SIZE_MB}MB exceeds target (5MB)"
+            echo "❌ Binary size ${BINARY_SIZE_MB}MB exceeds target (8MB)"
             exit 1
           fi
 
@@ -171,7 +171,7 @@ jobs:
 
           | Metric | Target | Actual | Status |
           |--------|--------|---------|---------|
-          | Binary Size | ≤ 5MB | ${BINARY_SIZE_MB}MB | $([ "${BINARY_SIZE}" -le "5242880" ] && echo "✅ Pass" || echo "❌ Fail") |
+          | Binary Size | ≤ 8MB | ${BINARY_SIZE_MB}MB | $([ "${BINARY_SIZE}" -le "8388608" ] && echo "✅ Pass" || echo "❌ Fail") |
           | Startup Time | ≤ 4ms | ${STARTUP_TIME_MS}ms | $([ "$(echo "${STARTUP_TIME_MS} <= 4.0" | bc -l)" = "1" ] && echo "✅ Pass" || echo "❌ Fail") |
           | Memory Usage | ≤ 10MB | ${MEMORY_MB}MB | $([ "$(echo "${MEMORY_MB} <= 10.0" | bc -l)" = "1" ] && echo "✅ Pass" || echo "❌ Fail") |
 

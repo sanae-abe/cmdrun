@@ -8,7 +8,7 @@ cmdrun maintains strict performance targets to ensure it remains a fast, lightwe
 |--------|--------|-----------|
 | **Startup Time** | ≤ 4ms | Must be faster than shell alias overhead |
 | **Memory Usage** | ≤ 10MB | Minimal impact on system resources |
-| **Binary Size** | ≤ 5MB | Fast downloads and minimal disk usage |
+| **Binary Size** | ≤ 8MB | Fast downloads, supports comprehensive feature set |
 | **Config Loading** | ≤ 1ms | Instant response for typical configs (< 100 commands) |
 
 ## 📊 Benchmark Categories

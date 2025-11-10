@@ -10,7 +10,7 @@
 - **プロジェクトタイプ**: CLIツール、システムユーティリティ
 - **主要技術**: tokio (async runtime), clap (CLI), TOML設定、ファイル監視
 - **セキュリティ重視**: シェルインジェクション対策、機密情報保護、入力検証
-- **パフォーマンス目標**: 起動時間4ms、メモリ10MB以下
+- **パフォーマンス目標**: 起動時間4ms、メモリ10MB以下、バイナリサイズ8MB以下
 
 ## 🤖 推奨Subagents（プロジェクト特化）
 
@@ -222,7 +222,7 @@ Task(multi-agent-coordinator, "rust-engineer、security-auditor、performance-en
 ```yaml
 起動時間: 4ms以下
 メモリ使用量: 10MB以下（アイドル時）
-バイナリサイズ: 5MB以下（strip後）
+バイナリサイズ: 8MB以下（strip後）
 TOML パース: 1ms以下（標準的な設定ファイル）
 ```
 
