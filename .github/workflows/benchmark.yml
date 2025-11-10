@@ -80,6 +80,26 @@ jobs:
             exit 1
           fi
 
+      - name: Create startup time measurement script
+        run: |
+          mkdir -p scripts
+          cat > scripts/measure_startup.sh << 'EOF'
+          #!/bin/bash
+          # Measure process startup time in nanoseconds
+
+          BINARY="$1"
+          shift
+          ARGS="$@"
+
+          # Use GNU time with high precision
+          START=$(date +%s%N)
+          "$BINARY" $ARGS > /dev/null 2>&1
+          END=$(date +%s%N)
+
+          echo $(($END - $START))
+          EOF
+          chmod +x scripts/measure_startup.sh
+
       - name: Measure startup time
         run: |
           echo "⏱️  Measuring startup time..."
@@ -136,26 +156,6 @@ jobs:
             echo "❌ Memory usage ${MEMORY_MB}MB exceeds target (${TARGET_MB}MB)"
             exit 1
           fi
-
-      - name: Create startup time measurement script
-        run: |
-          mkdir -p scripts
-          cat > scripts/measure_startup.sh << 'EOF'
-          #!/bin/bash
-          # Measure process startup time in nanoseconds
-
-          BINARY="$1"
-          shift
-          ARGS="$@"
-
-          # Use GNU time with high precision
-          START=$(date +%s%N)
-          "$BINARY" $ARGS > /dev/null 2>&1
-          END=$(date +%s%N)
-
-          echo $(($END - $START))
-          EOF
-          chmod +x scripts/measure_startup.sh
 
       - name: Generate performance report
         run: |
