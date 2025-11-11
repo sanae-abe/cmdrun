@@ -698,8 +698,29 @@ cmd = "echo Hello World"
             .output()
             .expect("Failed to execute cmdrun");
 
-        assert!(output.status.success(), "echo should work on all platforms");
-        assert!(String::from_utf8_lossy(&output.stdout).contains("Hello World"));
+        // Debug output for Windows CI investigation
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        eprintln!("=== DEBUG: test_echo_command ===");
+        eprintln!("Binary path: {:?}", get_cmdrun_binary());
+        eprintln!("Exit code: {:?}", output.status.code());
+        eprintln!("Stdout length: {}", stdout.len());
+        eprintln!("Stdout content: {:?}", stdout);
+        eprintln!("Stderr length: {}", stderr.len());
+        eprintln!("Stderr content: {:?}", stderr);
+        eprintln!("================================");
+
+        assert!(
+            output.status.success(),
+            "echo should work on all platforms. Exit code: {:?}, stderr: {}",
+            output.status.code(),
+            stderr
+        );
+        assert!(
+            stdout.contains("Hello World"),
+            "stdout should contain 'Hello World'. Actual stdout: {:?}",
+            stdout
+        );
     }
 
     #[test]
