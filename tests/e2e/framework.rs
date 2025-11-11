@@ -115,6 +115,7 @@ impl CmdrunTestEnv {
     /// # Arguments
     /// * `output` - コマンド実行結果
     /// * `expected` - 期待される文字列
+    #[allow(dead_code)]
     pub fn assert_stderr_contains(&self, output: &Output, expected: &str) {
         let stderr = String::from_utf8_lossy(&output.stderr);
         assert!(
@@ -141,6 +142,7 @@ impl CmdrunTestEnv {
     /// # Arguments
     /// * `output` - コマンド実行結果
     /// * `expected_code` - 期待される終了コード
+    #[allow(dead_code)]
     pub fn assert_exit_code(&self, output: &Output, expected_code: i32) {
         let actual_code = output.status.code().unwrap_or(-1);
         assert_eq!(
@@ -161,11 +163,13 @@ impl CmdrunTestEnv {
     }
 
     /// 設定ファイルの内容を読み取り
+    #[allow(dead_code)]
     pub fn read_config(&self) -> String {
         std::fs::read_to_string(self.config_path()).expect("Failed to read config file")
     }
 
     /// 設定ファイルに内容を書き込み
+    #[allow(dead_code)]
     pub fn write_config(&self, content: &str) {
         std::fs::write(self.config_path(), content).expect("Failed to write config file");
     }
@@ -180,6 +184,7 @@ impl CmdrunTestEnv {
     }
 
     /// 設定ファイルに期待される内容が含まれることを確認
+    #[allow(dead_code)]
     pub fn assert_config_contains(&self, expected: &str) {
         let config = self.read_config();
         assert!(

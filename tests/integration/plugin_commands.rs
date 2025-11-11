@@ -30,6 +30,7 @@ fn run_plugin_command(args: &[&str]) -> Result<std::process::Output, std::io::Er
 }
 
 /// Test helper to check if output contains expected pattern
+#[allow(dead_code)]
 fn assert_contains(output: &[u8], pattern: &str) {
     let stdout = String::from_utf8_lossy(output);
     assert!(
@@ -41,6 +42,7 @@ fn assert_contains(output: &[u8], pattern: &str) {
 }
 
 /// Test helper to check if stderr contains expected pattern
+#[allow(dead_code)]
 fn assert_stderr_contains(stderr: &[u8], pattern: &str) {
     let stderr_str = String::from_utf8_lossy(stderr);
     assert!(

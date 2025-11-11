@@ -200,7 +200,7 @@ fn test_watch_workflow() {
 
     // Watch機能のテスト（実装済みの場合）
     // 注: 実際のファイル監視は時間がかかるため、ここでは起動確認のみ
-    let watch = env.run_command(&["watch", "test", "--help"]);
+    let _watch = env.run_command(&["watch", "test", "--help"]);
     // helpが表示されればOK（実際のwatch実行は別のテストで）
 }
 

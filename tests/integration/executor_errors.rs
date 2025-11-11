@@ -479,7 +479,7 @@ async fn test_command_with_nonzero_exit_code() {
     let executor = CommandExecutor::new(ctx);
 
     // Command that exits with non-zero code
-    let fail_cmd = if cfg!(windows) { "exit 1" } else { "exit 1" };
+    let fail_cmd = "exit 1";
 
     let command = Command {
         description: "Command with exit code 1".to_string(),
