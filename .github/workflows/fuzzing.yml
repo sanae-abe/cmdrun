@@ -158,7 +158,7 @@ jobs:
     if: failure()
     steps:
       - name: Create issue for crashes
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const title = '🐛 Fuzzing found crashes';
