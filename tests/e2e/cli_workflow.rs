@@ -60,7 +60,12 @@ fn test_dependency_workflow() {
     let add_test = env.run_command(&["add", "mytest", "echo Testing...", "Run tests"]);
     env.assert_success(&add_test);
 
-    let add_deploy = env.run_command(&["add", "mydeploy", "echo Deploying...", "Deploy to production"]);
+    let add_deploy = env.run_command(&[
+        "add",
+        "mydeploy",
+        "echo Deploying...",
+        "Deploy to production",
+    ]);
     env.assert_success(&add_deploy);
 
     // 各コマンドを個別に実行して動作確認
@@ -86,12 +91,7 @@ fn test_parallel_execution_workflow() {
     // 並列実行可能なコマンドを追加
     env.run_command(&["add", "lint", "echo Linting...", "Lint code"]);
     env.run_command(&["add", "format", "echo Formatting...", "Format code"]);
-    env.run_command(&[
-        "add",
-        "typecheck",
-        "echo Type checking...",
-        "Type check",
-    ]);
+    env.run_command(&["add", "typecheck", "echo Type checking...", "Type check"]);
 
     // 並列実行（実装済みの場合）
     let output = env.run_command(&["lint", "format", "typecheck", "--parallel"]);
