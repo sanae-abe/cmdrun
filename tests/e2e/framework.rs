@@ -35,12 +35,9 @@ impl CmdrunTestEnv {
         // .cmdrunディレクトリを作成
         std::fs::create_dir_all(&config_dir).expect("Failed to create .cmdrun directory");
 
-        // バイナリパスを検出（debug or release）
-        let binary_path = if cfg!(debug_assertions) {
-            PathBuf::from("target/debug/cmdrun")
-        } else {
-            PathBuf::from("target/release/cmdrun")
-        };
+        // バイナリパスを検出（Cargoが提供する正確なパスを使用）
+        // env!("CARGO_BIN_EXE_cmdrun") はテスト環境でコンパイルされたバイナリの正確なパスを提供
+        let binary_path = PathBuf::from(env!("CARGO_BIN_EXE_cmdrun"));
 
         Self {
             temp_dir,
@@ -60,8 +57,13 @@ impl CmdrunTestEnv {
     /// let output = env.run_command(&["add", "test", "echo hello"]);
     /// ```
     pub fn run_command(&self, args: &[&str]) -> Output {
+        // ローカル設定ファイルのみを使用するため、--configオプションを追加
+        let config_path = self.config_path();
+        let mut full_args = vec!["--config", config_path.to_str().unwrap()];
+        full_args.extend_from_slice(args);
+
         Command::new(&self.binary_path)
-            .args(args)
+            .args(&full_args)
             .current_dir(self.temp_dir.path())
             .output()
             .expect("Failed to execute cmdrun")
@@ -154,7 +156,8 @@ impl CmdrunTestEnv {
 
     /// 設定ファイルパスを取得
     pub fn config_path(&self) -> PathBuf {
-        self.config_dir.join("config.toml")
+        // cmdrun init は現在のディレクトリに commands.toml を作成する
+        self.temp_dir.path().join("commands.toml")
     }
 
     /// 一時ディレクトリのパスを取得
