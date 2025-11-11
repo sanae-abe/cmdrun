@@ -55,7 +55,7 @@ walkdir = "2.5"
 globset = "0.4"
 ignore = "0.4"  # .gitignore 対応
 notify = "6.1"  # ファイル監視
-notify-debouncer-full = "0.3"  # イベントデバウンス
+notify-debouncer-full = "0.6"  # イベントデバウンス
 
 # プロセス実行（クロスプラットフォーム） - tokio::process使用
 shell-words = "1.1"  # シェルコマンド解析
