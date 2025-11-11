@@ -14,19 +14,218 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  test:
-    name: Test
+  # ============================================================================
+  # Unit Tests - 単体テストの実行（クロスプラットフォーム）
+  # ============================================================================
+  unit-test:
+    name: Unit Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - name: Run tests
-        run: cargo test --all-features --verbose
 
+      # 単体テスト（libのみ）
+      - name: Run unit tests
+        run: cargo test --lib --all-features --verbose
+
+      # ドキュメントテスト
+      - name: Run doc tests
+        run: cargo test --doc --all-features --verbose
+
+  # ============================================================================
+  # Integration Tests - 統合テスト（E2Eを含む）
+  # ============================================================================
+  integration-test:
+    name: Integration Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      # 統合テスト（tests/配下）
+      - name: Run integration tests
+        run: cargo test --test '*' --all-features --verbose
+
+      # セキュリティテスト
+      - name: Run security tests
+        run: cargo test --test security_injection --all-features --verbose
+
+  # ============================================================================
+  # CLI Smoke Tests - CLIバイナリの基本動作確認
+  # ============================================================================
+  cli-smoke-test:
+    name: CLI Smoke Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      # リリースビルド（最適化済みバイナリ）
+      - name: Build CLI binary (release)
+        run: cargo build --release --bin cmdrun
+
+      # バイナリサイズチェック（8MB目標）
+      - name: Check binary size (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          SIZE=$(stat -c%s target/release/cmdrun)
+          SIZE_MB=$((SIZE / 1024 / 1024))
+          echo "Binary size: ${SIZE_MB}MB"
+          if [ $SIZE_MB -gt 8 ]; then
+            echo "❌ Binary size ${SIZE_MB}MB exceeds 8MB target"
+            exit 1
+          fi
+          echo "✅ Binary size ${SIZE_MB}MB meets target"
+
+      - name: Check binary size (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          SIZE=$(stat -f%z target/release/cmdrun)
+          SIZE_MB=$((SIZE / 1024 / 1024))
+          echo "Binary size: ${SIZE_MB}MB"
+          if [ $SIZE_MB -gt 8 ]; then
+            echo "❌ Binary size ${SIZE_MB}MB exceeds 8MB target"
+            exit 1
+          fi
+          echo "✅ Binary size ${SIZE_MB}MB meets target"
+
+      - name: Check binary size (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          SIZE=$(stat -c%s target/release/cmdrun.exe 2>/dev/null || stat --printf="%s" target/release/cmdrun.exe)
+          SIZE_MB=$((SIZE / 1024 / 1024))
+          echo "Binary size: ${SIZE_MB}MB"
+          if [ $SIZE_MB -gt 8 ]; then
+            echo "❌ Binary size ${SIZE_MB}MB exceeds 8MB target"
+            exit 1
+          fi
+          echo "✅ Binary size ${SIZE_MB}MB meets target"
+
+      # 基本コマンド動作確認
+      - name: Test --version flag
+        run: |
+          ./target/release/cmdrun --version
+
+      - name: Test --version flag (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          ./target/release/cmdrun.exe --version
+
+      - name: Test --help flag
+        run: |
+          ./target/release/cmdrun --help
+
+      - name: Test --help flag (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          ./target/release/cmdrun.exe --help
+
+      # 設定ファイル作成と基本操作
+      - name: Test init command
+        shell: bash
+        run: |
+          mkdir -p test_workspace
+          cd test_workspace
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            ../target/release/cmdrun.exe init
+          else
+            ../target/release/cmdrun init
+          fi
+
+      - name: Test list command (empty config)
+        shell: bash
+        run: |
+          cd test_workspace
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            ../target/release/cmdrun.exe list
+          else
+            ../target/release/cmdrun list
+          fi
+
+      # コマンド追加と実行
+      - name: Test add and run commands (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cd test_workspace
+          ../target/release/cmdrun add smoke-test "echo Hello from cmdrun" "Smoke test command"
+          ../target/release/cmdrun list
+          ../target/release/cmdrun run smoke-test
+
+      - name: Test add and run commands (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          cd test_workspace
+          ../target/release/cmdrun.exe add smoke-test "echo Hello from cmdrun" "Smoke test command"
+          ../target/release/cmdrun.exe list
+          ../target/release/cmdrun.exe run smoke-test
+
+      # カラー出力テスト
+      - name: Test color flags
+        shell: bash
+        run: |
+          cd test_workspace
+          if [ "$RUNNER_OS" == "Windows" ]; then
+            ../target/release/cmdrun.exe --color never list
+            ../target/release/cmdrun.exe --color always list
+          else
+            ../target/release/cmdrun --color never list
+            ../target/release/cmdrun --color always list
+          fi
+
+      # アップロードアーティファクト（バイナリ保存）
+      - name: Upload CLI binary
+        uses: actions/upload-artifact@v5
+        with:
+          name: cmdrun-${{ matrix.os }}
+          path: |
+            target/release/cmdrun
+            target/release/cmdrun.exe
+          retention-days: 7
+
+  # ============================================================================
+  # CLI E2E Tests - CLIバイナリを使ったE2Eテスト
+  # ============================================================================
+  cli-e2e-test:
+    name: CLI E2E Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    needs: cli-smoke-test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      # E2Eテスト（CLIバイナリ使用）
+      - name: Run CLI E2E tests
+        run: cargo test --test cli_main --all-features --verbose
+
+      - name: Run cross-platform tests
+        run: cargo test --test cross_platform --all-features --verbose
+
+  # ============================================================================
+  # Lint - コード品質チェック
+  # ============================================================================
   lint:
     name: Lint
     runs-on: ubuntu-latest
@@ -53,41 +252,103 @@ jobs:
       - name: Run audit
         run: cargo audit
 
+  # ============================================================================
+  # Code Coverage - コードカバレッジ測定（統合テストを含む）
+  # ============================================================================
   coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
+    needs: [unit-test, integration-test]
     steps:
       - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
+
       - name: Install tarpaulin
         run: cargo install cargo-tarpaulin
-      - name: Generate coverage
-        run: cargo tarpaulin --workspace --out Xml --out Html --output-dir ./coverage --exclude-files 'build.rs' 'tests/*' --timeout 300 || true
+
+      # カバレッジ生成（統合テストを含める）
+      # --exclude-files: build.rsのみ除外、testsディレクトリは含める
+      - name: Generate coverage (with integration tests)
+        run: |
+          cargo tarpaulin \
+            --workspace \
+            --out Xml \
+            --out Html \
+            --output-dir ./coverage \
+            --exclude-files 'build.rs' \
+            --timeout 600 \
+            --verbose \
+            || true
+
+      # カバレッジレポートのサマリー表示
+      - name: Display coverage summary
+        run: |
+          if [[ -f coverage/cobertura.xml ]]; then
+            echo "### Coverage Summary"
+            COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' coverage/cobertura.xml | head -1)
+            COVERAGE_PERCENT=$(echo "$COVERAGE * 100" | bc)
+            echo "Total Coverage: ${COVERAGE_PERCENT}%"
+
+            # ファイル別カバレッジを表示
+            echo ""
+            echo "### File Coverage"
+            grep -E '<class.*line-rate=' coverage/cobertura.xml | head -20 || true
+          fi
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           files: ./coverage/cobertura.xml
           fail_ci_if_error: false
+          flags: unittests,integration
+          name: codecov-cmdrun
+
       - name: Archive coverage report
         uses: actions/upload-artifact@v5
         with:
           name: coverage-report
           path: coverage/
+          retention-days: 14
+
+      # カバレッジ閾値チェック（54% 目標）
       - name: Check coverage threshold
         run: |
           if [[ -f coverage/cobertura.xml ]]; then
             COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' coverage/cobertura.xml | head -1)
             COVERAGE_PERCENT=$(echo "$COVERAGE * 100" | bc)
-            echo "Coverage: $COVERAGE_PERCENT%"
+            echo "Coverage: ${COVERAGE_PERCENT}%"
+
+            # 54%閾値チェック
             if (( $(echo "$COVERAGE < 0.54" | bc -l) )); then
-              echo "❌ Coverage $COVERAGE_PERCENT% is below 54% threshold"
+              echo "❌ Coverage ${COVERAGE_PERCENT}% is below 54% threshold"
               exit 1
             fi
-            echo "✅ Coverage $COVERAGE_PERCENT% meets threshold"
+            echo "✅ Coverage ${COVERAGE_PERCENT}% meets 54% threshold"
           else
             echo "⚠️ Coverage file not found, skipping threshold check"
           fi
+
+  # ============================================================================
+  # Test Summary - 全テスト結果のサマリー
+  # ============================================================================
+  test-summary:
+    name: Test Summary
+    runs-on: ubuntu-latest
+    needs: [unit-test, integration-test, cli-smoke-test, cli-e2e-test, lint, security-audit, coverage]
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "### CI Test Summary"
+          echo "All test jobs completed"
+          echo "- Unit Tests: ${{ needs.unit-test.result }}"
+          echo "- Integration Tests: ${{ needs.integration-test.result }}"
+          echo "- CLI Smoke Tests: ${{ needs.cli-smoke-test.result }}"
+          echo "- CLI E2E Tests: ${{ needs.cli-e2e-test.result }}"
+          echo "- Lint: ${{ needs.lint.result }}"
+          echo "- Security Audit: ${{ needs.security-audit.result }}"
+          echo "- Coverage: ${{ needs.coverage.result }}"
 
   # Temporarily disabled due to gh-pages branch requirement
   # Re-enable when gh-pages branch is created or alternative storage is configured

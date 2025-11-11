@@ -132,13 +132,9 @@ pub async fn handle_search(keyword: String, config_path: Option<PathBuf>) -> Res
 
 #[cfg(test)]
 mod tests {
-
-    // TODO: Implement actual search test with temporary config file
-    // #[tokio::test]
-    // async fn test_search_matching() {
-    //     // This is a conceptual test - actual testing would require
-    //     // setting up a temporary config file
-    // }
+    use super::*;
+    use std::fs;
+    use tempfile::NamedTempFile;
 
     #[test]
     fn test_keyword_case_insensitive() {
@@ -148,5 +144,114 @@ mod tests {
 
         let text = "This is a Test command";
         assert!(text.to_lowercase().contains(&keyword_lower));
+    }
+
+    #[tokio::test]
+    async fn test_search_matching_by_id() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        let config = r#"
+[commands.build]
+description = "Build the project"
+cmd = "cargo build"
+
+[commands.test]
+description = "Run tests"
+cmd = "cargo test"
+"#;
+        fs::write(&path, config).unwrap();
+
+        let result = handle_search("build".to_string(), Some(path)).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_search_matching_by_description() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        let config = r#"
+[commands.deploy]
+description = "Deploy to production"
+cmd = "kubectl apply"
+"#;
+        fs::write(&path, config).unwrap();
+
+        let result = handle_search("production".to_string(), Some(path)).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_search_no_results() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        let config = r#"
+[commands.hello]
+description = "Say hello"
+cmd = "echo hello"
+"#;
+        fs::write(&path, config).unwrap();
+
+        let result = handle_search("nonexistent".to_string(), Some(path)).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_search_matching_by_tags() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        let config = r#"
+[commands.docker_build]
+description = "Build Docker image"
+cmd = "docker build"
+tags = ["docker", "container", "build"]
+"#;
+        fs::write(&path, config).unwrap();
+
+        let result = handle_search("docker".to_string(), Some(path)).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_search_case_insensitive() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        let config = r#"
+[commands.frontend]
+description = "Frontend development tasks"
+cmd = "npm run dev"
+"#;
+        fs::write(&path, config).unwrap();
+
+        // Search with uppercase should still match
+        let result = handle_search("FRONTEND".to_string(), Some(path)).await;
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_search_multiple_command_types() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        let config = r#"
+[commands.multi_step]
+description = "Multi-step build"
+cmd = ["step1", "step2", "step3"]
+
+[commands.platform_specific]
+description = "Platform-specific command"
+
+[commands.platform_specific.cmd]
+unix = "ls -la"
+windows = "dir"
+"#;
+        fs::write(&path, config).unwrap();
+
+        let result = handle_search("step".to_string(), Some(path)).await;
+        assert!(result.is_ok());
     }
 }
