@@ -110,3 +110,4 @@ jobs:
           fail-on-alert: false
           summary-always: true
           skip-fetch-gh-pages: true
+          save-data-file: false
