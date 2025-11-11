@@ -1,7 +1,7 @@
 //! Main file watcher implementation
 
 use anyhow::{Context, Result};
-use notify::{EventKind, RecommendedWatcher, RecursiveMode, Watcher};
+use notify::{EventKind, RecommendedWatcher, RecursiveMode};
 use notify_debouncer_full::{new_debouncer, DebounceEventResult, Debouncer, FileIdMap};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -155,7 +155,6 @@ impl WatchRunner {
             };
 
             debouncer
-                .watcher()
                 .watch(path, mode)
                 .with_context(|| format!("Failed to watch path: {}", path.display()))?;
 
