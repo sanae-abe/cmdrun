@@ -269,7 +269,7 @@ jobs:
           echo "  Binary size: ${BASE_BINARY_SIZE_MB}MB"
 
       - name: Download PR performance results
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           name: benchmark-results
 
