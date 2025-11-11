@@ -267,9 +267,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ConfigurationIsValid => "Configuration is valid",
 
             // ====== 対話プロンプト ======
-            PromptCommandId => "Command ID",
-            PromptCommand => "Command",
-            PromptDescription => "Description",
+            PromptCommandId => "Command ID:",
+            PromptCommand => "Command:",
+            PromptDescription => "Description:",
             PromptCategory => "Category",
             PromptTags => "Tags (comma-separated)",
             PromptConfirm => "Are you sure?",
@@ -501,9 +501,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ConfigurationIsValid => "設定は有効です",
 
             // ====== 対話プロンプト ======
-            PromptCommandId => "コマンドID",
-            PromptCommand => "コマンド",
-            PromptDescription => "説明",
+            PromptCommandId => "コマンドID:",
+            PromptCommand => "コマンド：",
+            PromptDescription => "説明：",
             PromptCategory => "カテゴリ",
             PromptTags => "タグ（カンマ区切り）",
             PromptConfirm => "よろしいですか？",
@@ -735,9 +735,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ConfigurationIsValid => "配置有效",
 
             // ====== 交互提示 ======
-            PromptCommandId => "命令ID",
-            PromptCommand => "命令",
-            PromptDescription => "描述",
+            PromptCommandId => "命令ID：",
+            PromptCommand => "命令：",
+            PromptDescription => "描述：",
             PromptCategory => "分类",
             PromptTags => "标签（逗号分隔）",
             PromptConfirm => "确定吗？",
@@ -969,9 +969,9 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ConfigurationIsValid => "配置有效",
 
             // ====== 互動提示 ======
-            PromptCommandId => "命令ID",
-            PromptCommand => "命令",
-            PromptDescription => "描述",
+            PromptCommandId => "命令ID：",
+            PromptCommand => "命令：",
+            PromptDescription => "描述：",
             PromptCategory => "分類",
             PromptTags => "標籤（逗號分隔）",
             PromptConfirm => "您確定嗎？",
