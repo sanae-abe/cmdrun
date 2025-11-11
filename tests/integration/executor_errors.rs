@@ -208,6 +208,36 @@ async fn test_command_not_found() {
     );
 }
 
+/// Tests command execution with shell syntax errors
+///
+/// # Platform Differences in Syntax Error Handling
+///
+/// Different shells have vastly different approaches to syntax validation:
+///
+/// ## Unix Shells (bash, zsh, sh)
+/// - **Strict syntax checking**: Parse and validate before execution
+/// - **Immediate errors**: Unclosed quotes, braces, parentheses cause errors
+/// - **Exit code**: Non-zero on syntax errors
+///
+/// ## Windows cmd.exe
+/// - **Lenient parser**: Minimal pre-execution validation
+/// - **Runtime interpretation**: Some "errors" are treated as literals
+/// - **Notable exception**: Unclosed quotes (`echo "unclosed`) outputs literal `"unclosed` with exit code 0
+///
+/// # Test Strategy
+///
+/// Due to these platform differences, we use different test commands:
+/// - **Windows**: `( echo test` - unbalanced parenthesis in command block
+/// - **Unix**: `echo ${UNCLOSED` - unclosed brace expansion
+///
+/// Both commands reliably produce syntax errors on their respective platforms.
+///
+/// # Historical Note
+///
+/// This test originally used `echo "unclosed` (Windows) and `echo 'unclosed` (Unix),
+/// expecting both to fail. However, Windows cmd.exe treats unclosed quotes as literals,
+/// causing CI failures. The test was updated to use platform-specific syntax errors
+/// that reliably fail on both platforms.
 #[tokio::test]
 async fn test_command_with_invalid_syntax() {
     let ctx = ExecutionContext {
@@ -227,11 +257,14 @@ async fn test_command_with_invalid_syntax() {
 
     let executor = CommandExecutor::new(ctx);
 
-    // Command with syntax error (unclosed quotes)
+    // Platform-specific commands that actually fail due to invalid syntax
     let invalid_cmd = if cfg!(windows) {
-        "echo \"unclosed"
+        // Windows: Malformed parenthesis in command block causes syntax error
+        // cmd.exe requires balanced parentheses in command blocks
+        "( echo test"
     } else {
-        "echo 'unclosed"
+        // Unix: Unclosed brace expansion causes immediate syntax error
+        "echo ${UNCLOSED"
     };
 
     let command = Command {
@@ -249,7 +282,7 @@ async fn test_command_with_invalid_syntax() {
 
     let result = executor.execute(&command).await;
 
-    // Should fail (shell will report syntax error)
+    // Should fail on both platforms due to syntax error
     assert!(
         result.is_err(),
         "Command with syntax error should fail, but got: {:?}",
