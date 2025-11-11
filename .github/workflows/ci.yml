@@ -89,25 +89,27 @@ jobs:
             echo "⚠️ Coverage file not found, skipping threshold check"
           fi
 
-  benchmark:
-    name: Benchmarks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-      - name: Run benchmarks
-        run: cargo bench --no-fail-fast -- --output-format bencher | tee benchmark_results.txt
-      - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@v1
-        with:
-          tool: 'cargo'
-          output-file-path: benchmark_results.txt
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          auto-push: false
-          alert-threshold: '150%'
-          comment-on-alert: true
-          fail-on-alert: false
-          summary-always: true
-          skip-fetch-gh-pages: true
-          save-data-file: false
+  # Temporarily disabled due to gh-pages branch requirement
+  # Re-enable when gh-pages branch is created or alternative storage is configured
+  # benchmark:
+  #   name: Benchmarks
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: dtolnay/rust-toolchain@stable
+  #     - uses: Swatinem/rust-cache@v2
+  #     - name: Run benchmarks
+  #       run: cargo bench --no-fail-fast -- --output-format bencher | tee benchmark_results.txt
+  #     - name: Store benchmark result
+  #       uses: benchmark-action/github-action-benchmark@v1
+  #       with:
+  #         tool: 'cargo'
+  #         output-file-path: benchmark_results.txt
+  #         github-token: ${{ secrets.GITHUB_TOKEN }}
+  #         auto-push: false
+  #         alert-threshold: '150%'
+  #         comment-on-alert: true
+  #         fail-on-alert: false
+  #         summary-always: true
+  #         skip-fetch-gh-pages: true
+  #         save-data-file: false
