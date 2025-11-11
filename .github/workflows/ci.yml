@@ -109,3 +109,4 @@ jobs:
           comment-on-alert: true
           fail-on-alert: false
           summary-always: true
+          skip-fetch-gh-pages: true
