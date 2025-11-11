@@ -83,7 +83,7 @@ which = "8.0"  # 実行可能ファイル検索
 os_info = "3.8"  # OS情報取得
 
 # セキュリティ
-secrecy = "0.8"  # 機密情報保護
+secrecy = "0.10"  # 機密情報保護
 
 # パフォーマンス最適化
 ahash = { version = "0.8", features = ["serde"] }  # 高速ハッシュマップ

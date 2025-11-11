@@ -2,18 +2,18 @@
 //!
 //! secrecyクレートを活用した機密情報のマスキングと安全な取り扱い
 
-use secrecy::{ExposeSecret, Secret};
+use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
 /// 機密文字列型（ログ出力時に自動マスキング）
 #[derive(Clone)]
-pub struct SensitiveString(Secret<String>);
+pub struct SensitiveString(SecretString);
 
 impl SensitiveString {
     /// 新しい機密文字列を作成
     pub fn new(value: String) -> Self {
-        Self(Secret::new(value))
+        Self(SecretString::from(value))
     }
 
     /// 機密情報を安全に取得（使用箇所は最小限に）
