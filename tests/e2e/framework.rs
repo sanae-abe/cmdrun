@@ -15,7 +15,6 @@ use tempfile::TempDir;
 /// - クリーンアップの自動化
 pub struct CmdrunTestEnv {
     temp_dir: TempDir,
-    config_dir: PathBuf,
     binary_path: PathBuf,
 }
 
@@ -30,10 +29,6 @@ impl CmdrunTestEnv {
     /// ```
     pub fn new() -> Self {
         let temp_dir = TempDir::new().expect("Failed to create temp directory");
-        let config_dir = temp_dir.path().join(".cmdrun");
-
-        // .cmdrunディレクトリを作成
-        std::fs::create_dir_all(&config_dir).expect("Failed to create .cmdrun directory");
 
         // バイナリパスを検出（Cargoが提供する正確なパスを使用）
         // env!("CARGO_BIN_EXE_cmdrun") はテスト環境でコンパイルされたバイナリの正確なパスを提供
@@ -41,7 +36,6 @@ impl CmdrunTestEnv {
 
         Self {
             temp_dir,
-            config_dir,
             binary_path,
         }
     }
@@ -213,7 +207,6 @@ mod tests {
     fn test_env_creation() {
         let env = CmdrunTestEnv::new();
         assert!(env.temp_path().exists());
-        assert!(env.temp_path().join(".cmdrun").exists());
     }
 
     #[test]
