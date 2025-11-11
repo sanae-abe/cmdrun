@@ -2,7 +2,7 @@
 name = "cmdrun"
 version = "1.0.0"
 edition = "2021"
-rust-version = "1.75"
+rust-version = "1.80"
 authors = ["Sanae Abe <sanae.a.sunny@gmail.com>"]
 license = "MIT"
 description = "A fast, secure, and cross-platform command runner with TOML configuration"
@@ -109,7 +109,7 @@ pretty_assertions = "1.4"  # アサーション表示改善
 tempfile = "3.12"  # 一時ファイル
 
 # ベンチマーク
-criterion = { version = "0.5", features = ["html_reports"] }
+criterion = { version = "0.7", features = ["html_reports"] }
 
 [build-dependencies]
 # ビルド時コード生成
