@@ -1,8 +1,8 @@
 //! Main file watcher implementation
 
 use anyhow::{Context, Result};
-use notify::{EventKind, RecommendedWatcher, RecursiveMode};
-use notify_debouncer_full::{new_debouncer, DebounceEventResult, Debouncer, FileIdMap};
+use notify::{EventKind, RecursiveMode};
+use notify_debouncer_full::{new_debouncer, DebounceEventResult};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::sync::mpsc;
@@ -116,7 +116,7 @@ impl WatchRunner {
         let matcher = Arc::clone(&self.matcher);
 
         // Create debounced watcher
-        let mut debouncer: Debouncer<RecommendedWatcher, FileIdMap> = new_debouncer(
+        let mut debouncer = new_debouncer(
             self.config.debounce_duration(),
             None,
             move |result: DebounceEventResult| {
