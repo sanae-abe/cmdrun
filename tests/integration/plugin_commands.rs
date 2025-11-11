@@ -14,8 +14,11 @@
 use std::process::Command;
 use tempfile::TempDir;
 
-/// Test helper to run cmdrun plugin command
-fn run_plugin_command(args: &[&str]) -> Result<std::process::Output, std::io::Error> {
+/// Test helper to run cmdrun plugin command with config file
+fn run_plugin_command_with_config(
+    args: &[&str],
+    config_path: &std::path::Path,
+) -> Result<std::process::Output, std::io::Error> {
     let mut cmd_args = vec![
         "run",
         "--bin",
@@ -23,10 +26,21 @@ fn run_plugin_command(args: &[&str]) -> Result<std::process::Output, std::io::Er
         "--features",
         "plugin-system",
         "--",
+        "--config",
+        config_path.to_str().unwrap(),
     ];
     cmd_args.extend_from_slice(args);
 
     Command::new("cargo").args(&cmd_args).output()
+}
+
+/// Test helper to run cmdrun plugin command (backward compatibility)
+fn run_plugin_command(args: &[&str]) -> Result<std::process::Output, std::io::Error> {
+    // Create temporary config for backward compatibility
+    // Leak temp_dir to keep it alive for the duration of the command
+    let temp_dir = Box::leak(Box::new(TempDir::new().expect("Failed to create temp dir")));
+    let config_path = create_test_config(temp_dir);
+    run_plugin_command_with_config(args, &config_path)
 }
 
 /// Test helper to check if output contains expected pattern
