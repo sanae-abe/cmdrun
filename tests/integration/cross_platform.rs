@@ -20,23 +20,9 @@ fn create_test_config(dir: &Path, content: &str) -> PathBuf {
 }
 
 /// Helper to get the cmdrun binary path
+/// Uses the same approach as E2E tests for reliability
 fn get_cmdrun_binary() -> PathBuf {
-    env::current_exe()
-        .ok()
-        .and_then(|mut path| {
-            path.pop(); // Remove test binary name
-            path.pop(); // Remove "deps" directory
-            path.push("cmdrun");
-            if cfg!(windows) {
-                path.set_extension("exe");
-            }
-            if path.exists() {
-                Some(path)
-            } else {
-                None
-            }
-        })
-        .unwrap_or_else(|| PathBuf::from("cmdrun"))
+    PathBuf::from(env!("CARGO_BIN_EXE_cmdrun"))
 }
 
 // =============================================================================
