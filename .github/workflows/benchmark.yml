@@ -109,8 +109,8 @@ jobs:
           done
 
           # Calculate average
-          AVG_VERSION_NS=$(echo "$VERSION_TIMES" | tr ' ' '\n' | grep -v '^$' | awk '{sum+=$1} END {print sum/NR}')
-          AVG_VERSION_MS=$(echo "scale=2; $AVG_VERSION_NS / 1000000" | bc)
+          AVG_VERSION_NS=$(echo "$VERSION_TIMES" | tr ' ' '\n' | grep -v '^$' | awk '{sum+=$1; count++} END {if (count > 0) print int(sum/count); else print 0}')
+          AVG_VERSION_MS=$(echo "scale=2; $AVG_VERSION_NS / 1000000" | bc -l)
           echo "STARTUP_TIME_NS=${AVG_VERSION_NS}" >> $GITHUB_ENV
           echo "STARTUP_TIME_MS=${AVG_VERSION_MS}" >> $GITHUB_ENV
           echo "📊 Average startup time: ${AVG_VERSION_MS}ms"
