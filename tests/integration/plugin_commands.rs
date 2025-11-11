@@ -428,6 +428,9 @@ fn test_plugin_with_global_config_flag() {
 #[test]
 #[cfg(feature = "plugin-system")]
 fn test_plugin_with_color_flag() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let config_path = create_test_config(&temp_dir);
+
     let output = Command::new("cargo")
         .args([
             "run",
@@ -436,6 +439,8 @@ fn test_plugin_with_color_flag() {
             "--features",
             "plugin-system",
             "--",
+            "--config",
+            config_path.to_str().unwrap(),
             "--color",
             "never",
             "plugin",
@@ -453,6 +458,9 @@ fn test_plugin_with_color_flag() {
 #[test]
 #[cfg(feature = "plugin-system")]
 fn test_plugin_with_verbose_flag() {
+    let temp_dir = TempDir::new().expect("Failed to create temp dir");
+    let config_path = create_test_config(&temp_dir);
+
     let output = Command::new("cargo")
         .args([
             "run",
@@ -461,6 +469,8 @@ fn test_plugin_with_verbose_flag() {
             "--features",
             "plugin-system",
             "--",
+            "--config",
+            config_path.to_str().unwrap(),
             "-v",
             "plugin",
             "list",
