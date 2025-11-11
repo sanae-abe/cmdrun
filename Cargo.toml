@@ -96,7 +96,7 @@ strsim = "0.11"  # Levenshtein distance, Jaro-Winkler等
 rusqlite = { version = "0.31", features = ["bundled"] }  # SQLite データベース
 
 # プラグインシステム
-libloading = { version = "0.8", optional = true }  # 動的ライブラリロード
+libloading = { version = "0.9", optional = true }  # 動的ライブラリロード
 abi_stable = { version = "0.11", optional = true }  # ABI安定性保証
 uuid = { version = "1.10", features = ["v4", "serde"], optional = true }  # プラグインID生成
 
