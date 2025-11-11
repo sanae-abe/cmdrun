@@ -61,7 +61,7 @@ notify-debouncer-full = "0.6"  # イベントデバウンス
 shell-words = "1.1"  # シェルコマンド解析
 
 # 環境変数・パス操作
-dirs = "5.0"
+dirs = "6.0"
 shellexpand = "3.1"
 
 # カラー出力
