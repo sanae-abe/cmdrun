@@ -85,7 +85,7 @@ jobs:
 
       - name: Upload crash artifacts
         if: failure() && steps.fuzz.outcome == 'failure'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: fuzz-crashes-${{ matrix.target }}
           path: |
@@ -102,7 +102,7 @@ jobs:
 
       - name: Upload corpus
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: fuzz-corpus-${{ matrix.target }}
           path: fuzz/corpus/${{ matrix.target }}/
