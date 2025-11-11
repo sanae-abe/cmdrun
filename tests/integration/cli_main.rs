@@ -462,7 +462,7 @@ fn test_typo_detection_suggestions() {
         r#"
 [config]
 typo_detection = true
-typo_threshold = 0.7
+typo_threshold = 2
 
 [commands.build]
 description = "Build"
