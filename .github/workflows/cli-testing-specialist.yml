@@ -67,7 +67,7 @@ jobs:
       - name: Install cli-testing-specialist
         if: steps.cache-cli-testing-specialist.outputs.cache-hit != 'true'
         run: |
-          cargo install --git https://github.com/sanae-abe/cli-testing-specialist --tag v1.0.2 cli-testing-specialist
+          cargo install --git https://github.com/sanae-abe/cli-testing-specialist --rev 3411fd4f8b2cb4937cb1c62082e4f62cbf783274 cli-testing-specialist
 
       - name: Verify cli-testing-specialist installation
         run: cli-testing-specialist --version
@@ -88,7 +88,7 @@ jobs:
           jq -r '"Subcommands: " + (.subcommands | length | tostring)' cmdrun-analysis.json
 
       - name: Upload analysis results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cli-analysis-${{ matrix.os }}
           path: cmdrun-analysis.json
@@ -110,7 +110,7 @@ jobs:
           ls -lh cli-tests/
 
       - name: Upload generated tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cli-tests-${{ matrix.os }}
           path: cli-tests/
@@ -152,7 +152,7 @@ jobs:
       # ========== Report Upload ==========
 
       - name: Upload test reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cli-test-reports-${{ matrix.os }}
@@ -160,7 +160,7 @@ jobs:
           retention-days: 30
 
       - name: Upload JUnit XML for test reporting
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: junit-report-${{ matrix.os }}
@@ -211,7 +211,7 @@ jobs:
       - name: Install cli-testing-specialist
         if: steps.cache-cli-testing-specialist-security.outputs.cache-hit != 'true'
         run: |
-          cargo install --git https://github.com/sanae-abe/cli-testing-specialist --tag v1.0.2 cli-testing-specialist
+          cargo install --git https://github.com/sanae-abe/cli-testing-specialist --rev 3411fd4f8b2cb4937cb1c62082e4f62cbf783274 cli-testing-specialist
 
       - name: Analyze CLI
         run: |
@@ -237,7 +237,7 @@ jobs:
             --output security-reports
 
       - name: Upload security reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-test-reports
