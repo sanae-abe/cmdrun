@@ -198,7 +198,7 @@ jobs:
       #     summary-always: true
 
       - name: Upload benchmark artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: benchmark-results
           path: |
@@ -316,7 +316,7 @@ jobs:
           echo "Results available in massif output"
 
       - name: Upload profiling results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: memory-profiling-results
           path: |
