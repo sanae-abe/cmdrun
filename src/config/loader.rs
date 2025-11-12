@@ -31,6 +31,8 @@ pub struct ConfigLoader {
     pub loaded_global_path: Option<PathBuf>,
     /// 実際に使用されたローカル設定ファイルパス
     pub loaded_local_path: Option<PathBuf>,
+    /// グローバル設定のみを使用するフラグ
+    global_only: bool,
 }
 
 impl ConfigLoader {
@@ -40,6 +42,17 @@ impl ConfigLoader {
             explicit_path: None,
             loaded_global_path: None,
             loaded_local_path: None,
+            global_only: false,
+        }
+    }
+
+    /// グローバル設定のみを使用するローダーを作成
+    pub fn global_only() -> Self {
+        Self {
+            explicit_path: None,
+            loaded_global_path: None,
+            loaded_local_path: None,
+            global_only: true,
         }
     }
 
@@ -65,6 +78,7 @@ impl ConfigLoader {
             explicit_path: Some(canonical_path),
             loaded_global_path: None,
             loaded_local_path: None,
+            global_only: false,
         })
     }
 
@@ -102,6 +116,16 @@ impl ConfigLoader {
                 (None, None)
             }
         };
+
+        // グローバルのみモードの場合、ローカル設定を探さない
+        if self.global_only {
+            let config = global_config.context("Global configuration file not found")?;
+            return Ok(LoadedConfig {
+                config,
+                global_path,
+                local_path: None,
+            });
+        }
 
         // ローカル設定（必須）
         let local_path = self.find_local_config().await?;

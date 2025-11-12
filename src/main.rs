@@ -63,8 +63,9 @@ fn configure_color_output(color_choice: ColorChoice) {
 
 /// Main execution flow
 async fn run(cli: Cli) -> Result<()> {
-    // Extract config path before matching on command
+    // Extract config path and global flag before matching on command
     let config_path = cli.config.clone();
+    let global_only = cli.global;
 
     match cli.command {
         Commands::Run {
@@ -72,10 +73,10 @@ async fn run(cli: Cli) -> Result<()> {
             args,
             parallel,
         } => {
-            run_command(&name, args, parallel, config_path).await?;
+            run_command(&name, args, parallel, global_only, config_path).await?;
         }
         Commands::List { verbose } => {
-            list_commands(verbose, config_path).await?;
+            list_commands(verbose, global_only, config_path).await?;
         }
         Commands::Init {
             template,
@@ -97,7 +98,15 @@ async fn run(cli: Cli) -> Result<()> {
             output,
             show_groups,
         } => {
-            show_dependency_graph(command, format, output, show_groups, config_path).await?;
+            show_dependency_graph(
+                command,
+                format,
+                output,
+                show_groups,
+                global_only,
+                config_path,
+            )
+            .await?;
         }
         Commands::Completion { shell } => {
             cmdrun::commands::handle_completion(shell);
@@ -122,13 +131,13 @@ async fn run(cli: Cli) -> Result<()> {
             cmdrun::commands::handle_edit(id, config_path).await?;
         }
         Commands::Info { id } => {
-            cmdrun::commands::handle_info(id, config_path).await?;
+            cmdrun::commands::handle_info(id, global_only, config_path).await?;
         }
         Commands::Search { keyword } => {
-            cmdrun::commands::handle_search(keyword, config_path).await?;
+            cmdrun::commands::handle_search(keyword, global_only, config_path).await?;
         }
         Commands::CompletionList => {
-            list_completion(config_path).await?;
+            list_completion(global_only, config_path).await?;
         }
         Commands::Config { action } => match action {
             ConfigAction::Get { key } => {
@@ -261,6 +270,7 @@ async fn run_command(
     name: &str,
     args: Vec<String>,
     parallel: bool,
+    global_only: bool,
     config_path: Option<std::path::PathBuf>,
 ) -> Result<()> {
     // Initialize history recorder
@@ -270,6 +280,8 @@ async fn run_command(
     // Load configuration (with environment support)
     let config_loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)?
+    } else if global_only {
+        ConfigLoader::global_only()
     } else {
         ConfigLoader::new()
     };
@@ -534,9 +546,15 @@ async fn run_command(
 }
 
 /// List available commands
-async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -> Result<()> {
+async fn list_commands(
+    verbose: bool,
+    global: bool,
+    config_path: Option<std::path::PathBuf>,
+) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)?
+    } else if global {
+        ConfigLoader::global_only()
     } else {
         ConfigLoader::new()
     };
@@ -601,9 +619,11 @@ async fn list_commands(verbose: bool, config_path: Option<std::path::PathBuf>) -
 }
 
 /// List command names for shell completion (with descriptions)
-async fn list_completion(config_path: Option<std::path::PathBuf>) -> Result<()> {
+async fn list_completion(global_only: bool, config_path: Option<std::path::PathBuf>) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)?
+    } else if global_only {
+        ConfigLoader::global_only()
     } else {
         ConfigLoader::new()
     };
@@ -646,10 +666,13 @@ async fn show_dependency_graph(
     format: GraphFormat,
     output_path: Option<std::path::PathBuf>,
     show_groups: bool,
+    global_only: bool,
     config_path: Option<std::path::PathBuf>,
 ) -> Result<()> {
     let config_loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)?
+    } else if global_only {
+        ConfigLoader::global_only()
     } else {
         ConfigLoader::new()
     };

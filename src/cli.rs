@@ -38,8 +38,22 @@ pub struct Cli {
     /// Use this option to specify which configuration file to use.
     /// This allows you to maintain multiple command sets for different
     /// purposes (work, personal, projects, environments, etc.)
-    #[arg(short, long, value_name = "FILE", global = true)]
+    #[arg(
+        short,
+        long,
+        value_name = "FILE",
+        global = true,
+        conflicts_with = "global"
+    )]
     pub config: Option<PathBuf>,
+
+    /// Use only global configuration (skip local config search)
+    ///
+    /// When this flag is set, cmdrun will only look for the global
+    /// configuration file and will not search for or merge local
+    /// configuration files in the current directory.
+    #[arg(short, long, global = true)]
+    pub global: bool,
 
     /// Control colored output
     ///
@@ -95,6 +109,7 @@ pub enum Commands {
     /// Examples:
     ///   cmdrun list
     ///   cmdrun list --verbose
+    ///   cmdrun list --global
     #[command(visible_alias = "ls")]
     List {
         /// Show detailed information
