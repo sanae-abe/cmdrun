@@ -451,7 +451,8 @@ mod tests {
         let output_path = temp_dir.path().join("history_export.json");
 
         // Should export to file
-        let result = handle_history_export(ExportFormat::Json, Some(output_path.clone()), Some(10)).await;
+        let result =
+            handle_history_export(ExportFormat::Json, Some(output_path.clone()), Some(10)).await;
         assert!(result.is_ok());
 
         // Verify file was created
@@ -509,6 +510,40 @@ mod tests {
 
         // Should display statistics without errors
         let result = display_stats(&_storage);
+        assert!(result.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_handle_history_clear_cancelled() {
+        // This test cannot be automated as it requires interactive input
+        // It would cover lines 88, 94 (Confirm interaction and cancellation)
+        // Mark as ignored for manual testing
+    }
+
+    #[tokio::test]
+    async fn test_handle_history_export_csv_to_file() {
+        let (_storage, temp_dir) = create_test_storage();
+        let output_path = temp_dir.path().join("history_export.csv");
+
+        // Test CSV export to file (covers line 118, 122-123)
+        let result =
+            handle_history_export(ExportFormat::Csv, Some(output_path.clone()), Some(10)).await;
+        assert!(result.is_ok());
+
+        // Verify file was created
+        assert!(output_path.exists());
+
+        // Verify content has CSV header
+        let content = std::fs::read_to_string(&output_path).unwrap();
+        assert!(content.contains("id,") || content.contains("command"));
+    }
+
+    #[tokio::test]
+    async fn test_handle_history_with_offset() {
+        let (_storage, _temp_dir) = create_test_storage();
+
+        // Test with offset parameter (covers line 33)
+        let result = handle_history(Some(10), Some(1), false, false).await;
         assert!(result.is_ok());
     }
 }

@@ -384,4 +384,13 @@ mod tests {
         let result = handle_info(Some("nonexistent".to_string())).await;
         assert!(result.is_err());
     }
+
+    #[tokio::test]
+    async fn test_handle_use_with_nonexistent_env() {
+        let (_temp_dir, _manager) = setup_test_env().await;
+
+        // Test handle_use with non-existent environment (covers lines 10-11, 17)
+        let result = handle_use("nonexistent".to_string()).await;
+        assert!(result.is_err());
+    }
 }

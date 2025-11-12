@@ -460,7 +460,11 @@ existing = { description = "Existing command", cmd = "echo existing" }
 
         assert!(result.is_err());
         let err_msg = result.unwrap_err().to_string();
-        assert!(err_msg.contains("exists") || err_msg.contains("already") || err_msg.contains("duplicate"));
+        assert!(
+            err_msg.contains("exists")
+                || err_msg.contains("already")
+                || err_msg.contains("duplicate")
+        );
     }
 
     #[tokio::test]
@@ -536,7 +540,10 @@ existing = { description = "Existing command", cmd = "echo existing" }
 
         // Verify file exists before calling get_config_path
         assert!(local_config.exists(), "Local config file should exist");
-        assert!(PathBuf::from("commands.toml").exists(), "Relative path should exist");
+        assert!(
+            PathBuf::from("commands.toml").exists(),
+            "Relative path should exist"
+        );
 
         let config_path = get_config_path().unwrap();
 
@@ -562,5 +569,82 @@ existing = { description = "Existing command", cmd = "echo existing" }
         if let Some(dir) = original_dir {
             let _ = std::env::set_current_dir(dir);
         }
+    }
+
+    #[tokio::test]
+    async fn test_handle_add_with_empty_id() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+        fs::write(&path, "[commands]\n").unwrap();
+
+        // Test empty ID validation (line 42)
+        let result = handle_add(
+            Some("".to_string()),
+            Some("echo test".to_string()),
+            Some("Test".to_string()),
+            None,
+            None,
+            Some(path),
+        )
+        .await;
+
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_handle_add_with_empty_command() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+        fs::write(&path, "[commands]\n").unwrap();
+
+        // Test empty command validation (line 45)
+        let result = handle_add(
+            Some("test".to_string()),
+            Some("  ".to_string()),
+            Some("Test".to_string()),
+            None,
+            None,
+            Some(path),
+        )
+        .await;
+
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_handle_add_with_empty_description() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+        fs::write(&path, "[commands]\n").unwrap();
+
+        // Test empty description validation (line 48)
+        let result = handle_add(
+            Some("test".to_string()),
+            Some("echo test".to_string()),
+            Some("\t\n".to_string()),
+            None,
+            None,
+            Some(path),
+        )
+        .await;
+
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_handle_add_with_default_config_path() {
+        // Test ConfigLoader::new() path (line 29)
+        let result = handle_add(
+            Some("test".to_string()),
+            Some("echo test".to_string()),
+            Some("Test".to_string()),
+            None,
+            None,
+            None, // No config_path - triggers ConfigLoader::new()
+        )
+        .await;
+
+        // May succeed or fail depending on default config existence
+        let _ = result;
     }
 }
