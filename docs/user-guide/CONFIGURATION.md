@@ -48,7 +48,7 @@ cmdrun -c ~/.cmdrun/staging.toml run deploy
 
 ### グローバル設定のみを使用
 
-`--global`（短縮形: `-g`）フラグでグローバル設定のみを使用し、ローカル設定を無視できます:
+`--global`（短縮形: `-G`）フラグでグローバル設定のみを使用し、ローカル設定を無視できます:
 
 ```bash
 # グローバル設定のコマンド一覧を表示
@@ -56,7 +56,7 @@ cmdrun --global list
 
 # グローバル設定のコマンドを実行
 cmdrun --global run weather
-cmdrun -g info backup-run
+cmdrun -G info backup-run
 
 # グローバル設定でコマンドを検索
 cmdrun --global search docker

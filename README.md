@@ -195,7 +195,7 @@ cmdrun -c ~/.cmdrun/personal.toml run dev
 
 # Use only global configuration (skip local config)
 cmdrun --global list
-cmdrun --global run weather
+cmdrun -G run weather
 
 # Show help
 cmdrun --help
@@ -205,7 +205,7 @@ cmdrun --help
 - Linux/macOS: `~/.config/cmdrun/commands.toml`
 - Windows: `%APPDATA%\cmdrun\commands.toml`
 - Custom path: Use `--config/-c` option to specify any path
-- Global only: Use `--global/-g` flag to skip local configuration and use only global settings
+- Global only: Use `--global/-G` flag to skip local configuration and use only global settings
 
 ## Features
 

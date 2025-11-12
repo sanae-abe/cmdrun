@@ -52,7 +52,7 @@ pub struct Cli {
     /// When this flag is set, cmdrun will only look for the global
     /// configuration file and will not search for or merge local
     /// configuration files in the current directory.
-    #[arg(short, long, global = true)]
+    #[arg(short = 'G', long, global = true)]
     pub global: bool,
 
     /// Control colored output
