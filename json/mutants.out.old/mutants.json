@@ -1,0 +1,1052 @@
+[
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::with_env",
+      "return_type": "-> Self",
+      "span": {
+        "start": {
+          "line": 46,
+          "column": 5
+        },
+        "end": {
+          "line": 50,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 48,
+        "column": 9
+      },
+      "end": {
+        "line": 49,
+        "column": 13
+      }
+    },
+    "replacement": "Default::default()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::with_env_map",
+      "return_type": "-> Self",
+      "span": {
+        "start": {
+          "line": 52,
+          "column": 5
+        },
+        "end": {
+          "line": 56,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 54,
+        "column": 9
+      },
+      "end": {
+        "line": 55,
+        "column": 13
+      }
+    },
+    "replacement": "Default::default()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::merge_system_env",
+      "return_type": "-> Self",
+      "span": {
+        "start": {
+          "line": 58,
+          "column": 5
+        },
+        "end": {
+          "line": 64,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 60,
+        "column": 9
+      },
+      "end": {
+        "line": 63,
+        "column": 13
+      }
+    },
+    "replacement": "Default::default()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 66,
+          "column": 5
+        },
+        "end": {
+          "line": 69,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 68,
+        "column": 9
+      },
+      "end": {
+        "line": 68,
+        "column": 46
+      }
+    },
+    "replacement": "Ok(String::new())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 66,
+          "column": 5
+        },
+        "end": {
+          "line": 69,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 68,
+        "column": 9
+      },
+      "end": {
+        "line": 68,
+        "column": 46
+      }
+    },
+    "replacement": "Ok(\"xyzzy\".into())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 66,
+          "column": 5
+        },
+        "end": {
+          "line": 69,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 68,
+        "column": 9
+      },
+      "end": {
+        "line": 68,
+        "column": 46
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 66,
+          "column": 5
+        },
+        "end": {
+          "line": 69,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 68,
+        "column": 9
+      },
+      "end": {
+        "line": 68,
+        "column": 46
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 73,
+        "column": 9
+      },
+      "end": {
+        "line": 110,
+        "column": 19
+      }
+    },
+    "replacement": "Ok(String::new())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 73,
+        "column": 9
+      },
+      "end": {
+        "line": 110,
+        "column": 19
+      }
+    },
+    "replacement": "Ok(\"xyzzy\".into())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 73,
+        "column": 9
+      },
+      "end": {
+        "line": 110,
+        "column": 19
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 73,
+        "column": 9
+      },
+      "end": {
+        "line": 110,
+        "column": 19
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 73,
+        "column": 18
+      },
+      "end": {
+        "line": 73,
+        "column": 20
+      }
+    },
+    "replacement": "<",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 78,
+        "column": 24
+      },
+      "end": {
+        "line": 78,
+        "column": 25
+      }
+    },
+    "replacement": "==",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 78,
+        "column": 24
+      },
+      "end": {
+        "line": 78,
+        "column": 25
+      }
+    },
+    "replacement": "<",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 78,
+        "column": 24
+      },
+      "end": {
+        "line": 78,
+        "column": 25
+      }
+    },
+    "replacement": ">=",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 99,
+        "column": 59
+      },
+      "end": {
+        "line": 99,
+        "column": 60
+      }
+    },
+    "replacement": "-",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::interpolate_with_depth",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 71,
+          "column": 5
+        },
+        "end": {
+          "line": 111,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 99,
+        "column": 59
+      },
+      "end": {
+        "line": 99,
+        "column": 60
+      }
+    },
+    "replacement": "*",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 120,
+        "column": 9
+      },
+      "end": {
+        "line": 164,
+        "column": 10
+      }
+    },
+    "replacement": "Ok(String::new())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 120,
+        "column": 9
+      },
+      "end": {
+        "line": 164,
+        "column": 10
+      }
+    },
+    "replacement": "Ok(\"xyzzy\".into())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 120,
+        "column": 9
+      },
+      "end": {
+        "line": 164,
+        "column": 10
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 120,
+        "column": 9
+      },
+      "end": {
+        "line": 164,
+        "column": 10
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 126,
+        "column": 25
+      },
+      "end": {
+        "line": 126,
+        "column": 36
+      }
+    },
+    "replacement": "true",
+    "genre": "MatchArmGuard"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 126,
+        "column": 25
+      },
+      "end": {
+        "line": 126,
+        "column": 36
+      }
+    },
+    "replacement": "false",
+    "genre": "MatchArmGuard"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 134,
+        "column": 29
+      },
+      "end": {
+        "line": 134,
+        "column": 30
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 140,
+        "column": 28
+      },
+      "end": {
+        "line": 140,
+        "column": 41
+      }
+    },
+    "replacement": "true",
+    "genre": "MatchArmGuard"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 140,
+        "column": 28
+      },
+      "end": {
+        "line": 140,
+        "column": 41
+      }
+    },
+    "replacement": "false",
+    "genre": "MatchArmGuard"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "InterpolationContext::resolve_variable",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 113,
+          "column": 5
+        },
+        "end": {
+          "line": 165,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 140,
+        "column": 28
+      },
+      "end": {
+        "line": 140,
+        "column": 29
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 168,
+          "column": 1
+        },
+        "end": {
+          "line": 174,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 170,
+        "column": 5
+      },
+      "end": {
+        "line": 173,
+        "column": 28
+      }
+    },
+    "replacement": "Ok(String::new())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 168,
+          "column": 1
+        },
+        "end": {
+          "line": 174,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 170,
+        "column": 5
+      },
+      "end": {
+        "line": 173,
+        "column": 28
+      }
+    },
+    "replacement": "Ok(\"xyzzy\".into())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 168,
+          "column": 1
+        },
+        "end": {
+          "line": 174,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 170,
+        "column": 5
+      },
+      "end": {
+        "line": 173,
+        "column": 28
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 168,
+          "column": 1
+        },
+        "end": {
+          "line": 174,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 170,
+        "column": 5
+      },
+      "end": {
+        "line": 173,
+        "column": 28
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate_strict",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 176,
+          "column": 1
+        },
+        "end": {
+          "line": 182,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 178,
+        "column": 5
+      },
+      "end": {
+        "line": 181,
+        "column": 28
+      }
+    },
+    "replacement": "Ok(String::new())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate_strict",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 176,
+          "column": 1
+        },
+        "end": {
+          "line": 182,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 178,
+        "column": 5
+      },
+      "end": {
+        "line": 181,
+        "column": 28
+      }
+    },
+    "replacement": "Ok(\"xyzzy\".into())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate_strict",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 176,
+          "column": 1
+        },
+        "end": {
+          "line": 182,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 178,
+        "column": 5
+      },
+      "end": {
+        "line": 181,
+        "column": 28
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/interpolation.rs",
+    "function": {
+      "function_name": "interpolate_strict",
+      "return_type": "-> Result<String>",
+      "span": {
+        "start": {
+          "line": 176,
+          "column": 1
+        },
+        "end": {
+          "line": 182,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 178,
+        "column": 5
+      },
+      "end": {
+        "line": 181,
+        "column": 28
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  }
+]

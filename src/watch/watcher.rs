@@ -268,4 +268,150 @@ mod tests {
         assert!(matcher.should_watch(Path::new("src/test.rs")));
         assert!(!matcher.should_watch(Path::new("test.txt")));
     }
+
+    #[tokio::test]
+    async fn test_watch_runner_with_cmdrun() {
+        use crate::command::executor::ExecutionContext;
+        use crate::config::schema::{Command, CommandSpec};
+
+        let temp_dir = TempDir::new().unwrap();
+        let mut config = WatchConfig::new();
+        config.paths = vec![temp_dir.path().to_path_buf()];
+        config.patterns = vec![super::super::config::WatchPattern {
+            pattern: "**/*.txt".to_string(),
+            case_insensitive: false,
+        }];
+        config.ignore_gitignore = true;
+
+        let command_def = Command {
+            description: "Test command".to_string(),
+            cmd: CommandSpec::Single("echo test".to_string()),
+            env: Default::default(),
+            working_dir: None,
+            deps: vec![],
+            platform: vec![],
+            tags: vec![],
+            timeout: None,
+            parallel: false,
+            confirm: false,
+        };
+
+        let exec_ctx = ExecutionContext {
+            working_dir: temp_dir.path().to_path_buf(),
+            env: Default::default(),
+            shell: "sh".to_string(),
+            timeout: None,
+            strict: false,
+            echo: false,
+            color: false,
+            language: crate::config::Language::English,
+        };
+
+        let runner = WatchRunner::new_with_cmdrun(
+            config,
+            "test".to_string(),
+            command_def,
+            exec_ctx,
+            temp_dir.path(),
+        );
+
+        assert!(runner.is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_watch_runner_cmdrun_with_invalid_pattern() {
+        use crate::command::executor::ExecutionContext;
+        use crate::config::schema::{Command, CommandSpec};
+
+        let temp_dir = TempDir::new().unwrap();
+        let config = WatchConfig::new()
+            .add_path(temp_dir.path())
+            .add_pattern("[invalid");
+
+        let command_def = Command {
+            description: "Test command".to_string(),
+            cmd: CommandSpec::Single("echo test".to_string()),
+            env: Default::default(),
+            working_dir: None,
+            deps: vec![],
+            platform: vec![],
+            tags: vec![],
+            timeout: None,
+            parallel: false,
+            confirm: false,
+        };
+
+        let exec_ctx = ExecutionContext {
+            working_dir: temp_dir.path().to_path_buf(),
+            env: Default::default(),
+            shell: "sh".to_string(),
+            timeout: None,
+            strict: false,
+            echo: false,
+            color: false,
+            language: crate::config::Language::English,
+        };
+
+        let runner = WatchRunner::new_with_cmdrun(
+            config,
+            "test".to_string(),
+            command_def,
+            exec_ctx,
+            temp_dir.path(),
+        );
+
+        assert!(runner.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_execution_mode_variants() {
+        let temp_dir = TempDir::new().unwrap();
+        let config = WatchConfig::new()
+            .add_path(temp_dir.path())
+            .add_pattern("*.txt");
+
+        // Test Shell execution mode
+        let shell_runner =
+            WatchRunner::new(config.clone(), "echo test".to_string(), temp_dir.path()).unwrap();
+        assert!(shell_runner.matcher().should_watch(Path::new("test.txt")));
+
+        // Test Cmdrun execution mode
+        use crate::command::executor::ExecutionContext;
+        use crate::config::schema::{Command, CommandSpec};
+
+        let command_def = Command {
+            description: "Test command".to_string(),
+            cmd: CommandSpec::Single("echo test".to_string()),
+            env: Default::default(),
+            working_dir: None,
+            deps: vec![],
+            platform: vec![],
+            tags: vec![],
+            timeout: None,
+            parallel: false,
+            confirm: false,
+        };
+
+        let exec_ctx = ExecutionContext {
+            working_dir: temp_dir.path().to_path_buf(),
+            env: Default::default(),
+            shell: "sh".to_string(),
+            timeout: None,
+            strict: false,
+            echo: false,
+            color: false,
+            language: crate::config::Language::English,
+        };
+
+        let cmdrun_runner = WatchRunner::new_with_cmdrun(
+            config,
+            "test".to_string(),
+            command_def,
+            exec_ctx,
+            temp_dir.path(),
+        )
+        .unwrap();
+
+        assert!(cmdrun_runner.matcher().should_watch(Path::new("test.txt")));
+    }
 }

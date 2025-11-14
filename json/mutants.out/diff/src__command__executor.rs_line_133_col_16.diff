@@ -1,0 +1,21 @@
+--- src/command/executor.rs
++++ delete ! in CommandExecutor::execute
+@@ -125,17 +125,17 @@
+ 
+         // 変数展開
+         let interpolated_commands = self.interpolate_commands(&commands, command)?;
+ 
+         // 実行
+         let mut last_result = None;
+         for cmd in interpolated_commands {
+             let result = self.execute_single(&cmd, &merged_env).await?;
+-            if !result.success {
++            if  /* ~ changed by cargo-mutants ~ */result.success {
+                 return Err(ExecutionError::CommandFailed {
+                     command: cmd,
+                     code: result.exit_code,
+                 }
+                 .into());
+             }
+             last_result = Some(result);
+         }

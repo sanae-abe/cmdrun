@@ -1,0 +1,12 @@
+[environment]
+current = "default"
+
+[environment.environments.qa]
+description = "QA environment"
+
+[environment.environments.qa.variables]
+
+[environment.environments.beta]
+description = "beta environment"
+
+[environment.environments.beta.variables]

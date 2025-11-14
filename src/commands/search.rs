@@ -297,4 +297,14 @@ cmd = "echo middle"
         let result = handle_search("Test".to_string(), false, Some(path)).await;
         assert!(result.is_ok());
     }
+
+    #[tokio::test]
+    async fn test_search_with_global_only_mode() {
+        // Test ConfigLoader::global_only() path (lines 18-19)
+        // This covers the global_only=true branch
+        let result = handle_search("test".to_string(), true, None).await;
+        // Result may be Ok or Err depending on global config existence
+        // We just want to execute the ConfigLoader::global_only() code path
+        let _ = result;
+    }
 }

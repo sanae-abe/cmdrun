@@ -396,6 +396,7 @@ See [Test Documentation](tests/README.md) for detailed testing information.
 ### Quality & Testing
 - [Test Documentation](tests/README.md)
 - [Coverage Reports](https://codecov.io/gh/sanae-abe/cmdrun) (Codecov)
+- [Mutation Testing Guide](docs/testing/mutation-testing-guide.md) 🧬
 - [Performance Benchmarks](docs/technical/PERFORMANCE_BENCHMARKS.md)
 - [CI/CD Pipeline](https://github.com/sanae-abe/cmdrun/actions) (GitHub Actions)
 

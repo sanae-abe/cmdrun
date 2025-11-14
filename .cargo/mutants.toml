@@ -1,0 +1,58 @@
+# cargo-mutants configuration for cmdrun
+# Documentation: https://mutants.rs/
+
+# Timeout multiplier for mutation tests (default: 5)
+# cmdrun has fast tests, so we use a lower multiplier
+timeout_multiplier = 4.0
+
+# Minimum timeout for tests (in seconds)
+minimum_test_timeout = 20
+
+# Test tool to use (cargo or nextest)
+# We use cargo test for compatibility
+test_tool = "cargo"
+
+# Build timeout multiplier
+build_timeout_multiplier = 2.0
+
+# Exclude globs for files/directories not to mutate
+exclude_globs = [
+    "tests/fixtures/**",
+    "benches/**",
+    "examples/**",
+    "src/build.rs",
+    "src/main.rs",
+]
+
+# Examine globs - files to mutate
+examine_globs = [
+    # Security-critical modules (highest priority)
+    "src/security/**/*.rs",
+    "src/command/interpolation.rs",
+
+    # Core logic modules (high priority)
+    "src/command/executor.rs",
+    "src/command/dependency.rs",
+
+    # Command modules with good test coverage
+    "src/commands/search.rs",
+    "src/commands/add.rs",
+
+    # Watch system
+    "src/watch/**/*.rs",
+]
+
+# Additional cargo test arguments
+additional_cargo_test_args = ["--lib", "--bins"]
+
+# Error values to test
+error_values = [
+    "anyhow::Error",
+    "std::io::Error",
+]
+
+# Output settings
+output = "json"
+
+# Cap lints to avoid false positives
+cap_lints = true

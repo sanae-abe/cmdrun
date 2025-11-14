@@ -647,4 +647,79 @@ existing = { description = "Existing command", cmd = "echo existing" }
         // May succeed or fail depending on default config existence
         let _ = result;
     }
+
+    #[tokio::test]
+    async fn test_add_command_creates_commands_table() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        // Create TOML file WITHOUT [commands] table
+        fs::write(&path, "# Empty config\n").unwrap();
+
+        // Add command should create [commands] table (lines 251-254)
+        let result = add_command_to_config(
+            "test".to_string(),
+            "echo test".to_string(),
+            "Test command".to_string(),
+            None,
+            None,
+            Language::English,
+            Some(path.clone()),
+        )
+        .await;
+
+        assert!(result.is_ok());
+
+        // Verify [commands] table was created
+        let content = fs::read_to_string(&path).unwrap();
+        assert!(content.contains("[commands]"));
+        assert!(content.contains("test"));
+    }
+
+    #[tokio::test]
+    async fn test_add_command_with_invalid_toml() {
+        let temp_file = NamedTempFile::new().unwrap();
+        let path = temp_file.path().to_path_buf();
+
+        // Create invalid TOML
+        fs::write(&path, "invalid toml [[[").unwrap();
+
+        // Should fail to parse TOML (line 221-223)
+        let result = add_command_to_config(
+            "test".to_string(),
+            "echo test".to_string(),
+            "Test".to_string(),
+            None,
+            None,
+            Language::English,
+            Some(path),
+        )
+        .await;
+
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("parse") || err.contains("TOML") || err.contains("Failed"));
+    }
+
+    #[tokio::test]
+    async fn test_add_command_with_nonexistent_file() {
+        let temp_dir = TempDir::new().unwrap();
+        let path = temp_dir.path().join("nonexistent.toml");
+
+        // Should fail to read file (line 217-218)
+        let result = add_command_to_config(
+            "test".to_string(),
+            "echo test".to_string(),
+            "Test".to_string(),
+            None,
+            None,
+            Language::English,
+            Some(path),
+        )
+        .await;
+
+        assert!(result.is_err());
+        let err = result.unwrap_err().to_string();
+        assert!(err.contains("Failed to read") || err.contains("No such file"));
+    }
 }

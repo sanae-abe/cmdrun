@@ -1,0 +1,2 @@
+src/command/interpolation.rs:48:9: replace InterpolationContext::with_env -> Self with Default::default()
+src/command/interpolation.rs:54:9: replace InterpolationContext::with_env_map -> Self with Default::default()

@@ -193,6 +193,10 @@ name = "cross_platform"
 path = "tests/integration/cross_platform.rs"
 
 [[test]]
+name = "platform_validation"
+path = "tests/integration/platform_validation.rs"
+
+[[test]]
 name = "security_injection"
 path = "tests/security/injection.rs"
 

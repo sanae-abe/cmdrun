@@ -1,0 +1,513 @@
+{
+  "binary_name": "cmdrun-tests",
+  "binary_version": null,
+  "suites": [
+    {
+      "name": "basic",
+      "file_path": "cmdrun-tests/basic.bats",
+      "tests": [
+        {
+          "name": "[basic] Display help with --help flag",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/basic.bats",
+          "line_number": null
+        },
+        {
+          "name": "[basic] Display help with -h flag",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/basic.bats",
+          "line_number": null
+        },
+        {
+          "name": "[basic] Display version with --version flag",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/basic.bats",
+          "line_number": null
+        },
+        {
+          "name": "[basic] Reject invalid option",
+          "status": "failed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": "Test 4 failed",
+          "file_path": "cmdrun-tests/basic.bats",
+          "line_number": null
+        },
+        {
+          "name": "[basic] Handle no arguments",
+          "status": "failed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": "Test 5 failed",
+          "file_path": "cmdrun-tests/basic.bats",
+          "line_number": null
+        }
+      ],
+      "duration": {
+        "secs": 0,
+        "nanos": 687375000
+      },
+      "started_at": "2025-11-12T03:10:23.499371Z",
+      "finished_at": "2025-11-12T03:10:24.186832Z"
+    },
+    {
+      "name": "destructive-ops",
+      "file_path": "cmdrun-tests/destructive-ops.bats",
+      "tests": [
+        {
+          "name": "[destructive-ops] Subcommand 'remove' requires confirmation",
+          "status": "failed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": "Test 1 failed",
+          "file_path": "cmdrun-tests/destructive-ops.bats",
+          "line_number": null
+        },
+        {
+          "name": "[destructive-ops] Subcommand 'remove' accepts --yes flag",
+          "status": "failed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": "Test 2 failed",
+          "file_path": "cmdrun-tests/destructive-ops.bats",
+          "line_number": null
+        }
+      ],
+      "duration": {
+        "secs": 0,
+        "nanos": 408004500
+      },
+      "started_at": "2025-11-12T03:10:24.186869Z",
+      "finished_at": "2025-11-12T03:10:24.594924Z"
+    },
+    {
+      "name": "help",
+      "file_path": "cmdrun-tests/help.bats",
+      "tests": [
+        {
+          "name": "[help] Display help for subcommand 'run'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'list'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'init'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'validate'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'graph'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'completion'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'remove'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'add'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'open'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'edit'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'info'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'search'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'config'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'watch'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'env'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'history'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'retry'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'template'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        },
+        {
+          "name": "[help] Display help for subcommand 'plugin'",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/help.bats",
+          "line_number": null
+        }
+      ],
+      "duration": {
+        "secs": 1,
+        "nanos": 714193667
+      },
+      "started_at": "2025-11-12T03:10:24.594943Z",
+      "finished_at": "2025-11-12T03:10:26.309333Z"
+    },
+    {
+      "name": "multi-shell",
+      "file_path": "cmdrun-tests/multi-shell.bats",
+      "tests": [
+        {
+          "name": "[multi-shell] Run --help in bash",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/multi-shell.bats",
+          "line_number": null
+        },
+        {
+          "name": "[multi-shell] Run --help in zsh",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/multi-shell.bats",
+          "line_number": null
+        },
+        {
+          "name": "[multi-shell] Run --help in sh",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/multi-shell.bats",
+          "line_number": null
+        }
+      ],
+      "duration": {
+        "secs": 0,
+        "nanos": 483577334
+      },
+      "started_at": "2025-11-12T03:10:26.309352Z",
+      "finished_at": "2025-11-12T03:10:26.792982Z"
+    },
+    {
+      "name": "performance",
+      "file_path": "cmdrun-tests/performance.bats",
+      "tests": [
+        {
+          "name": "[performance] Startup time for --help < 100ms",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/performance.bats",
+          "line_number": null
+        },
+        {
+          "name": "[performance] Memory usage stays within reasonable limits",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/performance.bats",
+          "line_number": null
+        }
+      ],
+      "duration": {
+        "secs": 0,
+        "nanos": 386737625
+      },
+      "started_at": "2025-11-12T03:10:26.793001Z",
+      "finished_at": "2025-11-12T03:10:27.179779Z"
+    },
+    {
+      "name": "security",
+      "file_path": "cmdrun-tests/security.bats",
+      "tests": [
+        {
+          "name": "[security] Reject command injection in option value",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/security.bats",
+          "line_number": null
+        },
+        {
+          "name": "[security] Reject null byte in option value",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/security.bats",
+          "line_number": null
+        },
+        {
+          "name": "[security] Reject path traversal attempt",
+          "status": "passed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": null,
+          "file_path": "cmdrun-tests/security.bats",
+          "line_number": null
+        },
+        {
+          "name": "[security] Handle extremely long input",
+          "status": "failed",
+          "duration": {
+            "secs": 0,
+            "nanos": 100000000
+          },
+          "output": "",
+          "error_message": "Test 4 failed",
+          "file_path": "cmdrun-tests/security.bats",
+          "line_number": null
+        }
+      ],
+      "duration": {
+        "secs": 0,
+        "nanos": 554884209
+      },
+      "started_at": "2025-11-12T03:10:27.179797Z",
+      "finished_at": "2025-11-12T03:10:27.734739Z"
+    }
+  ],
+  "total_duration": {
+    "secs": 4,
+    "nanos": 315793750
+  },
+  "started_at": "2025-11-12T03:10:23.418470Z",
+  "finished_at": "2025-11-12T03:10:27.734757Z",
+  "environment": {
+    "os": "macos",
+    "os_version": "15.6.1",
+    "shell": "/bin/zsh",
+    "shell_version": "GNU bash, バージョン 5.3.3(1)-release (aarch64-apple-darwin24.6.0)",
+    "bats_version": "Bats 1.12.0",
+    "hostname": "m3-2022mac21.local",
+    "user": "sanae.abe"
+  }
+}

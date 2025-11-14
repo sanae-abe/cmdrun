@@ -1,0 +1,21 @@
+--- src/command/executor.rs
++++ delete ! in CommandExecutor::execute_single
+@@ -203,17 +203,17 @@
+         &self,
+         command: &str,
+         env: &AHashMap<String, String>,
+     ) -> Result<ExecutionResult> {
+         let start = Instant::now();
+ 
+         // セキュリティ検証
+         let validation_result = self.validator.validate(command);
+-        if !validation_result.is_safe() {
++        if  /* ~ changed by cargo-mutants ~ */validation_result.is_safe() {
+             if let Some(err) = validation_result.error() {
+                 warn!("Command validation failed: {}", err);
+                 return Err(ExecutionError::CommandFailed {
+                     command: command.to_string(),
+                     code: 1,
+                 }
+                 .into());
+             }

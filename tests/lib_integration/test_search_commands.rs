@@ -15,7 +15,7 @@ build = { description = "Build project", cmd = "cargo build" }
 "#;
     fs::write(&config_path, config_content).unwrap();
 
-    let result = handle_search("test".to_string(), Some(config_path)).await;
+    let result = handle_search("test".to_string(), false, Some(config_path)).await;
     assert!(result.is_ok());
 }
 
@@ -29,7 +29,7 @@ test = { description = "Run unit tests", cmd = "cargo test" }
 "#;
     fs::write(&config_path, config_content).unwrap();
 
-    let result = handle_search("unit".to_string(), Some(config_path)).await;
+    let result = handle_search("unit".to_string(), false, Some(config_path)).await;
     assert!(result.is_ok());
 }
 
@@ -39,6 +39,6 @@ async fn test_search_no_results() {
     let config_path = temp_dir.path().join("commands.toml");
     fs::write(&config_path, "[commands]\n").unwrap();
 
-    let result = handle_search("nonexistent".to_string(), Some(config_path)).await;
+    let result = handle_search("nonexistent".to_string(), false, Some(config_path)).await;
     assert!(result.is_ok());
 }

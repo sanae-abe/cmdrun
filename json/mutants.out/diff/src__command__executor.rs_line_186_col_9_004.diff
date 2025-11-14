@@ -1,0 +1,33 @@
+--- src/command/executor.rs
++++ replace CommandExecutor::interpolate_commands -> Result<Vec<String>> with Err(std::io::Error)
+@@ -178,29 +178,17 @@
+             }
+             .into()
+         })
+     }
+ 
+     /// 変数展開
+     fn interpolate_commands(&self, commands: &[String], command: &Command) -> Result<Vec<String>> {
+         // 環境変数マージ
+-        let mut env = self.context.env.clone();
+-        env.extend(command.env.clone());
+-
+-        // 展開コンテキスト作成
+-        let ctx = InterpolationContext::new(self.context.strict)
+-            .with_env_map(env)
+-            .merge_system_env();
+-
+-        // 各コマンドを展開
+-        commands
+-            .iter()
+-            .map(|cmd| ctx.interpolate(cmd))
+-            .collect::<Result<Vec<_>>>()
++        Err(std::io::Error) /* ~ changed by cargo-mutants ~ */
+     }
+ 
+     /// 単一コマンド実行
+     async fn execute_single(
+         &self,
+         command: &str,
+         env: &AHashMap<String, String>,
+     ) -> Result<ExecutionResult> {

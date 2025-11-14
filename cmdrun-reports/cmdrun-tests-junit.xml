@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="cmdrun-tests" tests="35" failures="5" errors="0" skipped="0" time="4.316" timestamp="2025-11-12T03:10:23.418470+00:00">
+  <properties>
+    <property name="os" value="macos 15.6.1"/>
+    <property name="shell" value="GNU bash, バージョン 5.3.3(1)-release (aarch64-apple-darwin24.6.0)"/>
+    <property name="bats_version" value="Bats 1.12.0"/>
+    <property name="hostname" value="m3-2022mac21.local"/>
+  </properties>
+  <testsuite name="basic" tests="5" failures="2" errors="0" skipped="0" time="0.687" timestamp="2025-11-12T03:10:23.499371+00:00" file="cmdrun-tests/basic.bats">
+    <testcase name="[basic] Display help with --help flag" classname="basic" time="0.100"/>
+    <testcase name="[basic] Display help with -h flag" classname="basic" time="0.100"/>
+    <testcase name="[basic] Display version with --version flag" classname="basic" time="0.100"/>
+    <testcase name="[basic] Reject invalid option" classname="basic" time="0.100">
+      <failure message="Test 4 failed" type="AssertionError">
+      </failure>
+    </testcase>
+    <testcase name="[basic] Handle no arguments" classname="basic" time="0.100">
+      <failure message="Test 5 failed" type="AssertionError">
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="destructive-ops" tests="2" failures="2" errors="0" skipped="0" time="0.408" timestamp="2025-11-12T03:10:24.186869+00:00" file="cmdrun-tests/destructive-ops.bats">
+    <testcase name="[destructive-ops] Subcommand &apos;remove&apos; requires confirmation" classname="destructive-ops" time="0.100">
+      <failure message="Test 1 failed" type="AssertionError">
+      </failure>
+    </testcase>
+    <testcase name="[destructive-ops] Subcommand &apos;remove&apos; accepts --yes flag" classname="destructive-ops" time="0.100">
+      <failure message="Test 2 failed" type="AssertionError">
+      </failure>
+    </testcase>
+  </testsuite>
+  <testsuite name="help" tests="19" failures="0" errors="0" skipped="0" time="1.714" timestamp="2025-11-12T03:10:24.594943+00:00" file="cmdrun-tests/help.bats">
+    <testcase name="[help] Display help for subcommand &apos;run&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;list&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;init&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;validate&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;graph&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;completion&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;remove&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;add&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;open&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;edit&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;info&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;search&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;config&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;watch&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;env&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;history&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;retry&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;template&apos;" classname="help" time="0.100"/>
+    <testcase name="[help] Display help for subcommand &apos;plugin&apos;" classname="help" time="0.100"/>
+  </testsuite>
+  <testsuite name="multi-shell" tests="3" failures="0" errors="0" skipped="0" time="0.484" timestamp="2025-11-12T03:10:26.309352+00:00" file="cmdrun-tests/multi-shell.bats">
+    <testcase name="[multi-shell] Run --help in bash" classname="multi-shell" time="0.100"/>
+    <testcase name="[multi-shell] Run --help in zsh" classname="multi-shell" time="0.100"/>
+    <testcase name="[multi-shell] Run --help in sh" classname="multi-shell" time="0.100"/>
+  </testsuite>
+  <testsuite name="performance" tests="2" failures="0" errors="0" skipped="0" time="0.387" timestamp="2025-11-12T03:10:26.793001+00:00" file="cmdrun-tests/performance.bats">
+    <testcase name="[performance] Startup time for --help &lt; 100ms" classname="performance" time="0.100"/>
+    <testcase name="[performance] Memory usage stays within reasonable limits" classname="performance" time="0.100"/>
+  </testsuite>
+  <testsuite name="security" tests="4" failures="1" errors="0" skipped="0" time="0.555" timestamp="2025-11-12T03:10:27.179797+00:00" file="cmdrun-tests/security.bats">
+    <testcase name="[security] Reject command injection in option value" classname="security" time="0.100"/>
+    <testcase name="[security] Reject null byte in option value" classname="security" time="0.100"/>
+    <testcase name="[security] Reject path traversal attempt" classname="security" time="0.100"/>
+    <testcase name="[security] Handle extremely long input" classname="security" time="0.100">
+      <failure message="Test 4 failed" type="AssertionError">
+      </failure>
+    </testcase>
+  </testsuite>
+</testsuites>

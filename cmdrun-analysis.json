@@ -1,0 +1,1174 @@
+{
+  "binary_path": "/Users/sanae.abe/projects/cmdrun/target/release/cmdrun",
+  "binary_name": "cmdrun",
+  "version": "1.0.0",
+  "help_output": "A modern replacement for package.json scripts and Makefiles.\n\ncmdrun is a high-performance command runner built in Rust, optimized for:\n- Speed: 4ms startup time, 10MB memory footprint\n- Security: Shell injection protection, input validation\n- Developer Experience: Intuitive CLI, interactive prompts, multi-language support\n\nFeatures:\n- Parallel command execution with dependency resolution\n- File watching with automatic command re-execution\n- Environment management (dev/staging/prod)\n- Command history tracking and retry functionality\n- Reusable templates for common project types\n- Plugin system for extensibility\n\nUsage: cmdrun [OPTIONS] <COMMAND>\n\nCommands:\n  run         Run a command defined in commands.toml [aliases: r]\n  list        List available commands from configuration [aliases: ls]\n  init        Initialize a new commands.toml file in the current directory\n  validate    Validate configuration file syntax and semantics\n  graph       Show dependency graph for commands\n  completion  Generate shell completion scripts\n  remove      Remove a command from the configuration\n  add         Add a new command to the configuration\n  open        Open commands.toml in the default editor\n  edit        Edit an existing command interactively\n  info        Show detailed information about a command\n  search      Search commands by keyword\n  config      Manage configuration settings (get/set/show configuration values)\n  watch       Watch files and automatically execute commands on changes\n  env         Manage environments (switch between dev, staging, prod, etc.)\n  history     View and manage command execution history\n  retry       Retry the last failed command or a specific command by ID\n  template    Manage command templates\n  plugin      Manage plugins\n  help        Print this message or the help of the given subcommand(s)\n\nOptions:\n  -c, --config <FILE>\n          Path to configuration file (default: ~/.config/cmdrun/commands.toml)\n          \n          Use this option to specify which configuration file to use. This allows you to maintain\n          multiple command sets for different purposes (work, personal, projects, environments,\n          etc.)\n\n      --color <COLOR>\n          Control colored output\n          \n          Choose when to use colored output. The default is 'auto', which automatically enables\n          color when outputting to a terminal and disables it when piping to another command. Use\n          'never' to disable colors completely, or 'always' to force colors even when piping.\n          \n          Respects the NO_COLOR environment variable (https://no-color.org/).\n\n          Possible values:\n          - never:  Never use colored output\n          - auto:   Automatically detect (TTY/pipe detection)\n          - always: Always use colored output\n          \n          [default: auto]\n\n  -v, --verbose...\n          Verbose output (-v, -vv, -vvv for more verbosity)\n\n  -h, --help\n          Print help (see a summary with '-h')\n\n  -V, --version\n          Print version\n",
+  "subcommands": [
+    {
+      "name": "run",
+      "description": "Run a command defined in commands.toml [aliases: r]",
+      "options": [
+        {
+          "short": null,
+          "long": "--parallel",
+          "description": "to execute independent dependencies concurrently.",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-p",
+          "long": "--parallel",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "list",
+      "description": "List available commands from configuration [aliases: ls]",
+      "options": [
+        {
+          "short": null,
+          "long": "--verbose",
+          "description": "to see additional details",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-v",
+          "long": "--verbose",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "init",
+      "description": "Initialize a new commands.toml file in the current directory",
+      "options": [
+        {
+          "short": null,
+          "long": "--interactive",
+          "description": "to walk through setup with prompts.",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--template",
+          "description": "rust-cli cmdrun init --interactive",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-t",
+          "long": "--template",
+          "description": "<TEMPLATE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-i",
+          "long": "--interactive",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-o",
+          "long": "--output",
+          "description": "<OUTPUT>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "validate",
+      "description": "Validate configuration file syntax and semantics",
+      "options": [
+        {
+          "short": null,
+          "long": "--check-cycles",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--verbose",
+          "description": "cmdrun validate --check-cycles",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-p",
+          "long": "--path",
+          "description": "<PATH>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-v",
+          "long": "--verbose",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "graph",
+      "description": "Show dependency graph for commands",
+      "options": [
+        {
+          "short": null,
+          "long": "--format",
+          "description": "dot # Generate Graphviz DOT format cmdrun",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-o",
+          "long": "--format",
+          "description": "mermaid -o diagram.md",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-f",
+          "long": "--format",
+          "description": "<FORMAT>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-o",
+          "long": "--output",
+          "description": "<OUTPUT>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-g",
+          "long": "--show-groups",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "completion",
+      "description": "Generate shell completion scripts",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "remove",
+      "description": "Remove a command from the configuration",
+      "options": [
+        {
+          "short": null,
+          "long": "--force",
+          "description": "to skip the confirmation prompt.",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-f",
+          "long": "--force",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "add",
+      "description": "Add a new command to the configuration",
+      "options": [
+        {
+          "short": null,
+          "long": "--release",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--category",
+          "description": "rust cmdrun add test \"npm test\" --tags ci,test",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-C",
+          "long": "--category",
+          "description": "<CATEGORY>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-t",
+          "long": "--tags",
+          "description": "<TAGS>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "open",
+      "description": "Open commands.toml in the default editor",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "edit",
+      "description": "Edit an existing command interactively",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "info",
+      "description": "Show detailed information about a command",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "search",
+      "description": "Search commands by keyword",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "config",
+      "description": "Manage configuration settings (get/set/show configuration values)",
+      "options": [
+        {
+          "short": null,
+          "long": "--config",
+          "description": "option which specifies which",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "get",
+          "description": "Get a specific configuration value",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "set",
+          "description": "Set a configuration value",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "show",
+          "description": "Show all current configuration settings",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "help",
+          "description": "Print this message or the help of the given subcommand(s)",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        }
+      ],
+      "depth": 0
+    },
+    {
+      "name": "watch",
+      "description": "Watch files and automatically execute commands on changes",
+      "options": [
+        {
+          "short": "-w",
+          "long": null,
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--debounce",
+          "description": "1000",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-p",
+          "long": "--path",
+          "description": "<PATH>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-w",
+          "long": "--pattern",
+          "description": "<PATTERN>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-e",
+          "long": "--exclude",
+          "description": "<PATTERN>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-d",
+          "long": "--debounce",
+          "description": "<MS>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--ignore-gitignore",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--no-recursive",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "env",
+      "description": "Manage environments (switch between dev, staging, prod, etc.)",
+      "options": [
+        {
+          "short": null,
+          "long": "--description",
+          "description": "\"QA environment\"",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--env",
+          "description": "staging",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "use",
+          "description": "Switch to a different environment",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "current",
+          "description": "Show the current active environment",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "create",
+          "description": "Create a new environment",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        }
+      ],
+      "depth": 0
+    },
+    {
+      "name": "history",
+      "description": "View and manage command execution history",
+      "options": [
+        {
+          "short": "-o",
+          "long": "--format",
+          "description": "json -o history.json",
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "clear",
+          "description": "Clear command history",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "export",
+          "description": "Export history to file",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "stats",
+          "description": "Show history statistics",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        }
+      ],
+      "depth": 0
+    },
+    {
+      "name": "retry",
+      "description": "Retry the last failed command or a specific command by ID",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [],
+      "depth": 0
+    },
+    {
+      "name": "template",
+      "description": "Manage command templates",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "import",
+          "description": "Import a template from a file",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        }
+      ],
+      "depth": 0
+    },
+    {
+      "name": "plugin",
+      "description": "Manage plugins",
+      "options": [
+        {
+          "short": "-c",
+          "long": "--config",
+          "description": "<FILE>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": null,
+          "long": "--color",
+          "description": "<COLOR>",
+          "option_type": "String",
+          "required": false,
+          "default_value": null
+        },
+        {
+          "short": "-h",
+          "long": "--help",
+          "description": null,
+          "option_type": "Flag",
+          "required": false,
+          "default_value": null
+        }
+      ],
+      "subcommands": [
+        {
+          "name": "enable",
+          "description": "Enable a plugin",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        },
+        {
+          "name": "disable",
+          "description": "Disable a plugin",
+          "options": [
+            {
+              "short": null,
+              "long": "--help",
+              "description": null,
+              "option_type": "Flag",
+              "required": false,
+              "default_value": null
+            }
+          ],
+          "subcommands": [],
+          "depth": 1
+        }
+      ],
+      "depth": 0
+    }
+  ],
+  "global_options": [
+    {
+      "short": "-c",
+      "long": "--config",
+      "description": "<FILE>",
+      "option_type": "String",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "short": null,
+      "long": "--color",
+      "description": "<COLOR>",
+      "option_type": "String",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "short": "-v",
+      "long": "--verbose",
+      "description": null,
+      "option_type": "Flag",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "short": "-v",
+      "long": null,
+      "description": null,
+      "option_type": "Flag",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "short": "-h",
+      "long": "--help",
+      "description": null,
+      "option_type": "Flag",
+      "required": false,
+      "default_value": null
+    },
+    {
+      "short": "-V",
+      "long": "--version",
+      "description": null,
+      "option_type": "Flag",
+      "required": false,
+      "default_value": null
+    }
+  ],
+  "metadata": {
+    "analyzed_at": "2025-11-12T03:10:23.392794+00:00",
+    "analyzer_version": "1.0.5",
+    "total_subcommands": 32,
+    "total_options": 112,
+    "analysis_duration_ms": 1845
+  }
+}

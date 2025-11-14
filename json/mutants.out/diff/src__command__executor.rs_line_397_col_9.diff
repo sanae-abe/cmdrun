@@ -1,0 +1,25 @@
+--- src/command/executor.rs
++++ replace CommandExecutor::clone_for_task -> Self with Default::default()
+@@ -389,21 +389,17 @@
+             }
+         }
+ 
+         Ok(results)
+     }
+ 
+     /// タスク用のクローンを作成
+     fn clone_for_task(&self) -> Self {
+-        Self {
+-            context: self.context.clone(),
+-            validator: CommandValidator::new(),
+-            sensitive_env: SensitiveEnv::new(),
+-        }
++        Default::default() /* ~ changed by cargo-mutants ~ */
+     }
+ 
+     /// シェルビルトインコマンドかチェック
+     fn is_shell_builtin(command: &str) -> bool {
+         // コマンドの先頭部分を取得（パイプやリダイレクトの前）
+         let cmd_part = command
+             .split('|')
+             .next()

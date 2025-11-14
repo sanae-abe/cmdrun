@@ -210,4 +210,43 @@ mod tests {
         let result = PluginLoader::validate("/nonexistent/plugin.so");
         assert!(result.is_err());
     }
+
+    #[test]
+    fn test_unload_all() {
+        let mut loader = PluginLoader::new();
+        // Initially empty
+        assert_eq!(loader.loaded_libraries().len(), 0);
+
+        // After unload_all, should still be empty
+        unsafe {
+            loader.unload_all();
+        }
+        assert_eq!(loader.loaded_libraries().len(), 0);
+    }
+
+    #[test]
+    fn test_loaded_libraries_empty() {
+        let loader = PluginLoader::new();
+        let libs = loader.loaded_libraries();
+        assert!(libs.is_empty());
+    }
+
+    #[test]
+    fn test_validate_idempotent() {
+        // Calling validate multiple times on the same (non-existent) file should be safe
+        let path = "/nonexistent/plugin1.so";
+        let result1 = PluginLoader::validate(path);
+        let result2 = PluginLoader::validate(path);
+
+        assert!(result1.is_err());
+        assert!(result2.is_err());
+    }
+
+    #[test]
+    fn test_validate_invalid_extension() {
+        // Test validation with invalid file extension
+        let result = PluginLoader::validate("/tmp/not_a_plugin.txt");
+        // Should fail because file doesn't exist or isn't a valid dynamic library
+        assert!(result.is_err());
+    }
 }

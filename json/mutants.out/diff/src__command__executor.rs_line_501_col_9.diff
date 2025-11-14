@@ -1,0 +1,31 @@
+--- src/command/executor.rs
++++ replace CommandExecutor::generate_function_name -> String with String::new()
+@@ -493,27 +493,17 @@
+             eprintln!("{}", hint_cmd_msg);
+             eprintln!("   {}() {{ cd {}; }}\n", func_name, path);
+         }
+     }
+ 
+     /// 関数名を生成（簡易版）
+     fn generate_function_name(path: &str) -> String {
+         // パスの最後の部分から関数名を生成
+-        let path_parts: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+-        if let Some(last) = path_parts.last() {
+-            // ホームディレクトリ展開を除去
+-            let name = last.replace(['~', '.'], "");
+-            // 最初の3文字を取得（cdt, cdc など）
+-            let short = name.chars().take(3).collect::<String>();
+-            if !short.is_empty() {
+-                return short;
+-            }
+-        }
+-        "cdx".to_string() // デフォルト
++        String::new() /* ~ changed by cargo-mutants ~ */ // デフォルト
+     }
+ }
+ 
+ /// デフォルトシェル検出
+ pub fn detect_shell() -> String {
+     if cfg!(windows) {
+         // Windows: PowerShell Core → PowerShell → cmd の優先順位
+         if which::which("pwsh").is_ok() {

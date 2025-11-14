@@ -1,0 +1,187 @@
+name: Mutation Testing
+
+# Run mutation tests weekly and on manual trigger
+# WARNING: Mutation testing is time-consuming (10-30 minutes)
+on:
+  schedule:
+    # Run every Sunday at 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Target file or module to test (e.g., src/command/executor.rs)'
+        required: false
+        default: ''
+      timeout:
+        description: 'Timeout in seconds for each mutant'
+        required: false
+        default: '120'
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  mutation-testing:
+    name: Mutation Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo index
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo build
+        uses: actions/cache@v4
+        with:
+          path: target
+          key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install cargo-mutants
+        run: cargo install cargo-mutants --version 25.3.1
+
+      - name: Run baseline tests
+        run: cargo test --lib --bins --all-features
+
+      - name: Run mutation testing (full)
+        if: github.event.inputs.target == ''
+        run: |
+          cargo mutants \
+            --no-shuffle \
+            --timeout ${{ github.event.inputs.timeout || '120' }} \
+            --jobs 2 \
+            --output json \
+            2>&1 | tee mutation-results.json
+        continue-on-error: true
+
+      - name: Run mutation testing (targeted)
+        if: github.event.inputs.target != ''
+        run: |
+          cargo mutants \
+            --file "${{ github.event.inputs.target }}" \
+            --no-shuffle \
+            --timeout ${{ github.event.inputs.timeout || '120' }} \
+            --output json \
+            2>&1 | tee mutation-results.json
+        continue-on-error: true
+
+      - name: Parse mutation test results
+        id: parse-results
+        run: |
+          # Extract summary statistics from mutation test output
+          TOTAL=$(grep -oP '\d+(?= mutants tested)' mutation-results.json || echo "0")
+          MISSED=$(grep -oP '\d+(?= missed)' mutation-results.json || echo "0")
+          CAUGHT=$(grep -oP '\d+(?= caught)' mutation-results.json || echo "0")
+          UNVIABLE=$(grep -oP '\d+(?= unviable)' mutation-results.json || echo "0")
+
+          # Calculate mutation score (caught / (caught + missed) * 100)
+          if [ "$((CAUGHT + MISSED))" -gt 0 ]; then
+            SCORE=$(awk "BEGIN {printf \"%.2f\", ($CAUGHT / ($CAUGHT + $MISSED)) * 100}")
+          else
+            SCORE="0.00"
+          fi
+
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          echo "missed=$MISSED" >> $GITHUB_OUTPUT
+          echo "caught=$CAUGHT" >> $GITHUB_OUTPUT
+          echo "unviable=$UNVIABLE" >> $GITHUB_OUTPUT
+          echo "score=$SCORE" >> $GITHUB_OUTPUT
+
+          # Create summary report
+          cat > mutation-summary.md << EOF
+          # Mutation Testing Results
+
+          ## Summary
+          - **Total Mutants**: $TOTAL
+          - **Caught by Tests**: $CAUGHT ✅
+          - **Missed by Tests**: $MISSED ❌
+          - **Unviable**: $UNVIABLE ⚠️
+          - **Mutation Score**: ${SCORE}%
+
+          ## Interpretation
+          - **Mutation Score**: Percentage of mutants caught by tests (higher is better)
+          - **Target**: >80% for critical modules, >60% overall
+          - **Missed Mutants**: Indicate gaps in test coverage or test quality
+
+          ## Next Steps
+          $(if [ "$MISSED" -gt 0 ]; then
+            echo "- 🔍 Review missed mutants in the detailed log below"
+            echo "- ✍️ Add tests to catch the missed mutations"
+            echo "- 🎯 Focus on security-critical modules first"
+          else
+            echo "- ✅ Excellent! All viable mutants were caught"
+          fi)
+          EOF
+
+      - name: Upload mutation test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutation-test-results
+          path: |
+            mutation-results.json
+            mutation-summary.md
+            mutants.out/
+          retention-days: 90
+
+      - name: Comment PR with mutation results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('mutation-summary.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+      - name: Check mutation score threshold
+        run: |
+          SCORE="${{ steps.parse-results.outputs.score }}"
+          THRESHOLD=50.0  # Minimum acceptable mutation score
+
+          echo "Mutation Score: ${SCORE}%"
+          echo "Threshold: ${THRESHOLD}%"
+
+          if (( $(echo "$SCORE < $THRESHOLD" | bc -l) )); then
+            echo "❌ Mutation score ${SCORE}% is below threshold ${THRESHOLD}%"
+            echo "This is a warning, not a failure. Please review and improve test quality."
+            exit 0  # Don't fail the workflow, just warn
+          else
+            echo "✅ Mutation score ${SCORE}% meets threshold ${THRESHOLD}%"
+          fi
+
+      - name: Generate mutation testing badge
+        run: |
+          SCORE="${{ steps.parse-results.outputs.score }}"
+          COLOR="red"
+
+          if (( $(echo "$SCORE >= 80" | bc -l) )); then
+            COLOR="brightgreen"
+          elif (( $(echo "$SCORE >= 60" | bc -l) )); then
+            COLOR="yellow"
+          elif (( $(echo "$SCORE >= 40" | bc -l) )); then
+            COLOR="orange"
+          fi
+
+          # Badge URL for shields.io
+          echo "Badge URL: https://img.shields.io/badge/mutation%20score-${SCORE}%25-${COLOR}"
