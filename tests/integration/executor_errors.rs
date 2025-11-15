@@ -1532,10 +1532,7 @@ async fn test_cd_command_case_insensitive() {
 
     let result = executor.execute(&cmd_cd_upper).await;
     // CD detection should work and command should execute (even though it's a builtin)
-    assert!(
-        result.is_ok(),
-        "cd command should be detected and execute"
-    );
+    assert!(result.is_ok(), "cd command should be detected and execute");
 
     // Test mixed case CD
     // Note: Using lowercase "cd" because "Cd" is not a valid command on Unix
