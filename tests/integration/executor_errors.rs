@@ -1356,7 +1356,11 @@ async fn test_is_cd_command_detection() {
     // Case 1: Simple cd command
     let cmd_cd_simple = Command {
         description: "Simple CD command".to_string(),
-        cmd: CommandSpec::Single("cd /tmp".to_string()),
+        cmd: CommandSpec::Single(if cfg!(windows) {
+            "cd C:\\".to_string()
+        } else {
+            "cd /tmp".to_string()
+        }),
         env: AHashMap::new(),
         working_dir: None,
         deps: vec![],
@@ -1377,7 +1381,11 @@ async fn test_is_cd_command_detection() {
     // Case 2: cd with pipe (should still detect cd)
     let cmd_cd_pipe = Command {
         description: "CD with pipe".to_string(),
-        cmd: CommandSpec::Single("cd /tmp | echo done".to_string()),
+        cmd: CommandSpec::Single(if cfg!(windows) {
+            "cd C:\\ & echo done".to_string()
+        } else {
+            "cd /tmp | echo done".to_string()
+        }),
         env: AHashMap::new(),
         working_dir: None,
         deps: vec![],
@@ -1394,7 +1402,11 @@ async fn test_is_cd_command_detection() {
     // Case 3: cd with redirect (should still detect cd)
     let cmd_cd_redirect = Command {
         description: "CD with redirect".to_string(),
-        cmd: CommandSpec::Single("cd /tmp > /dev/null".to_string()),
+        cmd: CommandSpec::Single(if cfg!(windows) {
+            "cd C:\\ > NUL".to_string()
+        } else {
+            "cd /tmp > /dev/null".to_string()
+        }),
         env: AHashMap::new(),
         working_dir: None,
         deps: vec![],
@@ -1451,7 +1463,11 @@ async fn test_warn_shell_builtin_is_invoked() {
     // CD command should trigger warn_shell_builtin internally
     let cmd_cd = Command {
         description: "CD command triggering warning".to_string(),
-        cmd: CommandSpec::Single("cd /tmp".to_string()),
+        cmd: CommandSpec::Single(if cfg!(windows) {
+            "cd C:\\".to_string()
+        } else {
+            "cd /tmp".to_string()
+        }),
         env: AHashMap::new(),
         working_dir: None,
         deps: vec![],
