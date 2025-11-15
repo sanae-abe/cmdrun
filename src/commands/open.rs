@@ -6,6 +6,9 @@ use std::path::PathBuf;
 use std::process::Command;
 use tracing::{debug, info};
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
+
 /// Open the configuration file in the default editor
 pub async fn handle_open(config_file_path: Option<PathBuf>) -> Result<()> {
     let config_path = if let Some(path) = config_file_path {
@@ -49,8 +52,8 @@ async fn find_config_file() -> Result<PathBuf> {
     }
 
     anyhow::bail!(
-        "Configuration file not found. Searched for: {}",
-        CONFIG_FILENAMES.join(", ")
+        "{}",
+        get_message(MessageKey::ErrorNoConfigFileFound, Language::English)
     )
 }
 

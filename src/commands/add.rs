@@ -209,7 +209,11 @@ async fn add_command_to_config(
     let validation_result = validator.validate(&command);
     if !validation_result.is_safe() {
         if let Some(err) = validation_result.error() {
-            bail!("Security validation failed: {}", err);
+            bail!(
+                "{}: {}",
+                get_message(MessageKey::ErrorSecurityValidationFailed, lang),
+                err
+            );
         }
     }
 
@@ -258,7 +262,10 @@ async fn add_command_to_config(
     if let Some(commands_table) = doc["commands"].as_table_mut() {
         commands_table.insert(&id, Item::Value(command_table.into()));
     } else {
-        bail!("Failed to access commands table");
+        bail!(
+            "{}",
+            get_message(MessageKey::ErrorFailedToAccessCommandsTable, lang)
+        );
     }
 
     // Write back to file

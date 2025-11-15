@@ -1,6 +1,6 @@
 //! Command removal functionality
 
-use crate::config::loader::ConfigLoader;
+use crate::config::{loader::ConfigLoader, Language};
 use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use colored::*;
@@ -195,8 +195,8 @@ async fn find_config_file() -> Result<PathBuf> {
     }
 
     anyhow::bail!(
-        "Configuration file not found. Searched for: {}",
-        CONFIG_FILENAMES.join(", ")
+        "{}",
+        get_message(MessageKey::ErrorNoConfigFileFound, Language::English)
     )
 }
 

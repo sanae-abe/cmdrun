@@ -210,7 +210,10 @@ pub async fn handle_template_remove(name: String, force: bool) -> Result<()> {
 
     // Check if template exists
     if !manager.exists(&name) {
-        anyhow::bail!("Template '{}' not found", name);
+        anyhow::bail!(
+            "{}",
+            get_message(MessageKey::ErrorTemplateNotFound, Language::English)
+        );
     }
 
     // Confirm removal
@@ -292,7 +295,10 @@ pub async fn select_template_interactive(language: Language) -> Result<String> {
     let templates = manager.list()?;
 
     if templates.is_empty() {
-        anyhow::bail!("No templates available");
+        anyhow::bail!(
+            "{}",
+            get_message(MessageKey::ErrorNoTemplatesAvailable, language)
+        );
     }
 
     println!();

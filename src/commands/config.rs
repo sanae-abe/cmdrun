@@ -6,7 +6,7 @@ use std::fs;
 use std::path::PathBuf;
 use toml_edit::DocumentMut;
 
-use crate::config::loader::ConfigLoader;
+use crate::config::{loader::ConfigLoader, Language};
 use crate::i18n::{get_message, MessageKey};
 
 /// Get a configuration value
@@ -219,5 +219,8 @@ fn get_config_path() -> Result<PathBuf> {
         }
     }
 
-    anyhow::bail!("Configuration file not found")
+    anyhow::bail!(
+        "{}",
+        get_message(MessageKey::ErrorNoConfigFileFound, Language::English)
+    )
 }

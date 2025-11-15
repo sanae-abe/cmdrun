@@ -232,7 +232,11 @@ pub async fn handle_retry(id: Option<i64>) -> Result<()> {
             result.duration.as_secs_f64()
         );
     } else {
-        anyhow::bail!("Command failed with exit code {}", result.exit_code);
+        anyhow::bail!(
+            "{} {}",
+            get_message(MessageKey::ErrorCommandFailedWithCode, Language::English),
+            result.exit_code
+        );
     }
 
     Ok(())

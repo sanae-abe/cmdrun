@@ -386,11 +386,19 @@ async fn run_command(
                         "ℹ".bright_white(),
                         get_message(MessageKey::TypoRunHelp, language).dimmed()
                     );
-                    anyhow::bail!("Command not found: {}", name);
+                    anyhow::bail!(
+                        "{}",
+                        get_message(MessageKey::ErrorCommandNotFound, language)
+                    );
                 }
             }
 
-            return Err(anyhow::anyhow!("Command not found: {}", name));
+            use cmdrun::config::Language;
+            use cmdrun::i18n::{get_message, MessageKey};
+            return Err(anyhow::anyhow!(
+                "{}",
+                get_message(MessageKey::ErrorCommandNotFound, Language::English)
+            ));
         }
     };
 

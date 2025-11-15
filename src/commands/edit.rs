@@ -1,7 +1,7 @@
 //! Edit command - Edit existing command interactively
 
-use crate::config::loader::ConfigLoader;
 use crate::config::schema::{Command, CommandSpec, CommandsConfig};
+use crate::config::{loader::ConfigLoader, Language};
 use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use colored::*;
@@ -257,7 +257,10 @@ async fn find_config_file() -> Result<PathBuf> {
         }
     }
 
-    anyhow::bail!("Configuration file not found")
+    anyhow::bail!(
+        "{}",
+        get_message(MessageKey::ErrorNoConfigFileFound, Language::English)
+    )
 }
 
 #[cfg(test)]

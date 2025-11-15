@@ -88,8 +88,8 @@ pub async fn handle_init(
     // Check if file already exists
     if output_path.exists() {
         anyhow::bail!(
-            "Configuration file already exists: {}",
-            output_path.display()
+            "{}",
+            get_message(MessageKey::ErrorFileAlreadyExists, Language::English)
         );
     }
 
