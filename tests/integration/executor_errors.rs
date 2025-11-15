@@ -1357,8 +1357,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_simple = Command {
         description: "Simple CD command".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Use environment variable for Windows root directory
-            "cd %SYSTEMDRIVE%\\".to_string()
+            // Use Windows directory that always exists
+            "cd C:\\Windows".to_string()
         } else {
             "cd /tmp".to_string()
         }),
@@ -1384,7 +1384,7 @@ async fn test_is_cd_command_detection() {
         description: "CD with pipe".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
             // Windows: use & for command chaining, cd to Windows directory
-            "cd %SYSTEMDRIVE%\\ & echo done".to_string()
+            "cd C:\\Windows & echo done".to_string()
         } else {
             "cd /tmp | echo done".to_string()
         }),
@@ -1405,8 +1405,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_redirect = Command {
         description: "CD with redirect".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Use environment variable for Windows root directory
-            "cd %SYSTEMDRIVE%\\ > NUL".to_string()
+            // Use Windows directory that always exists
+            "cd C:\\Windows > NUL".to_string()
         } else {
             "cd /tmp > /dev/null".to_string()
         }),
@@ -1467,8 +1467,8 @@ async fn test_warn_shell_builtin_is_invoked() {
     let cmd_cd = Command {
         description: "CD command triggering warning".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Use environment variable for Windows root directory
-            "cd %SYSTEMDRIVE%\\".to_string()
+            // Use Windows directory that always exists
+            "cd C:\\Windows".to_string()
         } else {
             "cd /tmp".to_string()
         }),
