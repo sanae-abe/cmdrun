@@ -63,7 +63,7 @@ fn setup_history_db(temp_dir: &TempDir) -> HistoryStorage {
         .as_nanos();
     let thread_id = format!("{:?}", thread::current().id());
 
-    let db_path = temp_dir.path().join(&format!(
+    let db_path = temp_dir.path().join(format!(
         "history_{}_{}.db",
         timestamp,
         thread_id.replace("ThreadId(", "").replace(")", "")
