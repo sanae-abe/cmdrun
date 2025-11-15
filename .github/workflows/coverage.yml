@@ -168,7 +168,9 @@ jobs:
           fi
 
       - name: Create coverage badge
-        if: ${{ secrets.COVERAGE_GIST_ID != '' }}
+        env:
+          GIST_ID: ${{ secrets.COVERAGE_GIST_ID }}
+        if: ${{ env.GIST_ID != '' }}
         uses: schneegans/dynamic-badges-action@v1.7.0
         with:
           auth: ${{ secrets.GITHUB_TOKEN }}
