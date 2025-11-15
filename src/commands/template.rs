@@ -129,12 +129,15 @@ pub async fn handle_template_use(name: String, output: Option<PathBuf>) -> Resul
 }
 
 /// Handle template list command
-pub async fn handle_template_list(verbose: bool) -> Result<()> {
+pub async fn handle_template_list(verbose: bool, language: Language) -> Result<()> {
     let manager = TemplateManager::new()?;
     let templates = manager.list()?;
 
     if templates.is_empty() {
-        println!("{}", "No templates available".yellow());
+        println!(
+            "{}",
+            get_message(MessageKey::TemplateNoTemplatesAvailable, language).yellow()
+        );
         return Ok(());
     }
 
@@ -166,7 +169,12 @@ pub async fn handle_template_list(verbose: bool) -> Result<()> {
     }
 
     if !user.is_empty() {
-        println!("{}", "User templates:".bright_white().bold());
+        println!(
+            "{}",
+            get_message(MessageKey::TemplateUserTemplates, language)
+                .bright_white()
+                .bold()
+        );
         for template in user {
             println!(
                 "  {} {}",
@@ -334,7 +342,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_handle_template_list() {
-        let result = handle_template_list(false).await;
+        let result = handle_template_list(false, Language::English).await;
         assert!(result.is_ok());
     }
 

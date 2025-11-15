@@ -4,6 +4,8 @@ use anyhow::{Context, Result};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use crate::template::builtin::BuiltinTemplate;
 use crate::template::schema::UserTemplate;
 
@@ -48,7 +50,11 @@ impl TemplateManager {
 
         // Check if template already exists
         if file_path.exists() {
-            anyhow::bail!("Template '{}' already exists", template.template.name);
+            anyhow::bail!(
+                "{}: '{}'",
+                get_message(MessageKey::ErrorTemplateAlreadyExists, Language::English),
+                template.template.name
+            );
         }
 
         // Serialize to TOML
@@ -73,7 +79,11 @@ impl TemplateManager {
         let file_path = self.template_path(name);
 
         if !file_path.exists() {
-            anyhow::bail!("Template '{}' not found", name);
+            anyhow::bail!(
+                "{}: '{}'",
+                get_message(MessageKey::ErrorTemplateNotFound, Language::English),
+                name
+            );
         }
 
         let content = fs::read_to_string(&file_path)
@@ -130,13 +140,24 @@ impl TemplateManager {
     pub fn remove(&self, name: &str) -> Result<()> {
         // Prevent removal of built-in templates
         if BuiltinTemplate::parse(name).is_some() {
-            anyhow::bail!("Cannot remove built-in template '{}'", name);
+            anyhow::bail!(
+                "{}: '{}'",
+                get_message(
+                    MessageKey::ErrorCannotRemoveBuiltinTemplate,
+                    Language::English
+                ),
+                name
+            );
         }
 
         let file_path = self.template_path(name);
 
         if !file_path.exists() {
-            anyhow::bail!("Template '{}' not found", name);
+            anyhow::bail!(
+                "{}: '{}'",
+                get_message(MessageKey::ErrorTemplateNotFound, Language::English),
+                name
+            );
         }
 
         fs::remove_file(&file_path)
@@ -161,7 +182,11 @@ impl TemplateManager {
     /// Import template from a file
     pub fn import(&self, file_path: &Path) -> Result<String> {
         if !file_path.exists() {
-            anyhow::bail!("File not found: {}", file_path.display());
+            anyhow::bail!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFileNotFound, Language::English),
+                file_path.display()
+            );
         }
 
         let content = fs::read_to_string(file_path)

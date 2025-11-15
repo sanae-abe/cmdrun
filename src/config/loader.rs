@@ -3,6 +3,8 @@
 //! TOML 設定ファイルの読み込みと階層的なマージ処理
 
 use crate::config::schema::CommandsConfig;
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use std::path::{Path, PathBuf};
 use tokio::fs;
@@ -228,7 +230,8 @@ impl ConfigLoader {
         }
 
         anyhow::bail!(
-            "Local configuration file not found. Searched for: {}",
+            "{}. Searched for: {}",
+            get_message(MessageKey::ErrorLocalConfigNotFound, Language::English),
             CONFIG_FILENAMES.join(", ")
         )
     }
@@ -291,7 +294,10 @@ impl ConfigLoader {
     #[allow(dead_code)]
     async fn load_with_merge(&self, paths: &[PathBuf]) -> Result<CommandsConfig> {
         if paths.is_empty() {
-            anyhow::bail!("No configuration files specified");
+            anyhow::bail!(
+                "{}",
+                get_message(MessageKey::ErrorNoConfigFilesSpecified, Language::English)
+            );
         }
 
         let mut merged = self.load_from_path(&paths[0]).await?;

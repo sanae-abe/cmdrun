@@ -1,13 +1,15 @@
 //! Completion command implementation
 
 use crate::cli::Cli;
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use clap::CommandFactory;
 use clap_complete::{generate, Shell};
 use colored::Colorize;
 use std::io::{self, Write};
 
 /// Handle completion command
-pub fn handle_completion(shell: Shell) {
+pub fn handle_completion(shell: Shell, language: Language) {
     let mut cmd = Cli::command();
     let mut buf = Vec::new();
     generate(shell, &mut cmd, "cmdrun", &mut buf);
@@ -20,7 +22,12 @@ pub fn handle_completion(shell: Shell) {
 
     // Print installation instructions to stderr (won't interfere with eval)
     eprintln!();
-    eprintln!("{}", "Installation instructions:".cyan().bold());
+    eprintln!(
+        "{}",
+        get_message(MessageKey::CompletionInstallationInstructions, language)
+            .cyan()
+            .bold()
+    );
     print_installation_instructions(shell);
 }
 

@@ -3,6 +3,8 @@
 //! 設定の妥当性検証と循環依存検出
 
 use crate::config::schema::{CommandsConfig, Platform};
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use ahash::{AHashMap, AHashSet};
 use anyhow::Result;
 use std::collections::VecDeque;
@@ -316,7 +318,10 @@ impl DependencyGraph {
 
         // 訪問したノード数と結果の長さが一致するか確認（循環検出）
         if result.len() != in_degree.len() {
-            anyhow::bail!("Circular dependency detected in dependency graph");
+            anyhow::bail!(
+                "{}",
+                get_message(MessageKey::ErrorCircularDependency, Language::English)
+            );
         }
 
         Ok(result)

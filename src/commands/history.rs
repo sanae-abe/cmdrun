@@ -2,7 +2,9 @@
 //!
 //! Provides command history display, search, clear, and export functionality.
 
+use crate::config::Language;
 use crate::history::{HistoryEntry, HistoryStorage};
+use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use colored::*;
 use std::path::PathBuf;
@@ -13,11 +15,12 @@ pub async fn handle_history(
     offset: Option<usize>,
     show_failed_only: bool,
     show_stats: bool,
+    language: Language,
 ) -> Result<()> {
     let storage = HistoryStorage::new().context("Failed to open history database")?;
 
     if show_stats {
-        display_stats(&storage)?;
+        display_stats(&storage, language)?;
         return Ok(());
     }
 
@@ -34,7 +37,10 @@ pub async fn handle_history(
     };
 
     if entries.is_empty() {
-        println!("{}", "No history entries found".yellow());
+        println!(
+            "{}",
+            get_message(MessageKey::HistoryNoEntriesFound, language).yellow()
+        );
         return Ok(());
     }
 
@@ -43,7 +49,7 @@ pub async fn handle_history(
 
     let count = entries.len();
     for entry in entries {
-        display_entry(&entry);
+        display_entry(&entry, language);
     }
 
     println!();
@@ -53,7 +59,11 @@ pub async fn handle_history(
 }
 
 /// Handle the history search command
-pub async fn handle_history_search(query: &str, limit: Option<usize>) -> Result<()> {
+pub async fn handle_history_search(
+    query: &str,
+    limit: Option<usize>,
+    language: Language,
+) -> Result<()> {
     let storage = HistoryStorage::new().context("Failed to open history database")?;
 
     println!(
@@ -65,7 +75,15 @@ pub async fn handle_history_search(query: &str, limit: Option<usize>) -> Result<
     let results = storage.search(query, limit)?;
 
     if results.is_empty() {
-        println!("{}", format!("No commands matching '{}'", query).yellow());
+        println!(
+            "{}",
+            format!(
+                "{} '{}'",
+                get_message(MessageKey::HistoryNoCommandsMatching, language),
+                query
+            )
+            .yellow()
+        );
         return Ok(());
     }
 
@@ -74,7 +92,7 @@ pub async fn handle_history_search(query: &str, limit: Option<usize>) -> Result<
     println!();
 
     for entry in results {
-        display_entry(&entry);
+        display_entry(&entry, language);
     }
 
     Ok(())
@@ -228,7 +246,7 @@ pub enum ExportFormat {
 }
 
 /// Display a single history entry
-fn display_entry(entry: &HistoryEntry) {
+fn display_entry(entry: &HistoryEntry, language: Language) {
     let status_icon = if entry.success {
         "✓".green()
     } else {
@@ -253,7 +271,11 @@ fn display_entry(entry: &HistoryEntry) {
     println!("  {} {}", "Duration:".dimmed(), entry.duration_string());
 
     if let Some(exit_code) = entry.exit_code {
-        println!("  {} {}", "Exit code:".dimmed(), exit_code);
+        println!(
+            "  {} {}",
+            get_message(MessageKey::HistoryExitCode, language).dimmed(),
+            exit_code
+        );
     }
 
     if let Some(args) = &entry.args {
@@ -265,20 +287,28 @@ fn display_entry(entry: &HistoryEntry) {
     }
 
     if let Some(working_dir) = &entry.working_dir {
-        println!("  {} {}", "Working dir:".dimmed(), working_dir);
+        println!(
+            "  {} {}",
+            get_message(MessageKey::HistoryWorkingDir, language).dimmed(),
+            working_dir
+        );
     }
 
     println!();
 }
 
 /// Display history statistics
-fn display_stats(storage: &HistoryStorage) -> Result<()> {
+fn display_stats(storage: &HistoryStorage, language: Language) -> Result<()> {
     let stats = storage.get_stats()?;
 
     println!("{}", "History Statistics".cyan().bold());
     println!();
 
-    println!("  {} {}", "Total commands:".bright_white(), stats.total);
+    println!(
+        "  {} {}",
+        get_message(MessageKey::HistoryTotalCommands, language).bright_white(),
+        stats.total
+    );
     println!("  {} {}", "Successful:".green(), stats.successful);
     println!("  {} {}", "Failed:".red(), stats.failed);
     println!(
@@ -369,7 +399,7 @@ mod tests {
         let _storage = HistoryStorage::new().unwrap();
 
         // Should succeed without errors even with empty history
-        let result = handle_history(None, None, false, false).await;
+        let result = handle_history(None, None, false, false, Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -378,7 +408,7 @@ mod tests {
         let (_storage, _temp_dir) = create_test_storage();
 
         // Should succeed with limit parameter
-        let result = handle_history(Some(2), None, false, false).await;
+        let result = handle_history(Some(2), None, false, false, Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -387,7 +417,7 @@ mod tests {
         let (_storage, _temp_dir) = create_test_storage();
 
         // Should filter and show only failed commands
-        let result = handle_history(None, None, true, false).await;
+        let result = handle_history(None, None, true, false, Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -396,7 +426,7 @@ mod tests {
         let (_storage, _temp_dir) = create_test_storage();
 
         // Should display statistics
-        let result = handle_history(None, None, false, true).await;
+        let result = handle_history(None, None, false, true, Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -405,7 +435,7 @@ mod tests {
         let (_storage, _temp_dir) = create_test_storage();
 
         // Should find matching entries
-        let result = handle_history_search("test", Some(10)).await;
+        let result = handle_history_search("test", Some(10), Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -414,7 +444,7 @@ mod tests {
         let (_storage, _temp_dir) = create_test_storage();
 
         // Should handle no results gracefully
-        let result = handle_history_search("nonexistent-query", Some(10)).await;
+        let result = handle_history_search("nonexistent-query", Some(10), Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -481,7 +511,7 @@ mod tests {
         };
 
         // Should not panic when displaying entry
-        display_entry(&entry);
+        display_entry(&entry, Language::English);
     }
 
     #[test]
@@ -501,7 +531,7 @@ mod tests {
         };
 
         // Should not panic when displaying failed entry
-        display_entry(&entry);
+        display_entry(&entry, Language::English);
     }
 
     #[test]
@@ -509,7 +539,7 @@ mod tests {
         let (_storage, _temp_dir) = create_test_storage();
 
         // Should display statistics without errors
-        let result = display_stats(&_storage);
+        let result = display_stats(&_storage, Language::English);
         assert!(result.is_ok());
     }
 
@@ -543,7 +573,7 @@ mod tests {
         let (_storage, _temp_dir) = create_test_storage();
 
         // Test with offset parameter (covers line 33)
-        let result = handle_history(Some(10), Some(1), false, false).await;
+        let result = handle_history(Some(10), Some(1), false, false, Language::English).await;
         assert!(result.is_ok());
     }
 }

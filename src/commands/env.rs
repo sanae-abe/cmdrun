@@ -3,6 +3,8 @@
 //! 環境切り替えと環境変数管理コマンド
 
 use crate::config::environment::EnvironmentManager;
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use colored::Colorize;
 
@@ -26,7 +28,7 @@ pub async fn handle_use(env_name: String) -> Result<()> {
 }
 
 /// `cmdrun env current` - 現在の環境表示
-pub async fn handle_current() -> Result<()> {
+pub async fn handle_current(language: Language) -> Result<()> {
     let manager = EnvironmentManager::default_instance()
         .context("Failed to initialize environment manager")?;
 
@@ -35,14 +37,17 @@ pub async fn handle_current() -> Result<()> {
         .await
         .context("Failed to get current environment")?;
 
-    println!("{}", "Current environment:".bold());
+    println!(
+        "{}",
+        get_message(MessageKey::EnvCurrentEnvironmentLabel, language).bold()
+    );
     println!("  {}", current.cyan().bold());
 
     Ok(())
 }
 
 /// `cmdrun env list` - 利用可能な環境一覧
-pub async fn handle_list() -> Result<()> {
+pub async fn handle_list(language: Language) -> Result<()> {
     let manager = EnvironmentManager::default_instance()
         .context("Failed to initialize environment manager")?;
 
@@ -53,7 +58,10 @@ pub async fn handle_list() -> Result<()> {
 
     let current = manager.get_current_environment().await?;
 
-    println!("{}", "Available environments:".bold());
+    println!(
+        "{}",
+        get_message(MessageKey::EnvAvailableEnvironmentsLabel, language).bold()
+    );
     println!();
 
     for (name, description) in envs {
@@ -131,7 +139,7 @@ pub async fn handle_create(name: String, description: Option<String>) -> Result<
 }
 
 /// `cmdrun env info <name>` - 環境の詳細情報表示
-pub async fn handle_info(env_name: Option<String>) -> Result<()> {
+pub async fn handle_info(env_name: Option<String>, language: Language) -> Result<()> {
     let manager = EnvironmentManager::default_instance()
         .context("Failed to initialize environment manager")?;
 
@@ -149,22 +157,37 @@ pub async fn handle_info(env_name: Option<String>) -> Result<()> {
     if target_env == "default" {
         println!("  {}: Default environment", "Description".dimmed());
         println!();
-        println!("  {}:", "Configuration files".bold());
-        println!("    {}: commands.toml", "Base config".dimmed());
+        println!(
+            "  {}:",
+            get_message(MessageKey::EnvConfigurationFiles, language).bold()
+        );
+        println!(
+            "    {}: commands.toml",
+            get_message(MessageKey::EnvBaseConfig, language).dimmed()
+        );
     } else if let Some(env) = config.environments.get(&target_env) {
         println!("  {}: {}", "Description".dimmed(), env.description);
 
         if !env.variables.is_empty() {
             println!();
-            println!("  {}:", "Environment variables".bold());
+            println!(
+                "  {}:",
+                get_message(MessageKey::EnvEnvironmentVariables, language).bold()
+            );
             for (key, value) in &env.variables {
                 println!("    {} = {}", key.cyan(), value.yellow());
             }
         }
 
         println!();
-        println!("  {}:", "Configuration files".bold());
-        println!("    {}: commands.toml", "Base config".dimmed());
+        println!(
+            "  {}:",
+            get_message(MessageKey::EnvConfigurationFiles, language).bold()
+        );
+        println!(
+            "    {}: commands.toml",
+            get_message(MessageKey::EnvBaseConfig, language).dimmed()
+        );
 
         // 環境別設定ファイルの候補を表示
         let current_dir = std::env::current_dir().context("Failed to get current directory")?;
@@ -199,7 +222,11 @@ pub async fn handle_info(env_name: Option<String>) -> Result<()> {
             );
         }
     } else {
-        anyhow::bail!("Environment '{}' not found", target_env);
+        anyhow::bail!(
+            "{}: '{}'",
+            get_message(MessageKey::EnvErrorNotFound, language),
+            target_env
+        );
     }
 
     Ok(())
@@ -273,7 +300,7 @@ mod tests {
         let (_temp_dir, _manager) = setup_test_env().await;
 
         // Should succeed and display default environment
-        let result = handle_current().await;
+        let result = handle_current(Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -292,7 +319,7 @@ mod tests {
             .unwrap();
 
         // Test listing environments
-        let result = handle_list().await;
+        let result = handle_list(Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -352,7 +379,7 @@ mod tests {
         let (_temp_dir, _manager) = setup_test_env().await;
 
         // Test info for default environment
-        let result = handle_info(None).await;
+        let result = handle_info(None, Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -372,7 +399,7 @@ mod tests {
             .unwrap();
 
         // Test info for specific environment
-        let result = handle_info(Some("prod".to_string())).await;
+        let result = handle_info(Some("prod".to_string()), Language::English).await;
         assert!(result.is_ok());
     }
 
@@ -381,7 +408,7 @@ mod tests {
         let (_temp_dir, _manager) = setup_test_env().await;
 
         // Test info for non-existent environment should fail
-        let result = handle_info(Some("nonexistent".to_string())).await;
+        let result = handle_info(Some("nonexistent".to_string()), Language::English).await;
         assert!(result.is_err());
     }
 

@@ -10,7 +10,8 @@ use tokio::fs;
 use tracing::{debug, info};
 
 use super::schema::CommandsConfig;
-use super::ConfigLoader;
+use super::{ConfigLoader, Language};
+use crate::i18n::{get_message, MessageKey};
 
 /// 環境設定
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -223,7 +224,11 @@ impl EnvironmentManager {
 
         // 環境が存在するか確認（default は常に存在）
         if env_name != "default" && !config.environments.contains_key(env_name) {
-            anyhow::bail!("Environment '{}' not found", env_name);
+            anyhow::bail!(
+                "{}: '{}'",
+                get_message(MessageKey::EnvErrorNotFound, Language::English),
+                env_name
+            );
         }
 
         config.current = env_name.to_string();
@@ -262,7 +267,8 @@ impl EnvironmentManager {
         if env_name == "default" {
             // デフォルト環境の場合は基本設定ファイルに保存
             anyhow::bail!(
-                "Cannot set variables for 'default' environment. Use a specific environment name."
+                "{}",
+                get_message(MessageKey::ErrorCannotSetEnvVariable, Language::English)
             );
         } else {
             // 特定環境の変数を設定
@@ -281,7 +287,11 @@ impl EnvironmentManager {
         let mut config = self.load_environment_config().await?;
 
         if config.environments.contains_key(&name) {
-            anyhow::bail!("Environment '{}' already exists", name);
+            anyhow::bail!(
+                "{}: '{}'",
+                get_message(MessageKey::EnvErrorAlreadyExists, Language::English),
+                name
+            );
         }
 
         config.environments.insert(

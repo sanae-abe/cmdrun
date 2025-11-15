@@ -1,5 +1,7 @@
 //! Template schema definitions
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use ahash::AHashMap;
 use serde::{Deserialize, Serialize};
 
@@ -51,30 +53,48 @@ fn default_version() -> String {
 impl UserTemplate {
     /// Validate template structure
     pub fn validate(&self) -> anyhow::Result<()> {
+        self.validate_with_language(Language::English)
+    }
+
+    /// Validate template structure with specific language
+    pub fn validate_with_language(&self, language: Language) -> anyhow::Result<()> {
         // Check name is not empty
         if self.template.name.trim().is_empty() {
-            anyhow::bail!("Template name cannot be empty");
+            anyhow::bail!(
+                "{}",
+                get_message(MessageKey::ErrorTemplateNameEmpty, language)
+            );
         }
 
         // Check description is not empty
         if self.template.description.trim().is_empty() {
-            anyhow::bail!("Template description cannot be empty");
+            anyhow::bail!(
+                "{}",
+                get_message(MessageKey::ErrorTemplateDescriptionEmpty, language)
+            );
         }
 
         // Check at least one command is defined
         if self.commands.is_empty() {
-            anyhow::bail!("Template must contain at least one command");
+            anyhow::bail!(
+                "{}",
+                get_message(MessageKey::ErrorTemplateNoCommands, language)
+            );
         }
 
         // Validate command IDs
         for (id, _) in &self.commands {
             if id.trim().is_empty() {
-                anyhow::bail!("Command ID cannot be empty");
+                anyhow::bail!("{}", get_message(MessageKey::ErrorEmptyCommandId, language));
             }
 
             // Check for invalid characters in ID
             if id.contains(|c: char| c.is_whitespace() || c == '/' || c == '\\') {
-                anyhow::bail!("Command ID '{}' contains invalid characters", id);
+                anyhow::bail!(
+                    "{}: '{}'",
+                    get_message(MessageKey::ErrorCommandIdInvalidChars, language),
+                    id
+                );
             }
         }
 

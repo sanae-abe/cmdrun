@@ -2,6 +2,8 @@
 //!
 //! Unix（Linux/macOS）とWindows両対応のシェル検出・実行機能
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use anyhow::{Context, Result};
 use std::env;
 use std::path::PathBuf;
@@ -115,7 +117,10 @@ fn detect_unix_shell() -> Result<ShellInfo> {
         }
     }
 
-    anyhow::bail!("No suitable Unix shell found")
+    anyhow::bail!(
+        "{}",
+        get_message(MessageKey::ErrorNoSuitableUnixShell, Language::English)
+    )
 }
 
 /// Windowsのシェルを検出
@@ -145,7 +150,10 @@ fn detect_windows_shell() -> Result<ShellInfo> {
         ));
     }
 
-    anyhow::bail!("No suitable Windows shell found")
+    anyhow::bail!(
+        "{}",
+        get_message(MessageKey::ErrorNoSuitableWindowsShell, Language::English)
+    )
 }
 
 /// シェルの機能を検出

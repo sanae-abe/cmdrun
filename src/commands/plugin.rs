@@ -5,7 +5,11 @@
 #[cfg(feature = "plugin-system")]
 use crate::config::loader::ConfigLoader;
 #[cfg(feature = "plugin-system")]
+use crate::config::Language;
+#[cfg(feature = "plugin-system")]
 use crate::error::Result;
+#[cfg(feature = "plugin-system")]
+use crate::i18n::{get_message, MessageKey};
 #[cfg(feature = "plugin-system")]
 use crate::plugin::PluginManager;
 #[cfg(feature = "plugin-system")]
@@ -19,6 +23,7 @@ pub async fn handle_plugin_list(
     only_enabled: bool,
     verbose: bool,
     config_path: Option<PathBuf>,
+    language: Language,
 ) -> Result<()> {
     let loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)?
@@ -33,7 +38,10 @@ pub async fn handle_plugin_list(
     let plugins = manager.list_plugins();
 
     if plugins.is_empty() {
-        println!("{}", "No plugins installed".yellow());
+        println!(
+            "{}",
+            get_message(MessageKey::PluginNoPluginsInstalled, language).yellow()
+        );
         return Ok(());
     }
 
@@ -108,7 +116,11 @@ pub async fn handle_plugin_list(
 
 /// Show detailed information about a plugin
 #[cfg(feature = "plugin-system")]
-pub async fn handle_plugin_info(name: &str, config_path: Option<PathBuf>) -> Result<()> {
+pub async fn handle_plugin_info(
+    name: &str,
+    config_path: Option<PathBuf>,
+    language: Language,
+) -> Result<()> {
     let loader = if let Some(path) = config_path {
         ConfigLoader::with_path(path)?
     } else {
@@ -156,7 +168,11 @@ pub async fn handle_plugin_info(name: &str, config_path: Option<PathBuf>) -> Res
     }
 
     if let Some(min_version) = &metadata.min_cmdrun_version {
-        println!("Minimum cmdrun version: {}", min_version);
+        println!(
+            "{} {}",
+            get_message(MessageKey::PluginMinimumCmdrunVersion, language),
+            min_version
+        );
     }
 
     println!();

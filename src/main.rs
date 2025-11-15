@@ -109,7 +109,8 @@ async fn run(cli: Cli) -> Result<()> {
             .await?;
         }
         Commands::Completion { shell } => {
-            cmdrun::commands::handle_completion(shell);
+            use cmdrun::config::Language;
+            cmdrun::commands::handle_completion(shell, Language::English);
         }
         Commands::Remove { id, force } => {
             cmdrun::commands::handle_remove(id, force, config_path).await?;
@@ -177,10 +178,12 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_use(name).await?;
             }
             EnvAction::Current => {
-                cmdrun::commands::handle_current().await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_current(Language::English).await?;
             }
             EnvAction::List => {
-                cmdrun::commands::handle_env_list().await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_env_list(Language::English).await?;
             }
             EnvAction::Set { key, value, env } => {
                 cmdrun::commands::handle_env_set(key, value, env).await?;
@@ -189,7 +192,8 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_create(name, description).await?;
             }
             EnvAction::Info { name } => {
-                cmdrun::commands::handle_env_info(name).await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_env_info(name, Language::English).await?;
             }
         },
         Commands::History { action } => match action {
@@ -199,10 +203,19 @@ async fn run(cli: Cli) -> Result<()> {
                 failed,
                 stats,
             } => {
-                cmdrun::commands::handle_history(Some(limit), offset, failed, stats).await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_history(
+                    Some(limit),
+                    offset,
+                    failed,
+                    stats,
+                    Language::English,
+                )
+                .await?;
             }
             HistoryAction::Search { query, limit } => {
-                cmdrun::commands::handle_history_search(&query, limit).await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_history_search(&query, limit, Language::English).await?;
             }
             HistoryAction::Clear { force } => {
                 cmdrun::commands::handle_history_clear(force).await?;
@@ -219,7 +232,9 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_history_export(export_format, output, limit).await?;
             }
             HistoryAction::Stats => {
-                cmdrun::commands::handle_history(None, None, false, true).await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_history(None, None, false, true, Language::English)
+                    .await?;
             }
         },
         Commands::Retry { id } => {
@@ -233,7 +248,8 @@ async fn run(cli: Cli) -> Result<()> {
                 cmdrun::commands::handle_template_use(name, output).await?;
             }
             TemplateAction::List { verbose } => {
-                cmdrun::commands::handle_template_list(verbose).await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_template_list(verbose, Language::English).await?;
             }
             TemplateAction::Remove { name, force } => {
                 cmdrun::commands::handle_template_remove(name, force).await?;
@@ -248,10 +264,18 @@ async fn run(cli: Cli) -> Result<()> {
         #[cfg(feature = "plugin-system")]
         Commands::Plugin { action } => match action {
             PluginAction::List { enabled, verbose } => {
-                cmdrun::commands::handle_plugin_list(enabled, verbose, config_path).await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_plugin_list(
+                    enabled,
+                    verbose,
+                    config_path,
+                    Language::English,
+                )
+                .await?;
             }
             PluginAction::Info { name } => {
-                cmdrun::commands::handle_plugin_info(&name, config_path).await?;
+                use cmdrun::config::Language;
+                cmdrun::commands::handle_plugin_info(&name, config_path, Language::English).await?;
             }
             PluginAction::Enable { name } => {
                 cmdrun::commands::handle_plugin_enable(&name, config_path).await?;

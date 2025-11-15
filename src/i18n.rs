@@ -98,6 +98,21 @@ pub enum MessageKey {
     ErrorNoConfigFileFound,
     ErrorCannotDetermineConfigDir,
     ErrorCommandExecutionFailed,
+    ErrorLocalConfigNotFound,
+    ErrorNoConfigFilesSpecified,
+    ErrorCannotSetEnvVariable,
+    ErrorNoSuitableUnixShell,
+    ErrorNoSuitableWindowsShell,
+    ErrorTemplateAlreadyExists,
+    ErrorTemplateNotFound,
+    ErrorCannotRemoveBuiltinTemplate,
+    ErrorFileNotFound,
+    ErrorTemplateNameEmpty,
+    ErrorTemplateDescriptionEmpty,
+    ErrorTemplateNoCommands,
+    ErrorCommandIdInvalidChars,
+    ErrorCommandFailedWithCode,
+    ErrorNoTemplatesAvailable,
 
     // ====== ヘルプテキスト ======
     HelpAddCommand,
@@ -239,6 +254,30 @@ pub enum MessageKey {
     CreatingBackup,
     MatchingCommands,
     Template,
+
+    // ====== History コマンド ======
+    HistoryNoEntriesFound,
+    HistoryNoCommandsMatching,
+    HistoryExitCode,
+    HistoryWorkingDir,
+    HistoryTotalCommands,
+
+    // ====== Template コマンド ======
+    TemplateNoTemplatesAvailable,
+    TemplateUserTemplates,
+
+    // ====== Plugin コマンド ======
+    PluginNoPluginsInstalled,
+    PluginMinimumCmdrunVersion,
+
+    // ====== Env コマンド表示 ======
+    EnvCurrentEnvironmentLabel,
+    EnvAvailableEnvironmentsLabel,
+    EnvConfigurationFiles,
+    EnvBaseConfig,
+
+    // ====== Completion コマンド ======
+    CompletionInstallationInstructions,
 }
 
 /// メッセージの取得
@@ -338,6 +377,21 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorNoConfigFileFound => "No configuration file found. Run 'cmdrun init' to create one.",
             ErrorCannotDetermineConfigDir => "Cannot determine config directory",
             ErrorCommandExecutionFailed => "Command failed with exit code",
+            ErrorLocalConfigNotFound => "Local configuration file not found",
+            ErrorNoConfigFilesSpecified => "No configuration files specified",
+            ErrorCannotSetEnvVariable => "Cannot set environment variable in default environment",
+            ErrorNoSuitableUnixShell => "No suitable Unix shell found",
+            ErrorNoSuitableWindowsShell => "No suitable Windows shell found",
+            ErrorTemplateAlreadyExists => "Template already exists",
+            ErrorTemplateNotFound => "Template not found",
+            ErrorCannotRemoveBuiltinTemplate => "Cannot remove built-in template",
+            ErrorFileNotFound => "File not found",
+            ErrorTemplateNameEmpty => "Template name cannot be empty",
+            ErrorTemplateDescriptionEmpty => "Template description cannot be empty",
+            ErrorTemplateNoCommands => "Template must contain at least one command",
+            ErrorCommandIdInvalidChars => "Command ID contains invalid characters",
+            ErrorCommandFailedWithCode => "Command failed with exit code",
+            ErrorNoTemplatesAvailable => "No templates available",
 
             // ====== ヘルプテキスト ======
             HelpAddCommand => "Add a new command to the configuration",
@@ -479,6 +533,30 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             CreatingBackup => "Creating backup",
             MatchingCommands => "matching command(s)",
             Template => "template",
+
+            // ====== History コマンド ======
+            HistoryNoEntriesFound => "No history entries found",
+            HistoryNoCommandsMatching => "No commands matching",
+            HistoryExitCode => "Exit code:",
+            HistoryWorkingDir => "Working dir:",
+            HistoryTotalCommands => "Total commands:",
+
+            // ====== Template コマンド ======
+            TemplateNoTemplatesAvailable => "No templates available",
+            TemplateUserTemplates => "User templates:",
+
+            // ====== Plugin コマンド ======
+            PluginNoPluginsInstalled => "No plugins installed",
+            PluginMinimumCmdrunVersion => "Minimum cmdrun version:",
+
+            // ====== Env コマンド表示 ======
+            EnvCurrentEnvironmentLabel => "Current environment:",
+            EnvAvailableEnvironmentsLabel => "Available environments:",
+            EnvConfigurationFiles => "Configuration files",
+            EnvBaseConfig => "Base config",
+
+            // ====== Completion コマンド ======
+            CompletionInstallationInstructions => "Installation instructions:",
         },
         Language::Japanese => match key {
             // ====== 実行状態 ======
@@ -572,6 +650,21 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorNoConfigFileFound => "設定ファイルが見つかりません。'cmdrun init' を実行して作成してください。",
             ErrorCannotDetermineConfigDir => "設定ディレクトリを特定できません",
             ErrorCommandExecutionFailed => "コマンドが失敗しました（終了コード",
+            ErrorLocalConfigNotFound => "ローカル設定ファイルが見つかりません",
+            ErrorNoConfigFilesSpecified => "設定ファイルが指定されていません",
+            ErrorCannotSetEnvVariable => "デフォルト環境では環境変数を設定できません",
+            ErrorNoSuitableUnixShell => "適切なUnixシェルが見つかりません",
+            ErrorNoSuitableWindowsShell => "適切なWindowsシェルが見つかりません",
+            ErrorTemplateAlreadyExists => "テンプレートは既に存在します",
+            ErrorTemplateNotFound => "テンプレートが見つかりません",
+            ErrorCannotRemoveBuiltinTemplate => "組み込みテンプレートは削除できません",
+            ErrorFileNotFound => "ファイルが見つかりません",
+            ErrorTemplateNameEmpty => "テンプレート名は空にできません",
+            ErrorTemplateDescriptionEmpty => "テンプレートの説明は空にできません",
+            ErrorTemplateNoCommands => "テンプレートには少なくとも1つのコマンドが必要です",
+            ErrorCommandIdInvalidChars => "コマンドIDに無効な文字が含まれています",
+            ErrorCommandFailedWithCode => "コマンドが失敗しました（終了コード",
+            ErrorNoTemplatesAvailable => "利用可能なテンプレートがありません",
 
             // ====== ヘルプテキスト ======
             HelpAddCommand => "設定に新しいコマンドを追加",
@@ -713,6 +806,30 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             CreatingBackup => "バックアップを作成中",
             MatchingCommands => "件の一致するコマンド",
             Template => "テンプレート",
+
+            // ====== History コマンド ======
+            HistoryNoEntriesFound => "履歴エントリが見つかりません",
+            HistoryNoCommandsMatching => "一致するコマンドがありません",
+            HistoryExitCode => "終了コード:",
+            HistoryWorkingDir => "作業ディレクトリ:",
+            HistoryTotalCommands => "総コマンド数:",
+
+            // ====== Template コマンド ======
+            TemplateNoTemplatesAvailable => "利用可能なテンプレートがありません",
+            TemplateUserTemplates => "ユーザーテンプレート:",
+
+            // ====== Plugin コマンド ======
+            PluginNoPluginsInstalled => "インストール済みプラグインがありません",
+            PluginMinimumCmdrunVersion => "最小cmdrunバージョン:",
+
+            // ====== Env コマンド表示 ======
+            EnvCurrentEnvironmentLabel => "現在の環境:",
+            EnvAvailableEnvironmentsLabel => "利用可能な環境:",
+            EnvConfigurationFiles => "設定ファイル",
+            EnvBaseConfig => "ベース設定",
+
+            // ====== Completion コマンド ======
+            CompletionInstallationInstructions => "インストール手順:",
         },
         Language::ChineseSimplified => match key {
             // ====== 实行状态 ======
@@ -806,6 +923,21 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorNoConfigFileFound => "找不到配置文件。运行 'cmdrun init' 创建配置文件。",
             ErrorCannotDetermineConfigDir => "无法确定配置目录",
             ErrorCommandExecutionFailed => "命令执行失败，退出代码",
+            ErrorLocalConfigNotFound => "找不到本地配置文件",
+            ErrorNoConfigFilesSpecified => "未指定配置文件",
+            ErrorCannotSetEnvVariable => "无法在默认环境中设置环境变量",
+            ErrorNoSuitableUnixShell => "找不到合适的Unix shell",
+            ErrorNoSuitableWindowsShell => "找不到合适的Windows shell",
+            ErrorTemplateAlreadyExists => "模板已存在",
+            ErrorTemplateNotFound => "找不到模板",
+            ErrorCannotRemoveBuiltinTemplate => "无法删除内置模板",
+            ErrorFileNotFound => "找不到文件",
+            ErrorTemplateNameEmpty => "模板名称不能为空",
+            ErrorTemplateDescriptionEmpty => "模板描述不能为空",
+            ErrorTemplateNoCommands => "模板必须包含至少一个命令",
+            ErrorCommandIdInvalidChars => "命令ID包含无效字符",
+            ErrorCommandFailedWithCode => "命令执行失败，退出代码",
+            ErrorNoTemplatesAvailable => "没有可用模板",
 
             // ====== 帮助文本 ======
             HelpAddCommand => "向配置中添加新命令",
@@ -947,6 +1079,30 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             CreatingBackup => "正在创建备份",
             MatchingCommands => "个匹配命令",
             Template => "模板",
+
+            // ====== History 命令 ======
+            HistoryNoEntriesFound => "未找到历史记录",
+            HistoryNoCommandsMatching => "没有匹配的命令",
+            HistoryExitCode => "退出代码:",
+            HistoryWorkingDir => "工作目录:",
+            HistoryTotalCommands => "总命令数:",
+
+            // ====== Template 命令 ======
+            TemplateNoTemplatesAvailable => "没有可用模板",
+            TemplateUserTemplates => "用户模板:",
+
+            // ====== Plugin 命令 ======
+            PluginNoPluginsInstalled => "未安装插件",
+            PluginMinimumCmdrunVersion => "最低cmdrun版本:",
+
+            // ====== Env 命令显示 ======
+            EnvCurrentEnvironmentLabel => "当前环境:",
+            EnvAvailableEnvironmentsLabel => "可用环境:",
+            EnvConfigurationFiles => "配置文件",
+            EnvBaseConfig => "基础配置",
+
+            // ====== Completion 命令 ======
+            CompletionInstallationInstructions => "安装说明:",
         },
         Language::ChineseTraditional => match key {
             // ====== 執行狀態 ======
@@ -1040,6 +1196,21 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             ErrorNoConfigFileFound => "找不到配置檔案。執行 'cmdrun init' 建立配置檔案。",
             ErrorCannotDetermineConfigDir => "無法確定配置目錄",
             ErrorCommandExecutionFailed => "命令執行失敗，結束代碼",
+            ErrorLocalConfigNotFound => "找不到本地配置檔案",
+            ErrorNoConfigFilesSpecified => "未指定配置檔案",
+            ErrorCannotSetEnvVariable => "無法在預設環境中設定環境變數",
+            ErrorNoSuitableUnixShell => "找不到合適的Unix shell",
+            ErrorNoSuitableWindowsShell => "找不到合適的Windows shell",
+            ErrorTemplateAlreadyExists => "範本已存在",
+            ErrorTemplateNotFound => "找不到範本",
+            ErrorCannotRemoveBuiltinTemplate => "無法刪除內建範本",
+            ErrorFileNotFound => "找不到檔案",
+            ErrorTemplateNameEmpty => "範本名稱不能為空",
+            ErrorTemplateDescriptionEmpty => "範本描述不能為空",
+            ErrorTemplateNoCommands => "範本必須包含至少一個命令",
+            ErrorCommandIdInvalidChars => "命令ID包含無效字元",
+            ErrorCommandFailedWithCode => "命令執行失敗，結束代碼",
+            ErrorNoTemplatesAvailable => "沒有可用範本",
 
             // ====== 說明文字 ======
             HelpAddCommand => "向配置中新增命令",
@@ -1181,6 +1352,30 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             CreatingBackup => "正在建立備份",
             MatchingCommands => "個符合命令",
             Template => "範本",
+
+            // ====== History 命令 ======
+            HistoryNoEntriesFound => "未找到歷史記錄",
+            HistoryNoCommandsMatching => "沒有符合的命令",
+            HistoryExitCode => "結束代碼:",
+            HistoryWorkingDir => "工作目錄:",
+            HistoryTotalCommands => "總命令數:",
+
+            // ====== Template 命令 ======
+            TemplateNoTemplatesAvailable => "沒有可用範本",
+            TemplateUserTemplates => "使用者範本:",
+
+            // ====== Plugin 命令 ======
+            PluginNoPluginsInstalled => "未安裝外掛程式",
+            PluginMinimumCmdrunVersion => "最低cmdrun版本:",
+
+            // ====== Env 命令顯示 ======
+            EnvCurrentEnvironmentLabel => "目前環境:",
+            EnvAvailableEnvironmentsLabel => "可用環境:",
+            EnvConfigurationFiles => "配置檔案",
+            EnvBaseConfig => "基礎配置",
+
+            // ====== Completion 命令 ======
+            CompletionInstallationInstructions => "安裝說明:",
         },
     }
 }
