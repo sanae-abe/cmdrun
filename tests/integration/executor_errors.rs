@@ -1382,7 +1382,7 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_pipe = Command {
         description: "CD with pipe".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            "cd C:\\ & echo done".to_string()
+            "cd C:\\\\ & echo done".to_string()
         } else {
             "cd /tmp | echo done".to_string()
         }),
@@ -1487,10 +1487,15 @@ async fn test_warn_shell_builtin_is_invoked() {
         "CD command should execute successfully with warning"
     );
 
-    // Test with other shell builtins
+    // Test with other shell builtins (platform-specific)
     let cmd_export = Command {
         description: "Export command".to_string(),
-        cmd: CommandSpec::Single("export VAR=value".to_string()),
+        cmd: CommandSpec::Single(if cfg!(windows) {
+            // Windows: use 'set' instead of 'export'
+            "set VAR=value".to_string()
+        } else {
+            "export VAR=value".to_string()
+        }),
         env: AHashMap::new(),
         working_dir: None,
         deps: vec![],
@@ -1504,7 +1509,7 @@ async fn test_warn_shell_builtin_is_invoked() {
     let result = executor.execute(&cmd_export).await;
     assert!(
         result.is_ok(),
-        "Export command should execute (with warning)"
+        "Environment variable command should execute (with warning)"
     );
 }
 
