@@ -5,3 +5,5 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc e7b12f63b322a433fb9663ee01e6fcf46c1ced1139f80c54dff31dbbd578650d # shrinks to arg = ""
+cc 4468cef27529b014022fca3bfd21ce717a2214a3d11feed140269dbd537ccdb3 # shrinks to cmd = "\u{e000}"
+cc aa92d2986c577b50a3a3af1cb71016ab5e2b638d3ebbe716db6805ba87419288 # shrinks to var_name = "A", default_val = "} "

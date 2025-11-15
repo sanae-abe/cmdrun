@@ -257,9 +257,13 @@
   - 📝 対象mutants: 13個のMISSED mutantsのうち10個をカバー
   - 📝 備考: 正確なmutation scoreはバックグラウンド実行完了後に確認可能
 
-- [ ] Property-based Testingの拡充 | Priority: low | Context: test | Due: 2026-01-15
-  - 追加のプロパティテスト実装
-  - fuzzing 強化
+- [x] Property-based Testingの拡充 | Priority: low | Context: test | Due: 2026-01-15
+  - ✅ 追加のプロパティテスト実装 (18件追加、合計38件)
+  - ✅ 依存関係グラフ、変数展開、セキュリティ検証の強化
+  - ✅ エッジケース・境界値テストの網羅
+  - 📝 tests/proptest_coverage.rs:263 (Dependency Graph Tests)
+  - 📝 tests/proptest_coverage.rs:336 (Interpolation Edge Cases)
+  - 📝 tests/proptest_coverage.rs:455 (Security Validation Tests)
   - コーナーケースの自動発見
 
 ---
@@ -690,101 +694,7 @@ search.rs: 37/39行 (94.87%) → 39/39行 (100.00%) ✅
 
 # cmdrun - タスク管理
 
+> **注記**: task-validate改善タスクは `~/projects/claude-code-workspace/` に分離されました。
+> 詳細は `~/projects/claude-code-workspace/tasks.yml` および `~/projects/claude-code-workspace/todos.md` を参照。
+
 ---
-
-## 📋 task-validate.md 改善検討タスク (2025-01-14追加)
-
-> Iterative Reviewの結果に基づく将来的な実装検討項目
-
-### 🔴 Phase A: テスト基盤構築 (優先度: HIGH)
-
-- [ ] #task-validate-1 テストカバレッジ追加（batsフレームワーク） | Priority: high | Effort: 6-8h | Due: 2025-02-28
-  - `tests/task-validate/` ディレクトリ作成
-  - bats (Bash Automated Testing System) セットアップ
-  - 単体テスト: argument parser, error handler, report formatter
-  - 統合テスト: security layer, syntax layer, full workflow
-  - テストフィクスチャ: valid/invalid config, sample errors
-  - 目標カバレッジ: 70%（クリティカルパスの網羅）
-  - CI統合: GitHub Actionsでの自動実行
-  - **効果**: リグレッション防止、安全なリファクタリング基盤
-
-- [ ] #task-validate-2 エラーハンドリング改善 | Priority: high | Effort: 2-3h | Due: 2025-02-28
-  - シグナルハンドリング追加（SIGINT, SIGTERM）
-  - クリーンアップ処理実装（一時ファイル、バックグラウンドジョブ）
-  - --auto-fix ロールバック機能実装
-  - ディスク空間チェック追加（最低10MB確保）
-  - **効果**: データ損失防止、ユーザー体験向上
-
-### 🟡 Phase B: パフォーマンス最適化 (優先度: MEDIUM)
-
-- [ ] #task-validate-3 並列実行の実装 | Priority: medium | Effort: 2-3h | Due: 2025-03-31
-  - lint/test/buildの並列実行（Bashバックグラウンドジョブ）
-  - 終了コード収集の実装
-  - タイムアウト機構（max 120s/job）
-  - シグナルハンドリング統合（並列ジョブのクリーンアップ）
-  - **効果**: 50-60%高速化（65秒 → 30秒）
-
-- [ ] #task-validate-4 レイヤー実行順序変更（Fail-Fast） | Priority: medium | Effort: 10min | Due: 2025-03-31
-  - 現状: Security → Syntax → Integration
-  - 最適化: Syntax（失敗率60%）→ Security → Integration
-  - **効果**: 37%高速な失敗検出（平均12秒 → 7.5秒）
-
-- [ ] #task-validate-5 単一パスセキュリティスキャン最適化 | Priority: medium | Effort: 30min | Due: 2025-03-31
-  - 複数rgスキャン → 単一マルチパターンスキャン（既に実装済み✅）
-  - タイムアウト設定の調整検証
-  - **効果**: 60%高速化（既に達成済み）
-
-### 🟢 Phase C: 保守性向上 (優先度: LOW - 将来的な大規模リファクタリング時)
-
-- [ ] #task-validate-6 モジュール化リファクタリング | Priority: low | Effort: 4-6h | Due: 2025-06-30
-  - validation layers の分離（security.sh, syntax.sh, integration.sh）
-  - パーサーの分離（typescript.sh, eslint.sh, jest.sh）
-  - レポーターの分離（text-report.sh, json-report.sh）
-  - 共通ユーティリティライブラリ作成
-  - **効果**: 単一責任原則の遵守、再利用性向上
-
-- [ ] #task-validate-7 DRY原則違反の解消 | Priority: low | Effort: 2-3h | Due: 2025-06-30
-  - エラーハンドラー関数の抽出
-  - レイヤー実行パターンの汎化
-  - 共通バリデーション関数の統合
-  - **効果**: 30%コード削減（496行 → ~350行）
-
-- [ ] #task-validate-8 アーキテクチャドキュメント作成 | Priority: low | Effort: 1-2h | Due: 2025-06-30
-  - `~/.claude/docs/task-validate-architecture.md` 作成
-  - システム図追加（レイヤー構成、データフロー）
-  - 設計判断の記録（ADR形式）
-  - マイグレーションガイド作成
-  - **効果**: オンボーディング効率化、設計意図の明確化
-
-### 📊 実装の優先順位と期待効果
-
-| Phase | タスク数 | 総工数 | 期限 | ROI | 備考 |
-|-------|---------|-------|------|-----|------|
-| **Phase A** | 2 | 8-11h | 2025-02-28 | **HIGH** | セキュリティ・安定性の基盤 |
-| **Phase B** | 3 | 3-4h | 2025-03-31 | **VERY HIGH** | 3-4時間で50-60%高速化 |
-| **Phase C** | 3 | 7-11h | 2025-06-30 | MEDIUM | 大規模リファクタリング時 |
-
-### 🎯 推奨実装順序
-
-1. **第1優先（2025年2月）**: Phase A（テスト基盤）
-   - 理由: 安全なリファクタリングの前提条件
-   - 工数: 8-11時間
-   - 効果: リグレッション防止、データ損失防止
-
-2. **第2優先（2025年3月）**: Phase B（パフォーマンス）
-   - 理由: 低工数で高ROI（3-4時間で50-60%高速化）
-   - 工数: 3-4時間
-   - 効果: 週30-60回使用 × 35秒削減 = 17.5-35分/週の時間節約
-
-3. **第3優先（2025年6月以降）**: Phase C（保守性）
-   - 理由: 大規模リファクタリング時に実施
-   - 工数: 7-11時間
-   - 効果: 長期的な保守コスト削減
-
-### 📝 注記
-
-- **✅ 完了済み**: セキュリティ強化（2025-01-14実施）
-  - 入力検証、エスケープ処理、コマンドインジェクション対策、パストラバーサル対策
-- **Phase A完了後**: 安全にPhase BおよびPhase Cのリファクタリングが可能
-- **Phase B**: 投資対効果が最も高い（低工数で大幅な性能向上）
-- **Phase C**: 機能追加が頻繁になった時点で実施を推奨

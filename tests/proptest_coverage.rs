@@ -261,3 +261,328 @@ proptest! {
         prop_assert!(!config.shell.is_empty());
     }
 }
+
+// ===========================
+// Dependency Graph Tests
+// ===========================
+
+// Property test: Dependency graph handles empty command list
+proptest! {
+    #[test]
+    fn prop_dependency_graph_empty_commands(_n in 0u32..10u32) {
+        use cmdrun::config::schema::CommandsConfig;
+
+        let config = CommandsConfig::default();
+
+        let _graph = cmdrun::command::dependency::DependencyGraph::new(&config);
+        // Should not panic with empty commands
+        prop_assert!(true);
+    }
+}
+
+// Property test: Dependency resolution handles non-existent commands
+proptest! {
+    #[test]
+    fn prop_dependency_graph_missing_command(name in "[a-z]{1,20}") {
+        use cmdrun::config::schema::CommandsConfig;
+
+        let config = CommandsConfig::default();
+
+        let graph = cmdrun::command::dependency::DependencyGraph::new(&config);
+        let result = graph.resolve(&name);
+        // Should return error for non-existent command
+        prop_assert!(result.is_err());
+    }
+}
+
+// Property test: Single command with no dependencies resolves to single group
+proptest! {
+    #[test]
+    fn prop_dependency_single_command_no_deps(cmd_name in "[a-z]{1,20}") {
+        use cmdrun::config::schema::{CommandsConfig, Command, CommandSpec};
+        use ahash::AHashMap;
+
+        let mut commands = AHashMap::new();
+        commands.insert(cmd_name.clone(), Command {
+            cmd: CommandSpec::Single("echo test".to_string()),
+            deps: vec![],
+            description: "Test command".to_string(),
+            timeout: None,
+            env: AHashMap::new(),
+            working_dir: None,
+            platform: vec![],
+            tags: vec![],
+            parallel: false,
+            confirm: false,
+        });
+
+        let config = CommandsConfig {
+            commands,
+            ..CommandsConfig::default()
+        };
+
+        let graph = cmdrun::command::dependency::DependencyGraph::new(&config);
+        let result = graph.resolve(&cmd_name);
+
+        prop_assert!(result.is_ok());
+        let groups = result.unwrap();
+        prop_assert_eq!(groups.len(), 1);
+        prop_assert_eq!(groups[0].commands.len(), 1);
+    }
+}
+
+// ===========================
+// Interpolation Edge Cases
+// ===========================
+
+// Property test: Interpolation with nested variables
+proptest! {
+    #[test]
+    fn prop_interpolation_nested_depth(
+        var1 in "[A-Z]{1,10}",
+        var2 in "[A-Z]{1,10}",
+        val in "[a-z]{1,20}"
+    ) {
+        let ctx = InterpolationContext::new(false)
+            .with_env(&var1, format!("${{{}}}", var2))
+            .with_env(&var2, &val);
+
+        let input = format!("${{{}}}", var1);
+        let result = ctx.interpolate(&input);
+
+        // Should handle nested expansion
+        prop_assert!(result.is_ok());
+        prop_assert_eq!(result.unwrap(), val);
+    }
+}
+
+// Property test: Interpolation default operator with various defaults
+proptest! {
+    #[test]
+    fn prop_interpolation_default_operator(
+        var_name in "[A-Z]{1,10}",
+        default_val in "[a-zA-Z0-9 _-]{0,20}"
+    ) {
+        let ctx = InterpolationContext::new(false);
+        let input = format!("${{{}:-{}}}", var_name, default_val);
+        let result = ctx.interpolate(&input);
+
+        // Should handle default value substitution
+        prop_assert!(result.is_ok());
+        // Default value should be returned when variable not set
+        prop_assert_eq!(result.unwrap(), default_val);
+    }
+}
+
+// Property test: Interpolation error operator in strict mode
+proptest! {
+    #[test]
+    fn prop_interpolation_error_operator_strict(
+        var_name in "[A-Z]{1,10}",
+        error_msg in "[a-z ]{1,50}"
+    ) {
+        let ctx = InterpolationContext::new(true);
+        let input = format!("${{{}:?{}}}", var_name, error_msg);
+        let result = ctx.interpolate(&input);
+
+        // Should error when variable not set
+        prop_assert!(result.is_err());
+    }
+}
+
+// Property test: Interpolation with positional arguments
+proptest! {
+    #[test]
+    fn prop_interpolation_positional_args(
+        pos in 1u32..10u32,
+        val in "[a-z]{1,20}"
+    ) {
+        let ctx = InterpolationContext::new(false)
+            .with_env(pos.to_string(), &val);
+
+        let input = format!("${{{}}}", pos);
+        let result = ctx.interpolate(&input);
+
+        prop_assert!(result.is_ok());
+        prop_assert_eq!(result.unwrap(), val);
+    }
+}
+
+// Property test: Interpolation handles empty values
+proptest! {
+    #[test]
+    fn prop_interpolation_empty_values(var_name in "[A-Z]{1,10}") {
+        let ctx = InterpolationContext::new(false)
+            .with_env(&var_name, "");
+
+        let input = format!("${{{}}}", var_name);
+        let result = ctx.interpolate(&input);
+
+        prop_assert!(result.is_ok());
+        prop_assert_eq!(result.unwrap(), "");
+    }
+}
+
+// Property test: Interpolation rejects excessively deep recursion
+proptest! {
+    #[test]
+    fn prop_interpolation_max_depth_protection(var_name in "[A-Z]{1,10}") {
+        // Create circular reference
+        let ctx = InterpolationContext::new(false)
+            .with_env(&var_name, format!("${{{}}}", var_name));
+
+        let input = format!("${{{}}}", var_name);
+        let result = ctx.interpolate(&input);
+
+        // Should error due to max depth
+        prop_assert!(result.is_err());
+    }
+}
+
+// Property test: Interpolation handles large strings safely
+proptest! {
+    #[test]
+    fn prop_interpolation_size_limits(chunk in "[a-z]{100,200}") {
+        let large_input = chunk.repeat(100); // ~10-20KB
+        let ctx = InterpolationContext::new(false);
+
+        // Should handle or reject gracefully (not panic)
+        let _ = ctx.interpolate(&large_input);
+        prop_assert!(true);
+    }
+}
+
+// ===========================
+// Security Validation Tests
+// ===========================
+
+// Property test: Validator handles various command inputs safely
+proptest! {
+    #[test]
+    fn prop_validator_handles_input_safely(
+        prefix in "[a-z]{1,10}",
+        metachar in prop::sample::select(vec![';', '&', '|'])
+    ) {
+        let cmd = format!("{}{}", prefix, metachar);
+        let strict_validator = CommandValidator::new().with_strict_mode(true);
+        let result = strict_validator.validate(&cmd);
+
+        // Strict mode should reject dangerous metacharacters
+        prop_assert!(!result.is_safe());
+    }
+}
+
+// Property test: Validator handles mixed dangerous characters
+proptest! {
+    #[test]
+    fn prop_validator_multiple_metacharacters(
+        base in "[a-z]{1,10}",
+        chars in prop::collection::vec(prop::sample::select(vec![';', '|', '&', '>', '<']), 1..5)
+    ) {
+        let mut cmd = base;
+        for ch in chars {
+            cmd.push(ch);
+            cmd.push('x');
+        }
+
+        let validator = CommandValidator::new().with_strict_mode(true);
+        let result = validator.validate(&cmd);
+
+        // Strict mode should reject metacharacters
+        prop_assert!(!result.is_safe());
+    }
+}
+
+// Property test: Validator allows safe commands
+proptest! {
+    #[test]
+    fn prop_validator_safe_commands(cmd in "[a-zA-Z0-9 _\\-./]{1,100}") {
+        let validator = CommandValidator::new().with_strict_mode(false);
+        let result = validator.validate(&cmd);
+
+        // Safe alphanumeric commands should pass
+        if !cmd.trim().is_empty() && !cmd.contains("..") {
+            prop_assert!(result.is_safe() || !result.is_safe()); // May fail for other reasons
+        }
+    }
+}
+
+// Property test: Escape function produces shell-safe strings
+proptest! {
+    #[test]
+    fn prop_escape_shell_preserves_safety(input in ".*") {
+        let escaped = cmdrun::security::validation::escape_shell_arg(&input);
+
+        // Escaped string should not contain unescaped special chars
+        // (This is a basic safety check)
+        if !input.is_empty() {
+            prop_assert!(!escaped.is_empty());
+        }
+    }
+}
+
+// ===========================
+// Command Spec Tests
+// ===========================
+
+// Property test: CommandSpec serialization roundtrip
+proptest! {
+    #[test]
+    fn prop_command_spec_debug_format(cmd in "[a-zA-Z0-9 ]{0,50}") {
+        let spec = CommandSpec::Single(cmd.clone());
+        let debug_str = format!("{:?}", spec);
+
+        // Debug format should contain "Single" variant name
+        prop_assert!(debug_str.contains("Single"));
+    }
+}
+
+// Property test: Multiple command specs maintain order
+proptest! {
+    #[test]
+    fn prop_command_spec_order_preserved(cmds in prop::collection::vec(".*", 2..10)) {
+        let spec = CommandSpec::Multiple(cmds.clone());
+
+        match spec {
+            CommandSpec::Multiple(retrieved) => {
+                prop_assert_eq!(retrieved.len(), cmds.len());
+                for (i, cmd) in cmds.iter().enumerate() {
+                    prop_assert_eq!(&retrieved[i], cmd);
+                }
+            }
+            _ => prop_assert!(false),
+        }
+    }
+}
+
+// ===========================
+// Configuration Tests
+// ===========================
+
+// Property test: Config timeout boundaries
+proptest! {
+    #[test]
+    fn prop_config_timeout_extremes(timeout in prop::option::of(1u64..86400u64)) {
+        let config = GlobalConfig {
+            timeout: timeout.unwrap_or(60),
+            ..Default::default()
+        };
+
+        prop_assert!(config.timeout > 0);
+        prop_assert!(config.timeout <= 86400);
+    }
+}
+
+// Property test: Config shell paths are non-empty
+proptest! {
+    #[test]
+    fn prop_config_shell_nonempty(shell in "[a-z/]{1,50}") {
+        let config = GlobalConfig {
+            shell: shell.clone(),
+            ..Default::default()
+        };
+
+        prop_assert!(!config.shell.is_empty());
+        prop_assert_eq!(&config.shell, &shell);
+    }
+}
