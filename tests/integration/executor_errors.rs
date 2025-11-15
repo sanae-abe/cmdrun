@@ -1383,8 +1383,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_pipe = Command {
         description: "CD with pipe".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Windows: use & for command chaining, cd to Windows directory
-            "cd C:\\Windows & echo done".to_string()
+            // Windows: use /d to change drive, && for safer command chaining
+            "cd /d C:\\Windows && echo done".to_string()
         } else {
             "cd /tmp | echo done".to_string()
         }),
