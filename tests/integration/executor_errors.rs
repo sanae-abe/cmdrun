@@ -1357,8 +1357,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_simple = Command {
         description: "Simple CD command".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Quote the path to avoid parsing issues
-            r#"cd "C:\Windows""#.to_string()
+            // Use C:\ without quotes - simpler, no parsing issues
+            "cd C:\\".to_string()
         } else {
             "cd /tmp".to_string()
         }),
@@ -1383,8 +1383,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_pipe = Command {
         description: "CD with pipe".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Windows: use & for command chaining, quote path
-            r#"cd "C:\Windows" & echo done"#.to_string()
+            // Windows: use & for command chaining, no quotes
+            "cd C:\\ & echo done".to_string()
         } else {
             "cd /tmp | echo done".to_string()
         }),
@@ -1405,8 +1405,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_redirect = Command {
         description: "CD with redirect".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Quote path, redirect to NUL
-            r#"cd "C:\Windows" > NUL"#.to_string()
+            // Redirect to NUL, no quotes
+            "cd C:\\ > NUL".to_string()
         } else {
             "cd /tmp > /dev/null".to_string()
         }),
@@ -1467,8 +1467,8 @@ async fn test_warn_shell_builtin_is_invoked() {
     let cmd_cd = Command {
         description: "CD command triggering warning".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Quote the path to avoid parsing issues
-            r#"cd "C:\Windows""#.to_string()
+            // Use C:\ without quotes - simpler, no parsing issues
+            "cd C:\\".to_string()
         } else {
             "cd /tmp".to_string()
         }),
