@@ -292,7 +292,7 @@ fn test_platform_is_supported_empty_list() {
 fn test_platform_is_supported_exact_match() {
     let current = Platform::current();
     assert!(
-        current.is_supported(&[current.clone()]),
+        current.is_supported(std::slice::from_ref(&current)),
         "Platform should be supported when exactly matched"
     );
 }
