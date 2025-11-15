@@ -537,13 +537,13 @@ existing = { description = "Existing command", cmd = "echo existing" }
         let original_home = std::env::var("HOME").ok();
         let original_dir = std::env::current_dir().ok();
 
-        // Set HOME to isolate test
-        std::env::set_var("HOME", temp_dir.path());
-        std::env::set_current_dir(temp_dir.path()).unwrap();
-
-        // Create local commands.toml
+        // Create local commands.toml FIRST
         let local_config = temp_dir.path().join("commands.toml");
         fs::write(&local_config, "[commands]\n").unwrap();
+
+        // Then set environment and current directory
+        std::env::set_var("HOME", temp_dir.path());
+        std::env::set_current_dir(temp_dir.path()).unwrap();
 
         // Verify file exists before calling get_config_path
         assert!(local_config.exists(), "Local config file should exist");
