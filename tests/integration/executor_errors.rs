@@ -1383,8 +1383,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_pipe = Command {
         description: "CD with pipe".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Windows: use & for command chaining, no quotes
-            "cd C:\\ & echo done".to_string()
+            // Windows: use & for command chaining, drive letter only
+            "cd C: & echo done".to_string()
         } else {
             "cd /tmp | echo done".to_string()
         }),
@@ -1405,8 +1405,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_redirect = Command {
         description: "CD with redirect".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Redirect to NUL, no quotes
-            "cd C:\\ > NUL".to_string()
+            // Redirect to NUL, drive letter only
+            "cd C: > NUL".to_string()
         } else {
             "cd /tmp > /dev/null".to_string()
         }),
