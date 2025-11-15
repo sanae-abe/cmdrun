@@ -43,7 +43,10 @@ async fn test_check_platform_with_empty_restriction() {
 
     // Should succeed on any platform
     let result = executor.execute(&command).await;
-    assert!(result.is_ok(), "Empty platform restriction should allow execution");
+    assert!(
+        result.is_ok(),
+        "Empty platform restriction should allow execution"
+    );
 }
 
 #[tokio::test]
@@ -98,7 +101,10 @@ async fn test_check_platform_windows_on_windows() {
     let command = create_command_with_platform("windows-only", vec![Platform::Windows]);
 
     let result = executor.execute(&command).await;
-    assert!(result.is_ok(), "Windows command should run on Windows platform");
+    assert!(
+        result.is_ok(),
+        "Windows command should run on Windows platform"
+    );
 }
 
 #[tokio::test]
@@ -120,7 +126,10 @@ async fn test_check_platform_unix_on_unix_like() {
     let command = create_command_with_platform("unix-only", vec![Platform::Unix]);
 
     let result = executor.execute(&command).await;
-    assert!(result.is_ok(), "Unix command should run on Unix-like platforms (Linux/macOS)");
+    assert!(
+        result.is_ok(),
+        "Unix command should run on Unix-like platforms (Linux/macOS)"
+    );
 }
 
 #[tokio::test]
@@ -138,10 +147,8 @@ async fn test_check_platform_unix_on_windows() {
 async fn test_check_platform_multiple_platforms() {
     // Command with multiple platform restrictions
     let executor = create_test_executor();
-    let command = create_command_with_platform(
-        "multi-platform",
-        vec![Platform::Linux, Platform::Macos],
-    );
+    let command =
+        create_command_with_platform("multi-platform", vec![Platform::Linux, Platform::Macos]);
 
     let result = executor.execute(&command).await;
 
@@ -162,7 +169,12 @@ async fn test_check_platform_with_all_platforms() {
     let executor = create_test_executor();
     let command = create_command_with_platform(
         "all-platforms",
-        vec![Platform::Unix, Platform::Linux, Platform::Macos, Platform::Windows],
+        vec![
+            Platform::Unix,
+            Platform::Linux,
+            Platform::Macos,
+            Platform::Windows,
+        ],
     );
 
     let result = executor.execute(&command).await;
@@ -320,7 +332,11 @@ fn test_platform_current_detection() {
     let current = Platform::current();
 
     #[cfg(target_os = "windows")]
-    assert_eq!(current, Platform::Windows, "Current platform should be Windows");
+    assert_eq!(
+        current,
+        Platform::Windows,
+        "Current platform should be Windows"
+    );
 
     #[cfg(target_os = "linux")]
     assert_eq!(current, Platform::Linux, "Current platform should be Linux");
