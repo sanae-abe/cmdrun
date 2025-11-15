@@ -1,0 +1,21 @@
+--- src/command/executor.rs
++++ delete ! in CommandExecutor::execute_single
+@@ -226,17 +226,17 @@
+ 
+         // シェルビルトイン警告
+         self.warn_shell_builtin(command, self.context.language);
+ 
+         // シェルコマンド構築
+         let (shell, args) = self.build_shell_command(command);
+ 
+         // 環境変数のログ出力（機密情報マスキング）
+-        if self.context.echo && !env.is_empty() {
++        if self.context.echo &&  /* ~ changed by cargo-mutants ~ */env.is_empty() {
+             let masked_env = self.sensitive_env.mask_ahash_map(env);
+             debug!("Environment variables: {:?}", masked_env);
+         }
+ 
+         // プロセス起動
+         let mut child = TokioCommand::new(&shell)
+             .args(&args)
+             .current_dir(&self.context.working_dir)

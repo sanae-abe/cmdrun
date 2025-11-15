@@ -819,13 +819,139 @@ cmdrun watch build --path src --pattern "**/*.rs"
 
 ---
 
+## Japanese Optimization Guide (日本語最適化ガイド)
+
+### パフォーマンス目標
+
+- **起動時間**: 50ms以下（Node.js版の1/10）
+- **メモリ使用量**: 10MB以下（Node.js版の1/20）
+- **並列実行**: CPUコア数まで効率的にスケール
+- **大規模プロジェクト**: 1000+コマンド定義でも高速動作
+
+### コンパイル時最適化
+
+#### LTO（Link Time Optimization）
+```toml
+[profile.release]
+lto = "fat"              # 完全なLTO有効化
+codegen-units = 1        # 単一コード生成ユニット
+opt-level = 3            # 最大最適化
+```
+
+**効果**: バイナリサイズ30%削減、実行速度10-20%向上
+
+#### バイナリサイズ削減
+```toml
+[profile.release]
+strip = true             # デバッグシンボル削除
+panic = "abort"          # パニック時即終了（アンワインド不要）
+```
+
+**効果**: 2MB → 1.5MB程度に削減
+
+### ランタイム最適化
+
+#### 高速ハッシュマップ（ahash）
+```rust
+use ahash::AHashMap;
+
+// 標準HashMap比で2-3倍高速
+let mut env: AHashMap<String, String> = AHashMap::new();
+```
+
+**理由**: 暗号学的安全性不要（設定ファイル処理）、SipHash（標準）よりAHashの方が高速
+
+#### スタック最適化ベクター（SmallVec）
+```rust
+use smallvec::{SmallVec, smallvec};
+
+// 少数要素時はヒープアロケーション回避
+type Args = SmallVec<[String; 4]>;
+```
+
+**効果**: 引数4個以下ならスタック上で処理、アロケーション削減
+
+#### LazyStatic/LazyLock（正規表現の事前コンパイル）
+```rust
+use std::sync::LazyLock;
+use regex::Regex;
+
+static VAR_PATTERN: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\$\{([A-Za-z_][A-Za-z0-9_]*)(:[?+\-])?([^}]*)?\}").unwrap()
+});
+```
+
+**効果**: 初回のみコンパイル、以降は再利用で高速化
+
+### 非同期処理最適化
+
+#### Tokio マルチスレッドランタイム
+```rust
+#[tokio::main(flavor = "multi_thread", worker_threads = 4)]
+async fn main() {
+    // 並列コマンド実行
+}
+```
+
+**効果**: CPUバウンド・IOバウンドタスクの効率的並列化
+
+#### 並列コマンド実行
+```rust
+use tokio::task::JoinSet;
+
+let mut set = JoinSet::new();
+for cmd in parallel_commands {
+    set.spawn(execute_command(cmd));
+}
+
+while let Some(result) = set.join_next().await {
+    // 結果処理
+}
+```
+
+**効果**: 独立コマンドの完全並列実行
+
+### メモリ最適化
+
+#### String vs &str の適切な使い分け
+```rust
+// 読み取り専用 → &str
+fn process_command(cmd: &str) -> Result<()> { ... }
+
+// 所有権必要 → String
+fn store_command(cmd: String) -> Command { ... }
+```
+
+#### Clone回避（Arc/Rc活用）
+```rust
+use std::sync::Arc;
+
+// 大きな設定を共有
+let config = Arc::new(load_config());
+let config_clone = Arc::clone(&config);  // ポインタコピーのみ
+```
+
+### プロファイル駆動最適化（PGO）
+```bash
+# プロファイルデータ収集
+RUSTFLAGS="-Cprofile-generate=/tmp/pgo-data" cargo build --release
+./target/release/cmdrun run test
+
+# PGOビルド
+RUSTFLAGS="-Cprofile-use=/tmp/pgo-data/merged.profdata" cargo build --release
+```
+
+**効果**: 10-20%の追加高速化
+
+---
+
 ## Related Documentation
 
 - [Architecture](ARCHITECTURE.md) - System design and internals
-- [Performance Metrics](PERFORMANCE.md) - Benchmark results
+- [Performance Benchmarks](PERFORMANCE_BENCHMARKS.md) - Benchmark results
 - [User Guide](../user-guide/) - Usage documentation
 
 ---
 
-**Last Updated:** 2025-11-07
+**Last Updated:** 2025-11-15
 **Version:** 1.0.0

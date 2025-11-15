@@ -1,0 +1,30 @@
+--- src/command/executor.rs
++++ replace CommandExecutor::read_output -> String with String::new()
+@@ -323,26 +323,17 @@
+         }
+     }
+ 
+     /// 出力読み取り（リアルタイム表示）
+     async fn read_output<R>(reader: BufReader<R>, _color: bool) -> String
+     where
+         R: tokio::io::AsyncRead + Unpin,
+     {
+-        let mut output = String::new();
+-        let mut lines = reader.lines();
+-
+-        while let Ok(Some(line)) = lines.next_line().await {
+-            println!("{}", line);
+-            output.push_str(&line);
+-            output.push('\n');
+-        }
+-
+-        output
++        String::new() /* ~ changed by cargo-mutants ~ */
+     }
+ 
+     /// コマンド表示
+     fn print_command(&self, command: &str) {
+         if self.context.color {
+             eprintln!("{} {}", "→".cyan().bold(), command.bright_white());
+         } else {
+             eprintln!("→ {}", command);

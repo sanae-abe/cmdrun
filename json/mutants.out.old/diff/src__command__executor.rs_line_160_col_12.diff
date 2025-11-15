@@ -1,0 +1,21 @@
+--- src/command/executor.rs
++++ delete ! in CommandExecutor::check_platform
+@@ -152,17 +152,17 @@
+ 
+     /// プラットフォーム対応確認
+     fn check_platform(&self, command: &Command) -> Result<()> {
+         if command.platform.is_empty() {
+             return Ok(());
+         }
+ 
+         let current = Platform::current();
+-        if !current.is_supported(&command.platform) {
++        if  /* ~ changed by cargo-mutants ~ */current.is_supported(&command.platform) {
+             return Err(ExecutionError::CommandFailed {
+                 command: command.description.clone(),
+                 code: 1,
+             }
+             .into());
+         }
+ 
+         Ok(())

@@ -1,0 +1,42 @@
+--- src/command/executor.rs
++++ replace CommandExecutor::show_cd_hint with ()
+@@ -466,38 +466,17 @@
+             .next()
+             .unwrap_or("")
+             .to_lowercase()
+             == "cd"
+     }
+ 
+     /// cdコマンドのヒントを表示
+     fn show_cd_hint(&self, command: &str, language: crate::config::Language) {
+-        let hint_msg = get_message(MessageKey::HintShellFunction, language);
+-        let hint_cmd_msg = get_message(MessageKey::HintCdCommand, language);
+-
+-        // コマンドからディレクトリパスを抽出
+-        let path = command.trim().strip_prefix("cd").unwrap_or("").trim();
+-
+-        // 関数名を生成（簡易版）
+-        let func_name = Self::generate_function_name(path);
+-
+-        if self.context.color {
+-            eprintln!("{}", hint_msg.cyan());
+-            eprintln!("{}", hint_cmd_msg.cyan());
+-            eprintln!(
+-                "   {}() {{ cd {}; }}\n",
+-                func_name.green().bold(),
+-                path.bright_white()
+-            );
+-        } else {
+-            eprintln!("{}", hint_msg);
+-            eprintln!("{}", hint_cmd_msg);
+-            eprintln!("   {}() {{ cd {}; }}\n", func_name, path);
+-        }
++        () /* ~ changed by cargo-mutants ~ */
+     }
+ 
+     /// 関数名を生成（簡易版）
+     fn generate_function_name(path: &str) -> String {
+         // パスの最後の部分から関数名を生成
+         let path_parts: Vec<&str> = path.split('/').filter(|s| !s.is_empty()).collect();
+         if let Some(last) = path_parts.last() {
+             // ホームディレクトリ展開を除去

@@ -1,0 +1,34 @@
+--- src/command/executor.rs
++++ replace CommandExecutor::check_platform -> Result<()> with Ok(())
+@@ -147,30 +147,17 @@
+             stdout: String::new(),
+             stderr: String::new(),
+             success: true,
+         }))
+     }
+ 
+     /// プラットフォーム対応確認
+     fn check_platform(&self, command: &Command) -> Result<()> {
+-        if command.platform.is_empty() {
+-            return Ok(());
+-        }
+-
+-        let current = Platform::current();
+-        if !current.is_supported(&command.platform) {
+-            return Err(ExecutionError::CommandFailed {
+-                command: command.description.clone(),
+-                code: 1,
+-            }
+-            .into());
+-        }
+-
+-        Ok(())
++        Ok(()) /* ~ changed by cargo-mutants ~ */
+     }
+ 
+     /// コマンド文字列解決
+     fn resolve_commands(&self, command: &Command) -> Result<Vec<String>> {
+         let platform = Platform::current();
+         command.cmd.resolve_for_platform(&platform).ok_or_else(|| {
+             ExecutionError::CommandFailed {
+                 command: command.description.clone(),

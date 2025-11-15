@@ -1,0 +1,21 @@
+--- src/command/executor.rs
++++ delete - in CommandExecutor::execute_single
+@@ -287,17 +287,17 @@
+                 })?
+         };
+ 
+         // 出力取得
+         let stdout_output = stdout_handle.await.unwrap();
+         let stderr_output = stderr_handle.await.unwrap();
+ 
+         let duration = start.elapsed();
+-        let exit_code = status.code().unwrap_or(-1);
++        let exit_code = status.code().unwrap_or( /* ~ changed by cargo-mutants ~ */1);
+ 
+         Ok(ExecutionResult {
+             exit_code,
+             duration,
+             stdout: stdout_output,
+             stderr: stderr_output,
+             success: status.success(),
+         })
