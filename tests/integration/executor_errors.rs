@@ -1357,8 +1357,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_simple = Command {
         description: "Simple CD command".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Use Windows directory that always exists
-            "cd C:\\Windows".to_string()
+            // Use /d flag to change drive as well
+            "cd /d C:\\Windows".to_string()
         } else {
             "cd /tmp".to_string()
         }),
@@ -1405,8 +1405,8 @@ async fn test_is_cd_command_detection() {
     let cmd_cd_redirect = Command {
         description: "CD with redirect".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Use Windows directory that always exists
-            "cd C:\\Windows > NUL".to_string()
+            // Use /d flag to change drive as well
+            "cd /d C:\\Windows > NUL".to_string()
         } else {
             "cd /tmp > /dev/null".to_string()
         }),
@@ -1467,8 +1467,8 @@ async fn test_warn_shell_builtin_is_invoked() {
     let cmd_cd = Command {
         description: "CD command triggering warning".to_string(),
         cmd: CommandSpec::Single(if cfg!(windows) {
-            // Use Windows directory that always exists
-            "cd C:\\Windows".to_string()
+            // Use /d flag to change drive as well
+            "cd /d C:\\Windows".to_string()
         } else {
             "cd /tmp".to_string()
         }),
