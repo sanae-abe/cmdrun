@@ -1,179 +1,59 @@
 [
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::with_env",
-      "return_type": "-> Self",
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
       "span": {
         "start": {
-          "line": 46,
+          "line": 101,
           "column": 5
         },
         "end": {
-          "line": 50,
+          "line": 151,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 48,
+        "line": 103,
         "column": 9
       },
       "end": {
-        "line": 49,
-        "column": 13
+        "line": 150,
+        "column": 12
       }
     },
-    "replacement": "Default::default()",
+    "replacement": "Ok(Default::default())",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::with_env_map",
-      "return_type": "-> Self",
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
       "span": {
         "start": {
-          "line": 52,
+          "line": 101,
           "column": 5
         },
         "end": {
-          "line": 56,
+          "line": 151,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 54,
+        "line": 103,
         "column": 9
       },
       "end": {
-        "line": 55,
-        "column": 13
-      }
-    },
-    "replacement": "Default::default()",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::merge_system_env",
-      "return_type": "-> Self",
-      "span": {
-        "start": {
-          "line": 58,
-          "column": 5
-        },
-        "end": {
-          "line": 64,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 60,
-        "column": 9
-      },
-      "end": {
-        "line": 63,
-        "column": 13
-      }
-    },
-    "replacement": "Default::default()",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 66,
-          "column": 5
-        },
-        "end": {
-          "line": 69,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 68,
-        "column": 9
-      },
-      "end": {
-        "line": 68,
-        "column": 46
-      }
-    },
-    "replacement": "Ok(String::new())",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 66,
-          "column": 5
-        },
-        "end": {
-          "line": 69,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 68,
-        "column": 9
-      },
-      "end": {
-        "line": 68,
-        "column": 46
-      }
-    },
-    "replacement": "Ok(\"xyzzy\".into())",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 66,
-          "column": 5
-        },
-        "end": {
-          "line": 69,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 68,
-        "column": 9
-      },
-      "end": {
-        "line": 68,
-        "column": 46
+        "line": 150,
+        "column": 12
       }
     },
     "replacement": "Err(anyhow::Error)",
@@ -181,29 +61,29 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::interpolate",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
       "span": {
         "start": {
-          "line": 66,
+          "line": 101,
           "column": 5
         },
         "end": {
-          "line": 69,
+          "line": 151,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 68,
+        "line": 103,
         "column": 9
       },
       "end": {
-        "line": 68,
-        "column": 46
+        "line": 150,
+        "column": 12
       }
     },
     "replacement": "Err(std::io::Error)",
@@ -211,89 +91,119 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
       "span": {
         "start": {
-          "line": 71,
+          "line": 101,
           "column": 5
         },
         "end": {
-          "line": 111,
+          "line": 151,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 73,
+        "line": 118,
+        "column": 12
+      },
+      "end": {
+        "line": 118,
+        "column": 13
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 101,
+          "column": 5
+        },
+        "end": {
+          "line": 151,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 133,
+        "column": 16
+      },
+      "end": {
+        "line": 133,
+        "column": 17
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::check_platform",
+      "return_type": "-> Result<()>",
+      "span": {
+        "start": {
+          "line": 153,
+          "column": 5
+        },
+        "end": {
+          "line": 169,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 155,
         "column": 9
       },
       "end": {
-        "line": 110,
-        "column": 19
+        "line": 168,
+        "column": 15
       }
     },
-    "replacement": "Ok(String::new())",
+    "replacement": "Ok(())",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::check_platform",
+      "return_type": "-> Result<()>",
       "span": {
         "start": {
-          "line": 71,
+          "line": 153,
           "column": 5
         },
         "end": {
-          "line": 111,
+          "line": 169,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 73,
+        "line": 155,
         "column": 9
       },
       "end": {
-        "line": 110,
-        "column": 19
-      }
-    },
-    "replacement": "Ok(\"xyzzy\".into())",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 71,
-          "column": 5
-        },
-        "end": {
-          "line": 111,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 73,
-        "column": 9
-      },
-      "end": {
-        "line": 110,
-        "column": 19
+        "line": 168,
+        "column": 15
       }
     },
     "replacement": "Err(anyhow::Error)",
@@ -301,29 +211,29 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::check_platform",
+      "return_type": "-> Result<()>",
       "span": {
         "start": {
-          "line": 71,
+          "line": 153,
           "column": 5
         },
         "end": {
-          "line": 111,
+          "line": 169,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 73,
+        "line": 155,
         "column": 9
       },
       "end": {
-        "line": 110,
-        "column": 19
+        "line": 168,
+        "column": 15
       }
     },
     "replacement": "Err(std::io::Error)",
@@ -331,269 +241,929 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::check_platform",
+      "return_type": "-> Result<()>",
       "span": {
         "start": {
-          "line": 71,
+          "line": 153,
           "column": 5
         },
         "end": {
-          "line": 111,
+          "line": 169,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 73,
-        "column": 18
+        "line": 160,
+        "column": 12
       },
       "end": {
-        "line": 73,
+        "line": 160,
+        "column": 13
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(vec![])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(vec![String::new()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(vec![\"xyzzy\".into()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 183,
+          "column": 5
+        },
+        "end": {
+          "line": 199,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 186,
+        "column": 9
+      },
+      "end": {
+        "line": 198,
+        "column": 41
+      }
+    },
+    "replacement": "Ok(vec![])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 183,
+          "column": 5
+        },
+        "end": {
+          "line": 199,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 186,
+        "column": 9
+      },
+      "end": {
+        "line": 198,
+        "column": 41
+      }
+    },
+    "replacement": "Ok(vec![String::new()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 183,
+          "column": 5
+        },
+        "end": {
+          "line": 199,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 186,
+        "column": 9
+      },
+      "end": {
+        "line": 198,
+        "column": 41
+      }
+    },
+    "replacement": "Ok(vec![\"xyzzy\".into()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 183,
+          "column": 5
+        },
+        "end": {
+          "line": 199,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 186,
+        "column": 9
+      },
+      "end": {
+        "line": 198,
+        "column": 41
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 183,
+          "column": 5
+        },
+        "end": {
+          "line": 199,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 186,
+        "column": 9
+      },
+      "end": {
+        "line": 198,
+        "column": 41
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 207,
+        "column": 9
+      },
+      "end": {
+        "line": 303,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(Default::default())",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 207,
+        "column": 9
+      },
+      "end": {
+        "line": 303,
+        "column": 11
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 207,
+        "column": 9
+      },
+      "end": {
+        "line": 303,
+        "column": 11
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 211,
+        "column": 12
+      },
+      "end": {
+        "line": 211,
+        "column": 13
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 234,
+        "column": 30
+      },
+      "end": {
+        "line": 234,
+        "column": 32
+      }
+    },
+    "replacement": "||",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 234,
+        "column": 33
+      },
+      "end": {
+        "line": 234,
+        "column": 34
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 295,
+        "column": 49
+      },
+      "end": {
+        "line": 295,
+        "column": 50
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 308,
+        "column": 9
+      },
+      "end": {
+        "line": 323,
+        "column": 10
+      }
+    },
+    "replacement": "(String::new(), vec![])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 308,
+        "column": 9
+      },
+      "end": {
+        "line": 323,
+        "column": 10
+      }
+    },
+    "replacement": "(String::new(), vec![String::new()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 308,
+        "column": 9
+      },
+      "end": {
+        "line": 323,
+        "column": 10
+      }
+    },
+    "replacement": "(String::new(), vec![\"xyzzy\".into()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 308,
+        "column": 9
+      },
+      "end": {
+        "line": 323,
+        "column": 10
+      }
+    },
+    "replacement": "(\"xyzzy\".into(), vec![])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 308,
+        "column": 9
+      },
+      "end": {
+        "line": 323,
+        "column": 10
+      }
+    },
+    "replacement": "(\"xyzzy\".into(), vec![String::new()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 308,
+        "column": 9
+      },
+      "end": {
+        "line": 323,
+        "column": 10
+      }
+    },
+    "replacement": "(\"xyzzy\".into(), vec![\"xyzzy\".into()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 311,
+        "column": 39
+      },
+      "end": {
+        "line": 311,
+        "column": 41
+      }
+    },
+    "replacement": "&&",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::read_output",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 326,
+          "column": 5
+        },
+        "end": {
+          "line": 341,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 331,
+        "column": 9
+      },
+      "end": {
+        "line": 340,
+        "column": 15
+      }
+    },
+    "replacement": "String::new()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::read_output",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 326,
+          "column": 5
+        },
+        "end": {
+          "line": 341,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 331,
+        "column": 9
+      },
+      "end": {
+        "line": 340,
+        "column": 15
+      }
+    },
+    "replacement": "\"xyzzy\".into()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::print_command",
+      "return_type": "",
+      "span": {
+        "start": {
+          "line": 343,
+          "column": 5
+        },
+        "end": {
+          "line": 350,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 345,
+        "column": 9
+      },
+      "end": {
+        "line": 349,
+        "column": 10
+      }
+    },
+    "replacement": "()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_parallel",
+      "return_type": "-> Result<Vec<ExecutionResult>>",
+      "span": {
+        "start": {
+          "line": 352,
+          "column": 5
+        },
+        "end": {
+          "line": 393,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 354,
+        "column": 9
+      },
+      "end": {
+        "line": 392,
         "column": 20
       }
     },
-    "replacement": "<",
-    "genre": "BinaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 71,
-          "column": 5
-        },
-        "end": {
-          "line": 111,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 78,
-        "column": 24
-      },
-      "end": {
-        "line": 78,
-        "column": 25
-      }
-    },
-    "replacement": "==",
-    "genre": "BinaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 71,
-          "column": 5
-        },
-        "end": {
-          "line": 111,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 78,
-        "column": 24
-      },
-      "end": {
-        "line": 78,
-        "column": 25
-      }
-    },
-    "replacement": "<",
-    "genre": "BinaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 71,
-          "column": 5
-        },
-        "end": {
-          "line": 111,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 78,
-        "column": 24
-      },
-      "end": {
-        "line": 78,
-        "column": 25
-      }
-    },
-    "replacement": ">=",
-    "genre": "BinaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 71,
-          "column": 5
-        },
-        "end": {
-          "line": 111,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 99,
-        "column": 59
-      },
-      "end": {
-        "line": 99,
-        "column": 60
-      }
-    },
-    "replacement": "-",
-    "genre": "BinaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::interpolate_with_depth",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 71,
-          "column": 5
-        },
-        "end": {
-          "line": 111,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 99,
-        "column": 59
-      },
-      "end": {
-        "line": 99,
-        "column": 60
-      }
-    },
-    "replacement": "*",
-    "genre": "BinaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 113,
-          "column": 5
-        },
-        "end": {
-          "line": 165,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 120,
-        "column": 9
-      },
-      "end": {
-        "line": 164,
-        "column": 10
-      }
-    },
-    "replacement": "Ok(String::new())",
+    "replacement": "Ok(vec![])",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::execute_parallel",
+      "return_type": "-> Result<Vec<ExecutionResult>>",
       "span": {
         "start": {
-          "line": 113,
+          "line": 352,
           "column": 5
         },
         "end": {
-          "line": 165,
+          "line": 393,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 120,
+        "line": 354,
         "column": 9
       },
       "end": {
-        "line": 164,
-        "column": 10
+        "line": 392,
+        "column": 20
       }
     },
-    "replacement": "Ok(\"xyzzy\".into())",
+    "replacement": "Ok(vec![Default::default()])",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::execute_parallel",
+      "return_type": "-> Result<Vec<ExecutionResult>>",
       "span": {
         "start": {
-          "line": 113,
+          "line": 352,
           "column": 5
         },
         "end": {
-          "line": 165,
+          "line": 393,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 120,
+        "line": 354,
         "column": 9
       },
       "end": {
-        "line": 164,
-        "column": 10
+        "line": 392,
+        "column": 20
       }
     },
     "replacement": "Err(anyhow::Error)",
@@ -601,29 +1171,29 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::execute_parallel",
+      "return_type": "-> Result<Vec<ExecutionResult>>",
       "span": {
         "start": {
-          "line": 113,
+          "line": 352,
           "column": 5
         },
         "end": {
-          "line": 165,
+          "line": 393,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 120,
+        "line": 354,
         "column": 9
       },
       "end": {
-        "line": 164,
-        "column": 10
+        "line": 392,
+        "column": 20
       }
     },
     "replacement": "Err(std::io::Error)",
@@ -631,89 +1201,329 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::clone_for_task",
+      "return_type": "-> Self",
       "span": {
         "start": {
-          "line": 113,
+          "line": 395,
           "column": 5
         },
         "end": {
-          "line": 165,
+          "line": 402,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 126,
-        "column": 25
+        "line": 397,
+        "column": 9
       },
       "end": {
-        "line": 126,
-        "column": 36
+        "line": 401,
+        "column": 10
+      }
+    },
+    "replacement": "Default::default()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::is_shell_builtin",
+      "return_type": "-> bool",
+      "span": {
+        "start": {
+          "line": 404,
+          "column": 5
+        },
+        "end": {
+          "line": 431,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 407,
+        "column": 9
+      },
+      "end": {
+        "line": 430,
+        "column": 10
       }
     },
     "replacement": "true",
-    "genre": "MatchArmGuard"
+    "genre": "FnValue"
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::is_shell_builtin",
+      "return_type": "-> bool",
       "span": {
         "start": {
-          "line": 113,
+          "line": 404,
           "column": 5
         },
         "end": {
-          "line": 165,
+          "line": 431,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 126,
-        "column": 25
+        "line": 407,
+        "column": 9
       },
       "end": {
-        "line": 126,
-        "column": 36
+        "line": 430,
+        "column": 10
       }
     },
     "replacement": "false",
-    "genre": "MatchArmGuard"
+    "genre": "FnValue"
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::warn_shell_builtin",
+      "return_type": "",
       "span": {
         "start": {
-          "line": 113,
+          "line": 433,
           "column": 5
         },
         "end": {
-          "line": 165,
+          "line": 448,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 134,
-        "column": 29
+        "line": 435,
+        "column": 9
       },
       "end": {
-        "line": 134,
-        "column": 30
+        "line": 447,
+        "column": 10
+      }
+    },
+    "replacement": "()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::is_cd_command",
+      "return_type": "-> bool",
+      "span": {
+        "start": {
+          "line": 450,
+          "column": 5
+        },
+        "end": {
+          "line": 470,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 452,
+        "column": 9
+      },
+      "end": {
+        "line": 469,
+        "column": 20
+      }
+    },
+    "replacement": "true",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::is_cd_command",
+      "return_type": "-> bool",
+      "span": {
+        "start": {
+          "line": 450,
+          "column": 5
+        },
+        "end": {
+          "line": 470,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 452,
+        "column": 9
+      },
+      "end": {
+        "line": 469,
+        "column": 20
+      }
+    },
+    "replacement": "false",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::is_cd_command",
+      "return_type": "-> bool",
+      "span": {
+        "start": {
+          "line": 450,
+          "column": 5
+        },
+        "end": {
+          "line": 470,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 469,
+        "column": 13
+      },
+      "end": {
+        "line": 469,
+        "column": 15
+      }
+    },
+    "replacement": "!=",
+    "genre": "BinaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::show_cd_hint",
+      "return_type": "",
+      "span": {
+        "start": {
+          "line": 472,
+          "column": 5
+        },
+        "end": {
+          "line": 496,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 474,
+        "column": 9
+      },
+      "end": {
+        "line": 495,
+        "column": 10
+      }
+    },
+    "replacement": "()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::generate_function_name",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 498,
+          "column": 5
+        },
+        "end": {
+          "line": 512,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 501,
+        "column": 9
+      },
+      "end": {
+        "line": 511,
+        "column": 26
+      }
+    },
+    "replacement": "String::new()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::generate_function_name",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 498,
+          "column": 5
+        },
+        "end": {
+          "line": 512,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 501,
+        "column": 9
+      },
+      "end": {
+        "line": 511,
+        "column": 26
+      }
+    },
+    "replacement": "\"xyzzy\".into()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::generate_function_name",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 498,
+          "column": 5
+        },
+        "end": {
+          "line": 512,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 501,
+        "column": 64
+      },
+      "end": {
+        "line": 501,
+        "column": 65
       }
     },
     "replacement": "",
@@ -721,89 +1531,29 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
+      "function_name": "CommandExecutor::generate_function_name",
+      "return_type": "-> String",
       "span": {
         "start": {
-          "line": 113,
+          "line": 498,
           "column": 5
         },
         "end": {
-          "line": 165,
+          "line": 512,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 140,
-        "column": 28
+        "line": 507,
+        "column": 16
       },
       "end": {
-        "line": 140,
-        "column": 41
-      }
-    },
-    "replacement": "true",
-    "genre": "MatchArmGuard"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 113,
-          "column": 5
-        },
-        "end": {
-          "line": 165,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 140,
-        "column": 28
-      },
-      "end": {
-        "line": 140,
-        "column": 41
-      }
-    },
-    "replacement": "false",
-    "genre": "MatchArmGuard"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "InterpolationContext::resolve_variable",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 113,
-          "column": 5
-        },
-        "end": {
-          "line": 165,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 140,
-        "column": 28
-      },
-      "end": {
-        "line": 140,
-        "column": 29
+        "line": 507,
+        "column": 17
       }
     },
     "replacement": "",
@@ -811,242 +1561,62 @@
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "interpolate",
-      "return_type": "-> Result<String>",
+      "function_name": "detect_shell",
+      "return_type": "-> String",
       "span": {
         "start": {
-          "line": 168,
+          "line": 515,
           "column": 1
         },
         "end": {
-          "line": 174,
+          "line": 533,
           "column": 2
         }
       }
     },
     "span": {
       "start": {
-        "line": 170,
+        "line": 517,
         "column": 5
       },
       "end": {
-        "line": 173,
-        "column": 28
+        "line": 532,
+        "column": 6
       }
     },
-    "replacement": "Ok(String::new())",
+    "replacement": "String::new()",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
+    "file": "src/command/executor.rs",
     "function": {
-      "function_name": "interpolate",
-      "return_type": "-> Result<String>",
+      "function_name": "detect_shell",
+      "return_type": "-> String",
       "span": {
         "start": {
-          "line": 168,
+          "line": 515,
           "column": 1
         },
         "end": {
-          "line": 174,
+          "line": 533,
           "column": 2
         }
       }
     },
     "span": {
       "start": {
-        "line": 170,
+        "line": 517,
         "column": 5
       },
       "end": {
-        "line": 173,
-        "column": 28
+        "line": 532,
+        "column": 6
       }
     },
-    "replacement": "Ok(\"xyzzy\".into())",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "interpolate",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 168,
-          "column": 1
-        },
-        "end": {
-          "line": 174,
-          "column": 2
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 170,
-        "column": 5
-      },
-      "end": {
-        "line": 173,
-        "column": 28
-      }
-    },
-    "replacement": "Err(anyhow::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "interpolate",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 168,
-          "column": 1
-        },
-        "end": {
-          "line": 174,
-          "column": 2
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 170,
-        "column": 5
-      },
-      "end": {
-        "line": 173,
-        "column": 28
-      }
-    },
-    "replacement": "Err(std::io::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "interpolate_strict",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 176,
-          "column": 1
-        },
-        "end": {
-          "line": 182,
-          "column": 2
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 178,
-        "column": 5
-      },
-      "end": {
-        "line": 181,
-        "column": 28
-      }
-    },
-    "replacement": "Ok(String::new())",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "interpolate_strict",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 176,
-          "column": 1
-        },
-        "end": {
-          "line": 182,
-          "column": 2
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 178,
-        "column": 5
-      },
-      "end": {
-        "line": 181,
-        "column": 28
-      }
-    },
-    "replacement": "Ok(\"xyzzy\".into())",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "interpolate_strict",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 176,
-          "column": 1
-        },
-        "end": {
-          "line": 182,
-          "column": 2
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 178,
-        "column": 5
-      },
-      "end": {
-        "line": 181,
-        "column": 28
-      }
-    },
-    "replacement": "Err(anyhow::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/interpolation.rs",
-    "function": {
-      "function_name": "interpolate_strict",
-      "return_type": "-> Result<String>",
-      "span": {
-        "start": {
-          "line": 176,
-          "column": 1
-        },
-        "end": {
-          "line": 182,
-          "column": 2
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 178,
-        "column": 5
-      },
-      "end": {
-        "line": 181,
-        "column": 28
-      }
-    },
-    "replacement": "Err(std::io::Error)",
+    "replacement": "\"xyzzy\".into()",
     "genre": "FnValue"
   }
 ]

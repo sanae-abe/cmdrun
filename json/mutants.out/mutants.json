@@ -3,151 +3,31 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::execute",
-      "return_type": "-> Result<ExecutionResult>",
+      "function_name": "CommandExecutor::read_output",
+      "return_type": "-> String",
       "span": {
         "start": {
-          "line": 101,
+          "line": 326,
           "column": 5
         },
         "end": {
-          "line": 151,
+          "line": 341,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 103,
+        "line": 331,
         "column": 9
       },
       "end": {
-        "line": 150,
-        "column": 12
+        "line": 340,
+        "column": 15
       }
     },
-    "replacement": "Ok(Default::default())",
+    "replacement": "String::new()",
     "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 101,
-          "column": 5
-        },
-        "end": {
-          "line": 151,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 103,
-        "column": 9
-      },
-      "end": {
-        "line": 150,
-        "column": 12
-      }
-    },
-    "replacement": "Err(anyhow::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 101,
-          "column": 5
-        },
-        "end": {
-          "line": 151,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 103,
-        "column": 9
-      },
-      "end": {
-        "line": 150,
-        "column": 12
-      }
-    },
-    "replacement": "Err(std::io::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 101,
-          "column": 5
-        },
-        "end": {
-          "line": 151,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 118,
-        "column": 12
-      },
-      "end": {
-        "line": 118,
-        "column": 13
-      }
-    },
-    "replacement": "",
-    "genre": "UnaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 101,
-          "column": 5
-        },
-        "end": {
-          "line": 151,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 133,
-        "column": 16
-      },
-      "end": {
-        "line": 133,
-        "column": 17
-      }
-    },
-    "replacement": "",
-    "genre": "UnaryOperator"
   },
   {
     "package": "cmdrun",
@@ -183,276 +63,6 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::check_platform",
-      "return_type": "-> Result<()>",
-      "span": {
-        "start": {
-          "line": 153,
-          "column": 5
-        },
-        "end": {
-          "line": 169,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 155,
-        "column": 9
-      },
-      "end": {
-        "line": 168,
-        "column": 15
-      }
-    },
-    "replacement": "Err(anyhow::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::check_platform",
-      "return_type": "-> Result<()>",
-      "span": {
-        "start": {
-          "line": 153,
-          "column": 5
-        },
-        "end": {
-          "line": 169,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 155,
-        "column": 9
-      },
-      "end": {
-        "line": 168,
-        "column": 15
-      }
-    },
-    "replacement": "Err(std::io::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::check_platform",
-      "return_type": "-> Result<()>",
-      "span": {
-        "start": {
-          "line": 153,
-          "column": 5
-        },
-        "end": {
-          "line": 169,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 160,
-        "column": 12
-      },
-      "end": {
-        "line": 160,
-        "column": 13
-      }
-    },
-    "replacement": "",
-    "genre": "UnaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::resolve_commands",
-      "return_type": "-> Result<Vec<String>>",
-      "span": {
-        "start": {
-          "line": 171,
-          "column": 5
-        },
-        "end": {
-          "line": 181,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 173,
-        "column": 9
-      },
-      "end": {
-        "line": 180,
-        "column": 11
-      }
-    },
-    "replacement": "Ok(vec![])",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::resolve_commands",
-      "return_type": "-> Result<Vec<String>>",
-      "span": {
-        "start": {
-          "line": 171,
-          "column": 5
-        },
-        "end": {
-          "line": 181,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 173,
-        "column": 9
-      },
-      "end": {
-        "line": 180,
-        "column": 11
-      }
-    },
-    "replacement": "Ok(vec![String::new()])",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::resolve_commands",
-      "return_type": "-> Result<Vec<String>>",
-      "span": {
-        "start": {
-          "line": 171,
-          "column": 5
-        },
-        "end": {
-          "line": 181,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 173,
-        "column": 9
-      },
-      "end": {
-        "line": 180,
-        "column": 11
-      }
-    },
-    "replacement": "Ok(vec![\"xyzzy\".into()])",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::resolve_commands",
-      "return_type": "-> Result<Vec<String>>",
-      "span": {
-        "start": {
-          "line": 171,
-          "column": 5
-        },
-        "end": {
-          "line": 181,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 173,
-        "column": 9
-      },
-      "end": {
-        "line": 180,
-        "column": 11
-      }
-    },
-    "replacement": "Err(anyhow::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::resolve_commands",
-      "return_type": "-> Result<Vec<String>>",
-      "span": {
-        "start": {
-          "line": 171,
-          "column": 5
-        },
-        "end": {
-          "line": 181,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 173,
-        "column": 9
-      },
-      "end": {
-        "line": 180,
-        "column": 11
-      }
-    },
-    "replacement": "Err(std::io::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::interpolate_commands",
-      "return_type": "-> Result<Vec<String>>",
-      "span": {
-        "start": {
-          "line": 183,
-          "column": 5
-        },
-        "end": {
-          "line": 199,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 186,
-        "column": 9
-      },
-      "end": {
-        "line": 198,
-        "column": 41
-      }
-    },
-    "replacement": "Ok(vec![])",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
       "function_name": "CommandExecutor::interpolate_commands",
       "return_type": "-> Result<Vec<String>>",
       "span": {
@@ -483,30 +93,60 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::interpolate_commands",
-      "return_type": "-> Result<Vec<String>>",
+      "function_name": "CommandExecutor::generate_function_name",
+      "return_type": "-> String",
       "span": {
         "start": {
-          "line": 183,
+          "line": 498,
           "column": 5
         },
         "end": {
-          "line": 199,
+          "line": 512,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 186,
+        "line": 501,
         "column": 9
       },
       "end": {
-        "line": 198,
-        "column": 41
+        "line": 511,
+        "column": 26
       }
     },
-    "replacement": "Ok(vec![\"xyzzy\".into()])",
+    "replacement": "\"xyzzy\".into()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::is_shell_builtin",
+      "return_type": "-> bool",
+      "span": {
+        "start": {
+          "line": 404,
+          "column": 5
+        },
+        "end": {
+          "line": 431,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 407,
+        "column": 9
+      },
+      "end": {
+        "line": 430,
+        "column": 10
+      }
+    },
+    "replacement": "true",
     "genre": "FnValue"
   },
   {
@@ -543,30 +183,30 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::interpolate_commands",
-      "return_type": "-> Result<Vec<String>>",
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
       "span": {
         "start": {
-          "line": 183,
+          "line": 306,
           "column": 5
         },
         "end": {
-          "line": 199,
+          "line": 324,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 186,
+        "line": 308,
         "column": 9
       },
       "end": {
-        "line": 198,
-        "column": 41
+        "line": 323,
+        "column": 10
       }
     },
-    "replacement": "Err(std::io::Error)",
+    "replacement": "(String::new(), vec![String::new()])",
     "genre": "FnValue"
   },
   {
@@ -588,166 +228,196 @@
     },
     "span": {
       "start": {
-        "line": 207,
+        "line": 211,
+        "column": 12
+      },
+      "end": {
+        "line": 211,
+        "column": 13
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "detect_shell",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 515,
+          "column": 1
+        },
+        "end": {
+          "line": 533,
+          "column": 2
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 517,
+        "column": 5
+      },
+      "end": {
+        "line": 532,
+        "column": 6
+      }
+    },
+    "replacement": "\"xyzzy\".into()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::generate_function_name",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 498,
+          "column": 5
+        },
+        "end": {
+          "line": 512,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 507,
+        "column": 16
+      },
+      "end": {
+        "line": 507,
+        "column": 17
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::is_shell_builtin",
+      "return_type": "-> bool",
+      "span": {
+        "start": {
+          "line": 404,
+          "column": 5
+        },
+        "end": {
+          "line": 431,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 407,
         "column": 9
       },
       "end": {
-        "line": 303,
-        "column": 11
+        "line": 430,
+        "column": 10
+      }
+    },
+    "replacement": "false",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 101,
+          "column": 5
+        },
+        "end": {
+          "line": 151,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 103,
+        "column": 9
+      },
+      "end": {
+        "line": 150,
+        "column": 12
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::check_platform",
+      "return_type": "-> Result<()>",
+      "span": {
+        "start": {
+          "line": 153,
+          "column": 5
+        },
+        "end": {
+          "line": 169,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 155,
+        "column": 9
+      },
+      "end": {
+        "line": 168,
+        "column": 15
+      }
+    },
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 101,
+          "column": 5
+        },
+        "end": {
+          "line": 151,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 103,
+        "column": 9
+      },
+      "end": {
+        "line": 150,
+        "column": 12
       }
     },
     "replacement": "Ok(Default::default())",
     "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute_single",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 201,
-          "column": 5
-        },
-        "end": {
-          "line": 304,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 207,
-        "column": 9
-      },
-      "end": {
-        "line": 303,
-        "column": 11
-      }
-    },
-    "replacement": "Err(anyhow::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute_single",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 201,
-          "column": 5
-        },
-        "end": {
-          "line": 304,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 207,
-        "column": 9
-      },
-      "end": {
-        "line": 303,
-        "column": 11
-      }
-    },
-    "replacement": "Err(std::io::Error)",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute_single",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 201,
-          "column": 5
-        },
-        "end": {
-          "line": 304,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 211,
-        "column": 12
-      },
-      "end": {
-        "line": 211,
-        "column": 13
-      }
-    },
-    "replacement": "",
-    "genre": "UnaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute_single",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 201,
-          "column": 5
-        },
-        "end": {
-          "line": 304,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 234,
-        "column": 30
-      },
-      "end": {
-        "line": 234,
-        "column": 32
-      }
-    },
-    "replacement": "||",
-    "genre": "BinaryOperator"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::execute_single",
-      "return_type": "-> Result<ExecutionResult>",
-      "span": {
-        "start": {
-          "line": 201,
-          "column": 5
-        },
-        "end": {
-          "line": 304,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 234,
-        "column": 33
-      },
-      "end": {
-        "line": 234,
-        "column": 34
-      }
-    },
-    "replacement": "",
-    "genre": "UnaryOperator"
   },
   {
     "package": "cmdrun",
@@ -806,96 +476,6 @@
         "column": 10
       }
     },
-    "replacement": "(String::new(), vec![])",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::build_shell_command",
-      "return_type": "-> (String, Vec<String>)",
-      "span": {
-        "start": {
-          "line": 306,
-          "column": 5
-        },
-        "end": {
-          "line": 324,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 308,
-        "column": 9
-      },
-      "end": {
-        "line": 323,
-        "column": 10
-      }
-    },
-    "replacement": "(String::new(), vec![String::new()])",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::build_shell_command",
-      "return_type": "-> (String, Vec<String>)",
-      "span": {
-        "start": {
-          "line": 306,
-          "column": 5
-        },
-        "end": {
-          "line": 324,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 308,
-        "column": 9
-      },
-      "end": {
-        "line": 323,
-        "column": 10
-      }
-    },
-    "replacement": "(String::new(), vec![\"xyzzy\".into()])",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::build_shell_command",
-      "return_type": "-> (String, Vec<String>)",
-      "span": {
-        "start": {
-          "line": 306,
-          "column": 5
-        },
-        "end": {
-          "line": 324,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 308,
-        "column": 9
-      },
-      "end": {
-        "line": 323,
-        "column": 10
-      }
-    },
     "replacement": "(\"xyzzy\".into(), vec![])",
     "genre": "FnValue"
   },
@@ -903,30 +483,150 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::build_shell_command",
-      "return_type": "-> (String, Vec<String>)",
+      "function_name": "CommandExecutor::generate_function_name",
+      "return_type": "-> String",
       "span": {
         "start": {
-          "line": 306,
+          "line": 498,
           "column": 5
         },
         "end": {
-          "line": 324,
+          "line": 512,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 308,
+        "line": 501,
         "column": 9
       },
       "end": {
-        "line": 323,
-        "column": 10
+        "line": 511,
+        "column": 26
       }
     },
-    "replacement": "(\"xyzzy\".into(), vec![String::new()])",
+    "replacement": "String::new()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::read_output",
+      "return_type": "-> String",
+      "span": {
+        "start": {
+          "line": 326,
+          "column": 5
+        },
+        "end": {
+          "line": 341,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 331,
+        "column": 9
+      },
+      "end": {
+        "line": 340,
+        "column": 15
+      }
+    },
+    "replacement": "\"xyzzy\".into()",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 207,
+        "column": 9
+      },
+      "end": {
+        "line": 303,
+        "column": 11
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::is_cd_command",
+      "return_type": "-> bool",
+      "span": {
+        "start": {
+          "line": 450,
+          "column": 5
+        },
+        "end": {
+          "line": 470,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 452,
+        "column": 9
+      },
+      "end": {
+        "line": 469,
+        "column": 20
+      }
+    },
+    "replacement": "false",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 101,
+          "column": 5
+        },
+        "end": {
+          "line": 151,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 103,
+        "column": 9
+      },
+      "end": {
+        "line": 150,
+        "column": 12
+      }
+    },
+    "replacement": "Err(std::io::Error)",
     "genre": "FnValue"
   },
   {
@@ -963,6 +663,96 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(vec![\"xyzzy\".into()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(vec![String::new()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(vec![])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
       "function_name": "CommandExecutor::build_shell_command",
       "return_type": "-> (String, Vec<String>)",
       "span": {
@@ -993,91 +783,91 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::read_output",
-      "return_type": "-> String",
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
       "span": {
         "start": {
-          "line": 326,
+          "line": 306,
           "column": 5
         },
         "end": {
-          "line": 341,
+          "line": 324,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 331,
+        "line": 308,
         "column": 9
       },
       "end": {
-        "line": 340,
-        "column": 15
-      }
-    },
-    "replacement": "String::new()",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::read_output",
-      "return_type": "-> String",
-      "span": {
-        "start": {
-          "line": 326,
-          "column": 5
-        },
-        "end": {
-          "line": 341,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 331,
-        "column": 9
-      },
-      "end": {
-        "line": 340,
-        "column": 15
-      }
-    },
-    "replacement": "\"xyzzy\".into()",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::print_command",
-      "return_type": "",
-      "span": {
-        "start": {
-          "line": 343,
-          "column": 5
-        },
-        "end": {
-          "line": 350,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 345,
-        "column": 9
-      },
-      "end": {
-        "line": 349,
+        "line": 323,
         "column": 10
       }
     },
-    "replacement": "()",
+    "replacement": "(String::new(), vec![\"xyzzy\".into()])",
     "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 171,
+          "column": 5
+        },
+        "end": {
+          "line": 181,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 173,
+        "column": 9
+      },
+      "end": {
+        "line": 180,
+        "column": 11
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 101,
+          "column": 5
+        },
+        "end": {
+          "line": 151,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 133,
+        "column": 16
+      },
+      "end": {
+        "line": 133,
+        "column": 17
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
   },
   {
     "package": "cmdrun",
@@ -1106,7 +896,37 @@
         "column": 20
       }
     },
-    "replacement": "Ok(vec![])",
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 207,
+        "column": 9
+      },
+      "end": {
+        "line": 303,
+        "column": 11
+      }
+    },
+    "replacement": "Ok(Default::default())",
     "genre": "FnValue"
   },
   {
@@ -1143,27 +963,87 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::execute_parallel",
-      "return_type": "-> Result<Vec<ExecutionResult>>",
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
       "span": {
         "start": {
-          "line": 352,
+          "line": 183,
           "column": 5
         },
         "end": {
-          "line": 393,
+          "line": 199,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 354,
+        "line": 186,
         "column": 9
       },
       "end": {
-        "line": 392,
-        "column": 20
+        "line": 198,
+        "column": 41
+      }
+    },
+    "replacement": "Ok(vec![])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
+      "span": {
+        "start": {
+          "line": 183,
+          "column": 5
+        },
+        "end": {
+          "line": 199,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 186,
+        "column": 9
+      },
+      "end": {
+        "line": 198,
+        "column": 41
+      }
+    },
+    "replacement": "Ok(vec![\"xyzzy\".into()])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 207,
+        "column": 9
+      },
+      "end": {
+        "line": 303,
+        "column": 11
       }
     },
     "replacement": "Err(anyhow::Error)",
@@ -1173,120 +1053,150 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::execute_parallel",
-      "return_type": "-> Result<Vec<ExecutionResult>>",
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
       "span": {
         "start": {
-          "line": 352,
+          "line": 201,
           "column": 5
         },
         "end": {
-          "line": 393,
+          "line": 304,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 354,
+        "line": 234,
+        "column": 33
+      },
+      "end": {
+        "line": 234,
+        "column": 34
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
+      "span": {
+        "start": {
+          "line": 306,
+          "column": 5
+        },
+        "end": {
+          "line": 324,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 308,
         "column": 9
       },
       "end": {
-        "line": 392,
-        "column": 20
+        "line": 323,
+        "column": 10
       }
     },
-    "replacement": "Err(std::io::Error)",
+    "replacement": "(String::new(), vec![])",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::clone_for_task",
-      "return_type": "-> Self",
+      "function_name": "CommandExecutor::show_cd_hint",
+      "return_type": "",
       "span": {
         "start": {
-          "line": 395,
+          "line": 472,
           "column": 5
         },
         "end": {
-          "line": 402,
+          "line": 496,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 397,
+        "line": 474,
         "column": 9
       },
       "end": {
-        "line": 401,
+        "line": 495,
         "column": 10
       }
     },
-    "replacement": "Default::default()",
+    "replacement": "()",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::is_shell_builtin",
-      "return_type": "-> bool",
+      "function_name": "CommandExecutor::build_shell_command",
+      "return_type": "-> (String, Vec<String>)",
       "span": {
         "start": {
-          "line": 404,
+          "line": 306,
           "column": 5
         },
         "end": {
-          "line": 431,
+          "line": 324,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 407,
+        "line": 308,
         "column": 9
       },
       "end": {
-        "line": 430,
+        "line": 323,
         "column": 10
       }
     },
-    "replacement": "true",
+    "replacement": "(\"xyzzy\".into(), vec![String::new()])",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::is_shell_builtin",
-      "return_type": "-> bool",
+      "function_name": "detect_shell",
+      "return_type": "-> String",
       "span": {
         "start": {
-          "line": 404,
-          "column": 5
+          "line": 515,
+          "column": 1
         },
         "end": {
-          "line": 431,
-          "column": 6
+          "line": 533,
+          "column": 2
         }
       }
     },
     "span": {
       "start": {
-        "line": 407,
-        "column": 9
+        "line": 517,
+        "column": 5
       },
       "end": {
-        "line": 430,
-        "column": 10
+        "line": 532,
+        "column": 6
       }
     },
-    "replacement": "false",
+    "replacement": "String::new()",
     "genre": "FnValue"
   },
   {
@@ -1323,6 +1233,66 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
+      "function_name": "CommandExecutor::check_platform",
+      "return_type": "-> Result<()>",
+      "span": {
+        "start": {
+          "line": 153,
+          "column": 5
+        },
+        "end": {
+          "line": 169,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 160,
+        "column": 12
+      },
+      "end": {
+        "line": 160,
+        "column": 13
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 101,
+          "column": 5
+        },
+        "end": {
+          "line": 151,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 118,
+        "column": 12
+      },
+      "end": {
+        "line": 118,
+        "column": 13
+      }
+    },
+    "replacement": "",
+    "genre": "UnaryOperator"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
       "function_name": "CommandExecutor::is_cd_command",
       "return_type": "-> bool",
       "span": {
@@ -1353,150 +1323,180 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::is_cd_command",
-      "return_type": "-> bool",
+      "function_name": "CommandExecutor::interpolate_commands",
+      "return_type": "-> Result<Vec<String>>",
       "span": {
         "start": {
-          "line": 450,
+          "line": 183,
           "column": 5
         },
         "end": {
-          "line": 470,
+          "line": 199,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 452,
+        "line": 186,
         "column": 9
       },
       "end": {
-        "line": 469,
-        "column": 20
+        "line": 198,
+        "column": 41
       }
     },
-    "replacement": "false",
+    "replacement": "Err(std::io::Error)",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::is_cd_command",
-      "return_type": "-> bool",
+      "function_name": "CommandExecutor::resolve_commands",
+      "return_type": "-> Result<Vec<String>>",
       "span": {
         "start": {
-          "line": 450,
+          "line": 171,
           "column": 5
         },
         "end": {
-          "line": 470,
+          "line": 181,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 469,
-        "column": 13
+        "line": 173,
+        "column": 9
       },
       "end": {
-        "line": 469,
-        "column": 15
+        "line": 180,
+        "column": 11
       }
     },
-    "replacement": "!=",
+    "replacement": "Err(anyhow::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_single",
+      "return_type": "-> Result<ExecutionResult>",
+      "span": {
+        "start": {
+          "line": 201,
+          "column": 5
+        },
+        "end": {
+          "line": 304,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 234,
+        "column": 30
+      },
+      "end": {
+        "line": 234,
+        "column": 32
+      }
+    },
+    "replacement": "||",
     "genre": "BinaryOperator"
   },
   {
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::show_cd_hint",
-      "return_type": "",
+      "function_name": "CommandExecutor::execute_parallel",
+      "return_type": "-> Result<Vec<ExecutionResult>>",
       "span": {
         "start": {
-          "line": 472,
+          "line": 352,
           "column": 5
         },
         "end": {
-          "line": 496,
+          "line": 393,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 474,
+        "line": 354,
         "column": 9
       },
       "end": {
-        "line": 495,
+        "line": 392,
+        "column": 20
+      }
+    },
+    "replacement": "Err(std::io::Error)",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::execute_parallel",
+      "return_type": "-> Result<Vec<ExecutionResult>>",
+      "span": {
+        "start": {
+          "line": 352,
+          "column": 5
+        },
+        "end": {
+          "line": 393,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 354,
+        "column": 9
+      },
+      "end": {
+        "line": 392,
+        "column": 20
+      }
+    },
+    "replacement": "Ok(vec![])",
+    "genre": "FnValue"
+  },
+  {
+    "package": "cmdrun",
+    "file": "src/command/executor.rs",
+    "function": {
+      "function_name": "CommandExecutor::print_command",
+      "return_type": "",
+      "span": {
+        "start": {
+          "line": 343,
+          "column": 5
+        },
+        "end": {
+          "line": 350,
+          "column": 6
+        }
+      }
+    },
+    "span": {
+      "start": {
+        "line": 345,
+        "column": 9
+      },
+      "end": {
+        "line": 349,
         "column": 10
       }
     },
     "replacement": "()",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::generate_function_name",
-      "return_type": "-> String",
-      "span": {
-        "start": {
-          "line": 498,
-          "column": 5
-        },
-        "end": {
-          "line": 512,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 501,
-        "column": 9
-      },
-      "end": {
-        "line": 511,
-        "column": 26
-      }
-    },
-    "replacement": "String::new()",
-    "genre": "FnValue"
-  },
-  {
-    "package": "cmdrun",
-    "file": "src/command/executor.rs",
-    "function": {
-      "function_name": "CommandExecutor::generate_function_name",
-      "return_type": "-> String",
-      "span": {
-        "start": {
-          "line": 498,
-          "column": 5
-        },
-        "end": {
-          "line": 512,
-          "column": 6
-        }
-      }
-    },
-    "span": {
-      "start": {
-        "line": 501,
-        "column": 9
-      },
-      "end": {
-        "line": 511,
-        "column": 26
-      }
-    },
-    "replacement": "\"xyzzy\".into()",
     "genre": "FnValue"
   },
   {
@@ -1533,90 +1533,90 @@
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "CommandExecutor::generate_function_name",
-      "return_type": "-> String",
+      "function_name": "CommandExecutor::is_cd_command",
+      "return_type": "-> bool",
       "span": {
         "start": {
-          "line": 498,
+          "line": 450,
           "column": 5
         },
         "end": {
-          "line": 512,
+          "line": 470,
           "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 507,
-        "column": 16
+        "line": 469,
+        "column": 13
       },
       "end": {
-        "line": 507,
-        "column": 17
+        "line": 469,
+        "column": 15
       }
     },
-    "replacement": "",
-    "genre": "UnaryOperator"
+    "replacement": "!=",
+    "genre": "BinaryOperator"
   },
   {
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "detect_shell",
-      "return_type": "-> String",
+      "function_name": "CommandExecutor::clone_for_task",
+      "return_type": "-> Self",
       "span": {
         "start": {
-          "line": 515,
-          "column": 1
+          "line": 395,
+          "column": 5
         },
         "end": {
-          "line": 533,
-          "column": 2
+          "line": 402,
+          "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 517,
-        "column": 5
+        "line": 397,
+        "column": 9
       },
       "end": {
-        "line": 532,
-        "column": 6
+        "line": 401,
+        "column": 10
       }
     },
-    "replacement": "String::new()",
+    "replacement": "Default::default()",
     "genre": "FnValue"
   },
   {
     "package": "cmdrun",
     "file": "src/command/executor.rs",
     "function": {
-      "function_name": "detect_shell",
-      "return_type": "-> String",
+      "function_name": "CommandExecutor::check_platform",
+      "return_type": "-> Result<()>",
       "span": {
         "start": {
-          "line": 515,
-          "column": 1
+          "line": 153,
+          "column": 5
         },
         "end": {
-          "line": 533,
-          "column": 2
+          "line": 169,
+          "column": 6
         }
       }
     },
     "span": {
       "start": {
-        "line": 517,
-        "column": 5
+        "line": 155,
+        "column": 9
       },
       "end": {
-        "line": 532,
-        "column": 6
+        "line": 168,
+        "column": 15
       }
     },
-    "replacement": "\"xyzzy\".into()",
+    "replacement": "Err(std::io::Error)",
     "genre": "FnValue"
   }
 ]

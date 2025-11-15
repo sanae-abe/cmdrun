@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Pre-push hook: Fast quality checks before push
+# Design: Fail Fast - Clippy first, then fast tests (exclude slow proptest)
+
+set -e
+
+echo "🔍 Running cargo clippy..."
+cargo clippy --all-features -- -D warnings
+
+echo "🧪 Running unit tests..."
+cargo test --all-features --lib --bins
+
+echo "✅ All checks passed"

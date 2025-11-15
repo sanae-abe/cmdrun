@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Pre-commit hook: Automatic code formatting
+# This hook runs before every commit to ensure code is properly formatted
+
+set -e
+
+echo "🎨 Running cargo fmt..."
+
+# Run cargo fmt
+cargo fmt
+
+# Add any files that were formatted
+git add -u
+
+echo "✅ Formatting complete"

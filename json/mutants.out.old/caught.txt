@@ -1,0 +1,25 @@
+src/command/executor.rs:133:16: delete ! in CommandExecutor::execute
+src/command/executor.rs:155:9: replace CommandExecutor::check_platform -> Result<()> with Ok(())
+src/command/executor.rs:173:9: replace CommandExecutor::resolve_commands -> Result<Vec<String>> with Ok(vec![String::new()])
+src/command/executor.rs:173:9: replace CommandExecutor::resolve_commands -> Result<Vec<String>> with Ok(vec![])
+src/command/executor.rs:173:9: replace CommandExecutor::resolve_commands -> Result<Vec<String>> with Ok(vec!["xyzzy".into()])
+src/command/executor.rs:186:9: replace CommandExecutor::interpolate_commands -> Result<Vec<String>> with Ok(vec![])
+src/command/executor.rs:186:9: replace CommandExecutor::interpolate_commands -> Result<Vec<String>> with Ok(vec![String::new()])
+src/command/executor.rs:186:9: replace CommandExecutor::interpolate_commands -> Result<Vec<String>> with Ok(vec!["xyzzy".into()])
+src/command/executor.rs:211:12: delete ! in CommandExecutor::execute_single
+src/command/executor.rs:234:30: replace && with || in CommandExecutor::execute_single
+src/command/executor.rs:234:33: delete ! in CommandExecutor::execute_single
+src/command/executor.rs:308:9: replace CommandExecutor::build_shell_command -> (String, Vec<String>) with (String::new(), vec![])
+src/command/executor.rs:308:9: replace CommandExecutor::build_shell_command -> (String, Vec<String>) with (String::new(), vec![String::new()])
+src/command/executor.rs:308:9: replace CommandExecutor::build_shell_command -> (String, Vec<String>) with (String::new(), vec!["xyzzy".into()])
+src/command/executor.rs:308:9: replace CommandExecutor::build_shell_command -> (String, Vec<String>) with ("xyzzy".into(), vec![])
+src/command/executor.rs:308:9: replace CommandExecutor::build_shell_command -> (String, Vec<String>) with ("xyzzy".into(), vec![String::new()])
+src/command/executor.rs:308:9: replace CommandExecutor::build_shell_command -> (String, Vec<String>) with ("xyzzy".into(), vec!["xyzzy".into()])
+src/command/executor.rs:331:9: replace CommandExecutor::read_output -> String with String::new()
+src/command/executor.rs:331:9: replace CommandExecutor::read_output -> String with "xyzzy".into()
+src/command/executor.rs:407:9: replace CommandExecutor::is_shell_builtin -> bool with true
+src/command/executor.rs:407:9: replace CommandExecutor::is_shell_builtin -> bool with false
+src/command/executor.rs:474:9: replace CommandExecutor::show_cd_hint with ()
+src/command/executor.rs:501:9: replace CommandExecutor::generate_function_name -> String with String::new()
+src/command/executor.rs:517:5: replace detect_shell -> String with String::new()
+src/command/executor.rs:517:5: replace detect_shell -> String with "xyzzy".into()
