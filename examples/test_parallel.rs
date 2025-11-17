@@ -126,6 +126,7 @@ fn create_test_config() -> CommandsConfig {
             parallel: false,
             confirm: false,
             allow_chaining: None,
+            allow_subshells: None,
         },
     );
 
@@ -144,6 +145,7 @@ fn create_test_config() -> CommandsConfig {
             parallel: false,
             confirm: false,
             allow_chaining: None,
+            allow_subshells: None,
         },
     );
 
@@ -162,6 +164,7 @@ fn create_test_config() -> CommandsConfig {
             parallel: false,
             confirm: false,
             allow_chaining: None,
+            allow_subshells: None,
         },
     );
 
@@ -180,6 +183,7 @@ fn create_test_config() -> CommandsConfig {
             parallel: false,
             confirm: false,
             allow_chaining: None,
+            allow_subshells: None,
         },
     );
 
