@@ -11,6 +11,9 @@ use tracing_subscriber::{
     EnvFilter,
 };
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
+
 /// ロガー設定
 #[derive(Debug, Clone)]
 pub struct LoggerConfig {
@@ -144,7 +147,13 @@ pub fn init_logger_with_config(config: LoggerConfig) -> Result<()> {
                     .with_ansi(config.use_colors),
             )
             .try_init()
-            .map_err(|e| anyhow::anyhow!("Failed to initialize logger: {}", e))?;
+            .map_err(|e| {
+                anyhow::anyhow!(
+                    "{}: {}",
+                    get_message(MessageKey::ErrorFailedToInitializeLogger, Language::English),
+                    e
+                )
+            })?;
     } else {
         // 人間が読みやすい形式で出力
         if config.show_timestamps {
@@ -158,7 +167,13 @@ pub fn init_logger_with_config(config: LoggerConfig) -> Result<()> {
                         .with_ansi(config.use_colors),
                 )
                 .try_init()
-                .map_err(|e| anyhow::anyhow!("Failed to initialize logger: {}", e))?;
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "{}: {}",
+                        get_message(MessageKey::ErrorFailedToInitializeLogger, Language::English),
+                        e
+                    )
+                })?;
         } else {
             tracing_subscriber::registry()
                 .with(env_filter)
@@ -170,7 +185,13 @@ pub fn init_logger_with_config(config: LoggerConfig) -> Result<()> {
                         .with_ansi(config.use_colors),
                 )
                 .try_init()
-                .map_err(|e| anyhow::anyhow!("Failed to initialize logger: {}", e))?;
+                .map_err(|e| {
+                    anyhow::anyhow!(
+                        "{}: {}",
+                        get_message(MessageKey::ErrorFailedToInitializeLogger, Language::English),
+                        e
+                    )
+                })?;
         }
     }
 

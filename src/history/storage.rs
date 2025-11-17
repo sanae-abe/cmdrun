@@ -9,6 +9,9 @@ use rusqlite::{params, Connection, OptionalExtension};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
+
 /// Default maximum number of history entries to retain
 const DEFAULT_MAX_HISTORY: usize = 1000;
 
@@ -101,8 +104,15 @@ impl HistoryStorage {
 
     /// Get the default database path
     fn default_db_path() -> Result<PathBuf> {
-        let data_dir = dirs::data_local_dir()
-            .ok_or_else(|| anyhow::anyhow!("Failed to determine local data directory"))?;
+        let data_dir = dirs::data_local_dir().ok_or_else(|| {
+            anyhow::anyhow!(
+                "{}",
+                get_message(
+                    MessageKey::ErrorFailedToDetermineLocalDataDir,
+                    Language::English
+                )
+            )
+        })?;
 
         Ok(data_dir.join("cmdrun").join("history.db"))
     }

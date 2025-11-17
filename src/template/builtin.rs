@@ -1,5 +1,7 @@
 //! Built-in template definitions
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
 use crate::template::schema::UserTemplate;
 
 /// Built-in template types
@@ -82,8 +84,14 @@ impl BuiltinTemplate {
     /// Parse template content
     pub fn parse_template(&self) -> anyhow::Result<UserTemplate> {
         let content = self.content();
-        let template: UserTemplate = toml::from_str(content)
-            .map_err(|e| anyhow::anyhow!("Failed to parse {} template: {}", self.name(), e))?;
+        let template: UserTemplate = toml::from_str(content).map_err(|e| {
+            anyhow::anyhow!(
+                "{} ({}): {}",
+                get_message(MessageKey::ErrorFailedToParseTemplate, Language::English),
+                self.name(),
+                e
+            )
+        })?;
 
         // Validate template
         template.validate()?;

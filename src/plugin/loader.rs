@@ -5,7 +5,11 @@
 #[cfg(feature = "plugin-system")]
 use super::api::Plugin;
 #[cfg(feature = "plugin-system")]
+use crate::config::Language;
+#[cfg(feature = "plugin-system")]
 use crate::error::{CmdrunError, Result};
+#[cfg(feature = "plugin-system")]
+use crate::i18n::{get_message, MessageKey};
 #[cfg(feature = "plugin-system")]
 use libloading::{Library, Symbol};
 #[cfg(feature = "plugin-system")]
@@ -77,12 +81,21 @@ impl PluginLoader {
         }
 
         // Load the library
-        let library = Library::new(path)
-            .map_err(|e| CmdrunError::PluginLoad(format!("Failed to load library: {}", e)))?;
+        let library = Library::new(path).map_err(|e| {
+            CmdrunError::PluginLoad(format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToLoadLibrary, Language::English),
+                e
+            ))
+        })?;
 
         // Get the plugin creation function
         let create: Symbol<PluginCreate> = library.get(b"_plugin_create").map_err(|e| {
-            CmdrunError::PluginLoad(format!("Symbol _plugin_create not found: {}", e))
+            CmdrunError::PluginLoad(format!(
+                "{} (_plugin_create): {}",
+                get_message(MessageKey::ErrorPluginSymbolNotFound, Language::English),
+                e
+            ))
         })?;
 
         // Create the plugin instance
@@ -138,8 +151,13 @@ impl PluginLoader {
 
         // Try to load library temporarily
         unsafe {
-            let library = Library::new(path)
-                .map_err(|e| CmdrunError::PluginLoad(format!("Failed to load library: {}", e)))?;
+            let library = Library::new(path).map_err(|e| {
+                CmdrunError::PluginLoad(format!(
+                    "{}: {}",
+                    get_message(MessageKey::ErrorFailedToLoadLibrary, Language::English),
+                    e
+                ))
+            })?;
 
             // Check for required symbols
             let has_create = library.get::<PluginCreate>(b"_plugin_create").is_ok();

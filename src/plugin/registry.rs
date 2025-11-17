@@ -3,7 +3,9 @@
 //! Manages loaded plugins and their lifecycle.
 
 use super::api::{HookPhase, Plugin, PluginContext, PluginMetadata};
+use crate::config::Language;
 use crate::error::{CmdrunError, Result};
+use crate::i18n::{get_message, MessageKey};
 use ahash::AHashMap;
 use std::sync::{Arc, RwLock};
 use tracing::{debug, info, warn};
@@ -55,7 +57,11 @@ impl PluginRegistry {
         {
             let plugins = self.plugins.read().map_err(|e| CmdrunError::PluginError {
                 plugin: name.clone(),
-                message: format!("Failed to acquire read lock: {}", e),
+                message: format!(
+                    "{}: {}",
+                    get_message(MessageKey::ErrorFailedToAcquireReadLock, Language::English),
+                    e
+                ),
             })?;
 
             if plugins.contains_key(&name) {
@@ -72,13 +78,21 @@ impl PluginRegistry {
             .on_load(&config)
             .map_err(|e| CmdrunError::PluginError {
                 plugin: name.clone(),
-                message: format!("Failed to initialize plugin: {}", e),
+                message: format!(
+                    "{}: {}",
+                    get_message(MessageKey::ErrorFailedToInitializePlugin, Language::English),
+                    e
+                ),
             })?;
 
         // Add to registry
         let mut plugins = self.plugins.write().map_err(|e| CmdrunError::PluginError {
             plugin: name.clone(),
-            message: format!("Failed to acquire write lock: {}", e),
+            message: format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToAcquireWriteLock, Language::English),
+                e
+            ),
         })?;
 
         plugins.insert(
@@ -104,7 +118,11 @@ impl PluginRegistry {
 
         let mut plugins = self.plugins.write().map_err(|e| CmdrunError::PluginError {
             plugin: name.to_string(),
-            message: format!("Failed to acquire write lock: {}", e),
+            message: format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToAcquireWriteLock, Language::English),
+                e
+            ),
         })?;
 
         if let Some(mut instance) = plugins.remove(name) {
@@ -113,7 +131,11 @@ impl PluginRegistry {
                 .on_unload()
                 .map_err(|e| CmdrunError::PluginError {
                     plugin: name.to_string(),
-                    message: format!("Failed to unload plugin: {}", e),
+                    message: format!(
+                        "{}: {}",
+                        get_message(MessageKey::ErrorFailedToUnloadPlugin, Language::English),
+                        e
+                    ),
                 })?;
             info!("Plugin unregistered successfully: {}", name);
             Ok(())
@@ -129,7 +151,11 @@ impl PluginRegistry {
     pub fn enable(&self, name: &str) -> Result<()> {
         let mut plugins = self.plugins.write().map_err(|e| CmdrunError::PluginError {
             plugin: name.to_string(),
-            message: format!("Failed to acquire write lock: {}", e),
+            message: format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToAcquireWriteLock, Language::English),
+                e
+            ),
         })?;
 
         if let Some(instance) = plugins.get_mut(name) {
@@ -148,7 +174,11 @@ impl PluginRegistry {
     pub fn disable(&self, name: &str) -> Result<()> {
         let mut plugins = self.plugins.write().map_err(|e| CmdrunError::PluginError {
             plugin: name.to_string(),
-            message: format!("Failed to acquire write lock: {}", e),
+            message: format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToAcquireWriteLock, Language::English),
+                e
+            ),
         })?;
 
         if let Some(instance) = plugins.get_mut(name) {
@@ -203,7 +233,11 @@ impl PluginRegistry {
     pub fn execute_hook(&self, phase: HookPhase, context: &mut PluginContext) -> Result<bool> {
         let plugins = self.plugins.read().map_err(|e| CmdrunError::PluginError {
             plugin: "registry".to_string(),
-            message: format!("Failed to acquire read lock: {}", e),
+            message: format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToAcquireReadLock, Language::English),
+                e
+            ),
         })?;
 
         let mut should_continue = true;
@@ -282,7 +316,11 @@ impl PluginRegistry {
     pub fn unload_all(&self) -> Result<()> {
         let mut plugins = self.plugins.write().map_err(|e| CmdrunError::PluginError {
             plugin: "registry".to_string(),
-            message: format!("Failed to acquire write lock: {}", e),
+            message: format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToAcquireWriteLock, Language::English),
+                e
+            ),
         })?;
 
         let plugin_names: Vec<String> = plugins.keys().cloned().collect();

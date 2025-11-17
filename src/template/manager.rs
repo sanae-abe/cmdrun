@@ -13,11 +13,18 @@ use crate::template::schema::UserTemplate;
 pub struct TemplateManager {
     /// Template directory path
     template_dir: PathBuf,
+    /// Language for error messages
+    language: Language,
 }
 
 impl TemplateManager {
     /// Create a new template manager
     pub fn new() -> Result<Self> {
+        Self::with_language(Language::English)
+    }
+
+    /// Create a new template manager with specified language
+    pub fn with_language(language: Language) -> Result<Self> {
         let template_dir = Self::get_template_dir()?;
 
         // Create directory if it doesn't exist
@@ -30,13 +37,20 @@ impl TemplateManager {
             })?;
         }
 
-        Ok(Self { template_dir })
+        Ok(Self {
+            template_dir,
+            language,
+        })
     }
 
     /// Get template directory path (~/.cmdrun/templates/)
     fn get_template_dir() -> Result<PathBuf> {
-        let home_dir = dirs::home_dir()
-            .ok_or_else(|| anyhow::anyhow!("Could not determine home directory"))?;
+        let home_dir = dirs::home_dir().ok_or_else(|| {
+            anyhow::anyhow!(
+                "{}",
+                get_message(MessageKey::ErrorCannotDetermineHomeDir, Language::English)
+            )
+        })?;
 
         Ok(home_dir.join(".cmdrun").join("templates"))
     }
@@ -52,7 +66,7 @@ impl TemplateManager {
         if file_path.exists() {
             anyhow::bail!(
                 "{}: '{}'",
-                get_message(MessageKey::ErrorTemplateAlreadyExists, Language::English),
+                get_message(MessageKey::ErrorTemplateAlreadyExists, self.language),
                 template.template.name
             );
         }
@@ -81,7 +95,7 @@ impl TemplateManager {
         if !file_path.exists() {
             anyhow::bail!(
                 "{}: '{}'",
-                get_message(MessageKey::ErrorTemplateNotFound, Language::English),
+                get_message(MessageKey::ErrorTemplateNotFound, self.language),
                 name
             );
         }
@@ -142,10 +156,7 @@ impl TemplateManager {
         if BuiltinTemplate::parse(name).is_some() {
             anyhow::bail!(
                 "{}: '{}'",
-                get_message(
-                    MessageKey::ErrorCannotRemoveBuiltinTemplate,
-                    Language::English
-                ),
+                get_message(MessageKey::ErrorCannotRemoveBuiltinTemplate, self.language),
                 name
             );
         }
@@ -155,7 +166,7 @@ impl TemplateManager {
         if !file_path.exists() {
             anyhow::bail!(
                 "{}: '{}'",
-                get_message(MessageKey::ErrorTemplateNotFound, Language::English),
+                get_message(MessageKey::ErrorTemplateNotFound, self.language),
                 name
             );
         }
@@ -184,7 +195,7 @@ impl TemplateManager {
         if !file_path.exists() {
             anyhow::bail!(
                 "{}: {}",
-                get_message(MessageKey::ErrorFileNotFound, Language::English),
+                get_message(MessageKey::ErrorFileNotFound, self.language),
                 file_path.display()
             );
         }
@@ -261,6 +272,7 @@ mod tests {
         let temp_dir = TempDir::new().unwrap();
         let manager = TemplateManager {
             template_dir: temp_dir.path().to_path_buf(),
+            language: Language::English,
         };
         (manager, temp_dir)
     }

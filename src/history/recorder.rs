@@ -11,6 +11,9 @@ use serde_json;
 use std::collections::HashMap;
 use std::env;
 
+use crate::config::Language;
+use crate::i18n::{get_message, MessageKey};
+
 /// Sensitive environment variable patterns to exclude from history
 const SENSITIVE_ENV_PATTERNS: &[&str] = &[
     "KEY",
@@ -94,10 +97,13 @@ impl HistoryRecorder {
         success: bool,
     ) -> Result<()> {
         // Get the original entry
-        let mut entry = self
-            .storage
-            .get_by_id(id)?
-            .ok_or_else(|| anyhow::anyhow!("History entry not found: {}", id))?;
+        let mut entry = self.storage.get_by_id(id)?.ok_or_else(|| {
+            anyhow::anyhow!(
+                "{}: {}",
+                get_message(MessageKey::ErrorHistoryEntryNotFound, Language::English),
+                id
+            )
+        })?;
 
         // Update with completion data
         entry.duration_ms = Some(duration_ms);

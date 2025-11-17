@@ -96,12 +96,21 @@ impl EnvironmentManager {
             return Ok(EnvironmentConfig::default());
         }
 
-        let content = fs::read_to_string(&config_path)
-            .await
-            .with_context(|| format!("Failed to read config: {}", config_path.display()))?;
+        let content = fs::read_to_string(&config_path).await.with_context(|| {
+            format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToReadConfig, Language::English),
+                config_path.display()
+            )
+        })?;
 
-        let full_config: toml::Value = toml::from_str(&content)
-            .with_context(|| format!("Failed to parse config: {}", config_path.display()))?;
+        let full_config: toml::Value = toml::from_str(&content).with_context(|| {
+            format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToParseConfig, Language::English),
+                config_path.display()
+            )
+        })?;
 
         // environment セクションを抽出
         if let Some(env_section) = full_config.get("environment") {

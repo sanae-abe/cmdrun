@@ -274,12 +274,21 @@ impl ConfigLoader {
 
     /// 指定されたパスから設定ファイルを読み込む
     async fn load_from_path(&self, path: &Path) -> Result<CommandsConfig> {
-        let content = fs::read_to_string(path)
-            .await
-            .with_context(|| format!("Failed to read config file: {}", path.display()))?;
+        let content = fs::read_to_string(path).await.with_context(|| {
+            format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToReadConfig, Language::English),
+                path.display()
+            )
+        })?;
 
-        let config: CommandsConfig = toml::from_str(&content)
-            .with_context(|| format!("Failed to parse TOML config: {}", path.display()))?;
+        let config: CommandsConfig = toml::from_str(&content).with_context(|| {
+            format!(
+                "{}: {}",
+                get_message(MessageKey::ErrorFailedToParseConfig, Language::English),
+                path.display()
+            )
+        })?;
 
         debug!(
             "Loaded {} commands, {} aliases",
