@@ -653,6 +653,7 @@ mod integration_tests {
         }
 
         // ケース2: グローバル許可（グローバル: true, コマンド: None） → 許可
+        #[cfg(not(windows))]
         {
             let ctx = ExecutionContext {
                 working_dir: std::path::PathBuf::from("."),
@@ -667,33 +668,31 @@ mod integration_tests {
                 allow_subshells: true, // グローバル許可
             };
 
-            #[cfg(not(windows))]
-            {
-                let executor = CommandExecutor::new(ctx);
-                let cmd = Command {
-                    description: "test".to_string(),
-                    cmd: CommandSpec::Single("(echo test)".to_string()),
-                    env: AHashMap::new(),
-                    working_dir: None,
-                    deps: vec![],
-                    platform: vec![],
-                    tags: vec![],
-                    timeout: None,
-                    parallel: false,
-                    confirm: false,
-                    allow_chaining: None,
-                    allow_subshells: None, // コマンド個別設定なし → グローバルに従う
-                };
+            let executor = CommandExecutor::new(ctx);
+            let cmd = Command {
+                description: "test".to_string(),
+                cmd: CommandSpec::Single("(echo test)".to_string()),
+                env: AHashMap::new(),
+                working_dir: None,
+                deps: vec![],
+                platform: vec![],
+                tags: vec![],
+                timeout: None,
+                parallel: false,
+                confirm: false,
+                allow_chaining: None,
+                allow_subshells: None, // コマンド個別設定なし → グローバルに従う
+            };
 
-                let result = executor.execute(&cmd).await;
-                assert!(
-                    result.is_ok(),
-                    "Subshells should be allowed when global allow_subshells = true"
-                );
-            }
+            let result = executor.execute(&cmd).await;
+            assert!(
+                result.is_ok(),
+                "Subshells should be allowed when global allow_subshells = true"
+            );
         }
 
         // ケース3: コマンド個別許可（グローバル: false, コマンド: Some(true)） → 許可
+        #[cfg(not(windows))]
         {
             let ctx = ExecutionContext {
                 working_dir: std::path::PathBuf::from("."),
@@ -708,30 +707,27 @@ mod integration_tests {
                 allow_subshells: false, // グローバル: 拒否
             };
 
-            #[cfg(not(windows))]
-            {
-                let executor = CommandExecutor::new(ctx);
-                let cmd = Command {
-                    description: "test".to_string(),
-                    cmd: CommandSpec::Single("(echo test)".to_string()),
-                    env: AHashMap::new(),
-                    working_dir: None,
-                    deps: vec![],
-                    platform: vec![],
-                    tags: vec![],
-                    timeout: None,
-                    parallel: false,
-                    confirm: false,
-                    allow_chaining: None,
-                    allow_subshells: Some(true), // コマンド個別で許可 → グローバルを上書き
-                };
+            let executor = CommandExecutor::new(ctx);
+            let cmd = Command {
+                description: "test".to_string(),
+                cmd: CommandSpec::Single("(echo test)".to_string()),
+                env: AHashMap::new(),
+                working_dir: None,
+                deps: vec![],
+                platform: vec![],
+                tags: vec![],
+                timeout: None,
+                parallel: false,
+                confirm: false,
+                allow_chaining: None,
+                allow_subshells: Some(true), // コマンド個別で許可 → グローバルを上書き
+            };
 
-                let result = executor.execute(&cmd).await;
-                assert!(
-                    result.is_ok(),
-                    "Command-level allow_subshells should override global setting"
-                );
-            }
+            let result = executor.execute(&cmd).await;
+            assert!(
+                result.is_ok(),
+                "Command-level allow_subshells should override global setting"
+            );
         }
 
         // ケース4: コマンド個別拒否（グローバル: true, コマンド: Some(false)） → 拒否
@@ -776,25 +772,24 @@ mod integration_tests {
     /// grep正規表現パターンのテスト（実際のユースケース）
     #[tokio::test]
     async fn test_grep_regex_pattern_with_subshells() {
-        use ahash::AHashMap;
-        use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
-        use cmdrun::config::schema::{Command, CommandSpec};
-
-        let ctx = ExecutionContext {
-            working_dir: std::path::PathBuf::from("."),
-            env: AHashMap::new(),
-            shell: "bash".to_string(),
-            timeout: Some(10),
-            strict: true,
-            echo: false,
-            color: false,
-            language: cmdrun::config::Language::English,
-            allow_command_chaining: false,
-            allow_subshells: true, // サブシェル許可（grep正規表現で必要）
-        };
-
         #[cfg(not(windows))]
         {
+            use ahash::AHashMap;
+            use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
+            use cmdrun::config::schema::{Command, CommandSpec};
+
+            let ctx = ExecutionContext {
+                working_dir: std::path::PathBuf::from("."),
+                env: AHashMap::new(),
+                shell: "bash".to_string(),
+                timeout: Some(10),
+                strict: true,
+                echo: false,
+                color: false,
+                language: cmdrun::config::Language::English,
+                allow_command_chaining: false,
+                allow_subshells: true, // サブシェル許可（grep正規表現で必要）
+            };
             let executor = CommandExecutor::new(ctx);
 
             // grep -E '(pattern1|pattern2)' のパターン
@@ -826,25 +821,24 @@ mod integration_tests {
     /// エスケープシーケンスのテスト
     #[tokio::test]
     async fn test_escape_sequences_allowed() {
-        use ahash::AHashMap;
-        use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
-        use cmdrun::config::schema::{Command, CommandSpec};
-
-        let ctx = ExecutionContext {
-            working_dir: std::path::PathBuf::from("."),
-            env: AHashMap::new(),
-            shell: "bash".to_string(),
-            timeout: Some(10),
-            strict: true,
-            echo: false,
-            color: false,
-            language: cmdrun::config::Language::English,
-            allow_command_chaining: false,
-            allow_subshells: false,
-        };
-
         #[cfg(not(windows))]
         {
+            use ahash::AHashMap;
+            use cmdrun::command::executor::{CommandExecutor, ExecutionContext};
+            use cmdrun::config::schema::{Command, CommandSpec};
+
+            let ctx = ExecutionContext {
+                working_dir: std::path::PathBuf::from("."),
+                env: AHashMap::new(),
+                shell: "bash".to_string(),
+                timeout: Some(10),
+                strict: true,
+                echo: false,
+                color: false,
+                language: cmdrun::config::Language::English,
+                allow_command_chaining: false,
+                allow_subshells: false,
+            };
             let executor = CommandExecutor::new(ctx);
 
             // エスケープシーケンス（\n, \t）を含むコマンド
