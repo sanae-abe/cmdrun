@@ -57,9 +57,9 @@ mod edge_case_tests {
             let result = validator.validate("echo    hello    world");
             assert!(result.is_safe(), "Multiple spaces should be allowed");
 
-            // Tabs are dangerous metacharacters
+            // Phase 4: Tabs are now allowed (minimal security risk)
             let result = validator.validate("echo\thello");
-            assert!(!result.is_safe(), "Tabs should be rejected");
+            assert!(result.is_safe(), "Tabs should be allowed (Phase 4)");
         }
 
         #[test]
