@@ -667,24 +667,24 @@ mod integration_tests {
                 allow_subshells: true, // グローバル許可
             };
 
-            let executor = CommandExecutor::new(ctx);
-            let cmd = Command {
-                description: "test".to_string(),
-                cmd: CommandSpec::Single("(echo test)".to_string()),
-                env: AHashMap::new(),
-                working_dir: None,
-                deps: vec![],
-                platform: vec![],
-                tags: vec![],
-                timeout: None,
-                parallel: false,
-                confirm: false,
-                allow_chaining: None,
-                allow_subshells: None, // コマンド個別設定なし → グローバルに従う
-            };
-
             #[cfg(not(windows))]
             {
+                let executor = CommandExecutor::new(ctx);
+                let cmd = Command {
+                    description: "test".to_string(),
+                    cmd: CommandSpec::Single("(echo test)".to_string()),
+                    env: AHashMap::new(),
+                    working_dir: None,
+                    deps: vec![],
+                    platform: vec![],
+                    tags: vec![],
+                    timeout: None,
+                    parallel: false,
+                    confirm: false,
+                    allow_chaining: None,
+                    allow_subshells: None, // コマンド個別設定なし → グローバルに従う
+                };
+
                 let result = executor.execute(&cmd).await;
                 assert!(
                     result.is_ok(),
@@ -708,24 +708,24 @@ mod integration_tests {
                 allow_subshells: false, // グローバル: 拒否
             };
 
-            let executor = CommandExecutor::new(ctx);
-            let cmd = Command {
-                description: "test".to_string(),
-                cmd: CommandSpec::Single("(echo test)".to_string()),
-                env: AHashMap::new(),
-                working_dir: None,
-                deps: vec![],
-                platform: vec![],
-                tags: vec![],
-                timeout: None,
-                parallel: false,
-                confirm: false,
-                allow_chaining: None,
-                allow_subshells: Some(true), // コマンド個別で許可 → グローバルを上書き
-            };
-
             #[cfg(not(windows))]
             {
+                let executor = CommandExecutor::new(ctx);
+                let cmd = Command {
+                    description: "test".to_string(),
+                    cmd: CommandSpec::Single("(echo test)".to_string()),
+                    env: AHashMap::new(),
+                    working_dir: None,
+                    deps: vec![],
+                    platform: vec![],
+                    tags: vec![],
+                    timeout: None,
+                    parallel: false,
+                    confirm: false,
+                    allow_chaining: None,
+                    allow_subshells: Some(true), // コマンド個別で許可 → グローバルを上書き
+                };
+
                 let result = executor.execute(&cmd).await;
                 assert!(
                     result.is_ok(),
@@ -793,26 +793,28 @@ mod integration_tests {
             allow_subshells: true, // サブシェル許可（grep正規表現で必要）
         };
 
-        let executor = CommandExecutor::new(ctx);
-
-        // grep -E '(pattern1|pattern2)' のパターン
-        let cmd = Command {
-            description: "grep with regex".to_string(),
-            cmd: CommandSpec::Single("echo -e 'test\\ndata' | grep -E '(test|data)'".to_string()),
-            env: AHashMap::new(),
-            working_dir: None,
-            deps: vec![],
-            platform: vec![],
-            tags: vec![],
-            timeout: None,
-            parallel: false,
-            confirm: false,
-            allow_chaining: None,
-            allow_subshells: Some(true), // サブシェル許可
-        };
-
         #[cfg(not(windows))]
         {
+            let executor = CommandExecutor::new(ctx);
+
+            // grep -E '(pattern1|pattern2)' のパターン
+            let cmd = Command {
+                description: "grep with regex".to_string(),
+                cmd: CommandSpec::Single(
+                    "echo -e 'test\\ndata' | grep -E '(test|data)'".to_string(),
+                ),
+                env: AHashMap::new(),
+                working_dir: None,
+                deps: vec![],
+                platform: vec![],
+                tags: vec![],
+                timeout: None,
+                parallel: false,
+                confirm: false,
+                allow_chaining: None,
+                allow_subshells: Some(true), // サブシェル許可
+            };
+
             let result = executor.execute(&cmd).await;
             assert!(
                 result.is_ok(),
@@ -841,26 +843,26 @@ mod integration_tests {
             allow_subshells: false,
         };
 
-        let executor = CommandExecutor::new(ctx);
-
-        // エスケープシーケンス（\n, \t）を含むコマンド
-        let cmd = Command {
-            description: "test".to_string(),
-            cmd: CommandSpec::Single("echo -e 'line1\\nline2\\ttab'".to_string()),
-            env: AHashMap::new(),
-            working_dir: None,
-            deps: vec![],
-            platform: vec![],
-            tags: vec![],
-            timeout: None,
-            parallel: false,
-            confirm: false,
-            allow_chaining: None,
-            allow_subshells: None,
-        };
-
         #[cfg(not(windows))]
         {
+            let executor = CommandExecutor::new(ctx);
+
+            // エスケープシーケンス（\n, \t）を含むコマンド
+            let cmd = Command {
+                description: "test".to_string(),
+                cmd: CommandSpec::Single("echo -e 'line1\\nline2\\ttab'".to_string()),
+                env: AHashMap::new(),
+                working_dir: None,
+                deps: vec![],
+                platform: vec![],
+                tags: vec![],
+                timeout: None,
+                parallel: false,
+                confirm: false,
+                allow_chaining: None,
+                allow_subshells: None,
+            };
+
             let result = executor.execute(&cmd).await;
             assert!(
                 result.is_ok(),
