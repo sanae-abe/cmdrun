@@ -120,6 +120,19 @@ pub struct GlobalConfig {
     /// 自動修正の有効化（将来の拡張用）
     #[serde(default)]
     pub auto_correct: bool,
+
+    /// コマンド連結（&&, ||, ;）をグローバルで許可
+    /// デフォルト: false（セキュア）
+    /// 個別コマンドの allow_chaining 設定が優先される
+    #[serde(default)]
+    pub allow_command_chaining: bool,
+
+    /// サブシェル（()）をグローバルで許可
+    /// デフォルト: false（セキュア）
+    /// 個別コマンドの allow_subshells 設定が優先される
+    /// 用途: grep -E '(pattern)', (cd /tmp && make)
+    #[serde(default)]
+    pub allow_subshells: bool,
 }
 
 impl Default for GlobalConfig {
@@ -135,6 +148,8 @@ impl Default for GlobalConfig {
             typo_detection: true,
             typo_threshold: default_typo_threshold(),
             auto_correct: false,
+            allow_command_chaining: false,
+            allow_subshells: false,
         }
     }
 }
@@ -157,6 +172,8 @@ impl GlobalConfig {
             typo_detection: overlay.typo_detection,
             typo_threshold: overlay.typo_threshold,
             auto_correct: overlay.auto_correct,
+            allow_command_chaining: overlay.allow_command_chaining,
+            allow_subshells: overlay.allow_subshells,
         }
     }
 }
@@ -203,6 +220,17 @@ pub struct Command {
     /// 実行前確認
     #[serde(default)]
     pub confirm: bool,
+
+    /// コマンド連結（&&, ||, ;）を許可
+    /// デフォルト: None（グローバル設定に従う）
+    #[serde(default)]
+    pub allow_chaining: Option<bool>,
+
+    /// サブシェル（()）を許可
+    /// デフォルト: None（グローバル設定に従う）
+    /// 用途: grep -E '(pattern)', (cd /tmp && make)
+    #[serde(default)]
+    pub allow_subshells: Option<bool>,
 }
 
 impl Command {

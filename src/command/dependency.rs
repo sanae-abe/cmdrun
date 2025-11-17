@@ -247,6 +247,8 @@ mod tests {
                 timeout: None,
                 parallel: false,
                 confirm: false,
+                allow_chaining: None,
+                allow_subshells: None,
             },
         );
 
@@ -264,6 +266,8 @@ mod tests {
                 timeout: None,
                 parallel: false,
                 confirm: false,
+                allow_chaining: None,
+                allow_subshells: None,
             },
         );
 
@@ -281,6 +285,8 @@ mod tests {
                 timeout: None,
                 parallel: false,
                 confirm: false,
+                allow_chaining: None,
+                allow_subshells: None,
             },
         );
 
@@ -298,6 +304,8 @@ mod tests {
                 timeout: None,
                 parallel: false,
                 confirm: false,
+                allow_chaining: None,
+                allow_subshells: None,
             },
         );
 

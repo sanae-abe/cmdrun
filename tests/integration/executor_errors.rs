@@ -35,6 +35,8 @@ async fn test_command_timeout() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -57,6 +59,8 @@ async fn test_command_timeout() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -93,6 +97,8 @@ async fn test_command_timeout_with_custom_timeout() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -111,6 +117,8 @@ async fn test_command_timeout_with_custom_timeout() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -138,6 +146,8 @@ async fn test_no_timeout_setting() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -153,6 +163,8 @@ async fn test_no_timeout_setting() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -180,6 +192,8 @@ async fn test_command_not_found() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -196,6 +210,8 @@ async fn test_command_not_found() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -253,6 +269,8 @@ async fn test_command_with_invalid_syntax() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -278,6 +296,8 @@ async fn test_command_with_invalid_syntax() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -322,6 +342,8 @@ async fn test_execute_file_without_permission() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -337,6 +359,8 @@ async fn test_execute_file_without_permission() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -368,6 +392,8 @@ async fn test_invalid_working_directory() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -383,6 +409,8 @@ async fn test_invalid_working_directory() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -412,6 +440,8 @@ async fn test_command_specific_working_directory() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -428,6 +458,8 @@ async fn test_command_specific_working_directory() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -456,6 +488,8 @@ async fn test_dangerous_env_vars_warning() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -474,6 +508,8 @@ async fn test_dangerous_env_vars_warning() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     // Should execute but log warning (captured by tracing)
@@ -507,6 +543,8 @@ async fn test_command_with_nonzero_exit_code() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -525,6 +563,8 @@ async fn test_command_with_nonzero_exit_code() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -559,6 +599,8 @@ async fn test_command_with_zero_exit_code() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -574,6 +616,8 @@ async fn test_command_with_zero_exit_code() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -604,6 +648,8 @@ async fn test_parallel_execution_with_one_failure() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -619,6 +665,8 @@ async fn test_parallel_execution_with_one_failure() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let fail_cmd = Command {
@@ -632,6 +680,8 @@ async fn test_parallel_execution_with_one_failure() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let commands = vec![&success_cmd, &fail_cmd];
@@ -660,6 +710,8 @@ async fn test_parallel_execution_empty_commands() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -691,6 +743,8 @@ async fn test_undefined_variable_in_strict_mode() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -706,6 +760,8 @@ async fn test_undefined_variable_in_strict_mode() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -733,6 +789,8 @@ async fn test_defined_variable_interpolation() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     ctx.env
@@ -751,6 +809,8 @@ async fn test_defined_variable_interpolation() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -785,6 +845,8 @@ async fn test_platform_mismatch() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -807,6 +869,8 @@ async fn test_platform_mismatch() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&command).await;
@@ -838,6 +902,8 @@ async fn test_execute_parallel_actually_runs_commands() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -854,6 +920,8 @@ async fn test_execute_parallel_actually_runs_commands() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let cmd2 = Command {
@@ -867,6 +935,8 @@ async fn test_execute_parallel_actually_runs_commands() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let commands = vec![&cmd1, &cmd2];
@@ -920,6 +990,8 @@ async fn test_execute_parallel_with_empty_list() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -949,6 +1021,8 @@ async fn test_execute_parallel_with_failures() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -964,6 +1038,8 @@ async fn test_execute_parallel_with_failures() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let cmd_failure = Command {
@@ -977,6 +1053,8 @@ async fn test_execute_parallel_with_failures() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let commands = vec![&cmd_success, &cmd_failure];
@@ -1012,6 +1090,8 @@ async fn test_dangerous_env_vars_warning_logic() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -1031,6 +1111,8 @@ async fn test_dangerous_env_vars_warning_logic() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     // Should execute (with warning in logs) but not fail
@@ -1052,6 +1134,8 @@ async fn test_dangerous_env_vars_warning_logic() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_safe).await;
@@ -1076,6 +1160,8 @@ async fn test_platform_support_check_logic() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -1092,6 +1178,8 @@ async fn test_platform_support_check_logic() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_no_platform).await;
@@ -1120,6 +1208,8 @@ async fn test_platform_support_check_logic() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_current_platform).await;
@@ -1146,6 +1236,8 @@ async fn test_platform_support_check_logic() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_wrong_platform).await;
@@ -1172,6 +1264,8 @@ async fn test_shell_detection_logic_powershell() {
             echo: false,
             color: false,
             language: cmdrun::config::Language::default(),
+            allow_command_chaining: false,
+            allow_subshells: false,
         };
 
         let executor_pwsh = CommandExecutor::new(ctx_pwsh);
@@ -1186,6 +1280,8 @@ async fn test_shell_detection_logic_powershell() {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let result = executor_pwsh.execute(&cmd).await;
@@ -1204,6 +1300,8 @@ async fn test_shell_detection_logic_powershell() {
             echo: false,
             color: false,
             language: cmdrun::config::Language::default(),
+            allow_command_chaining: false,
+            allow_subshells: false,
         };
 
         let executor_powershell = CommandExecutor::new(ctx_powershell);
@@ -1223,6 +1321,8 @@ async fn test_shell_detection_logic_powershell() {
             echo: false,
             color: false,
             language: cmdrun::config::Language::default(),
+            allow_command_chaining: false,
+            allow_subshells: false,
         };
 
         let executor_cmd = CommandExecutor::new(ctx_cmd);
@@ -1237,6 +1337,8 @@ async fn test_shell_detection_logic_powershell() {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let result = executor_cmd.execute(&cmd_cmd).await;
@@ -1258,6 +1360,8 @@ async fn test_shell_detection_logic_powershell() {
             echo: false,
             color: false,
             language: cmdrun::config::Language::default(),
+            allow_command_chaining: false,
+            allow_subshells: false,
         };
 
         let executor = CommandExecutor::new(ctx);
@@ -1272,6 +1376,8 @@ async fn test_shell_detection_logic_powershell() {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let result = executor.execute(&cmd).await;
@@ -1301,6 +1407,8 @@ async fn test_print_command_function_is_called() {
         echo: true, // Enable echo to trigger print_command
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -1316,6 +1424,8 @@ async fn test_print_command_function_is_called() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     // Execute command - print_command should be called internally
@@ -1349,6 +1459,8 @@ async fn test_is_cd_command_detection() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -1370,6 +1482,8 @@ async fn test_is_cd_command_detection() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_cd_simple).await;
@@ -1394,6 +1508,8 @@ async fn test_is_cd_command_detection() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_cd_pipe).await;
@@ -1417,6 +1533,8 @@ async fn test_is_cd_command_detection() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_cd_redirect).await;
@@ -1435,6 +1553,8 @@ async fn test_is_cd_command_detection() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_not_cd).await;
@@ -1459,6 +1579,8 @@ async fn test_warn_shell_builtin_is_invoked() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -1480,6 +1602,8 @@ async fn test_warn_shell_builtin_is_invoked() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_cd).await;
@@ -1508,6 +1632,8 @@ async fn test_warn_shell_builtin_is_invoked() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_export).await;
@@ -1535,6 +1661,8 @@ async fn test_cd_command_case_insensitive() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -1553,6 +1681,8 @@ async fn test_cd_command_case_insensitive() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_cd_upper).await;
@@ -1572,6 +1702,8 @@ async fn test_cd_command_case_insensitive() {
         timeout: None,
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd_cd_mixed).await;

@@ -202,6 +202,8 @@ async fn test_missing_dependency() {
             env: Default::default(),
             deps: vec!["nonexistent".to_string()],
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
             timeout: None,
             platform: vec![],
             working_dir: None,

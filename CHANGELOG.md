@@ -5,9 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-11-06
+## [1.0.0] - 2025-11-17
 
 ### Added
+
+- **Security Enhancement (Phase 4)**
+  - `allow_subshells` configuration option for fine-grained control of subshell usage
+    - Global setting: `config.allow_subshells` (default: `false`)
+    - Per-command setting: `commands.<name>.allow_subshells` (overrides global)
+    - Hierarchical control: command-level > global > default (false)
+  - Support for legitimate use cases requiring parentheses:
+    - grep regex patterns: `grep -E '(ERROR|WARN)'`
+    - Command grouping: `(cd /tmp && make) && echo Done`
+  - Escape sequence support (`\n`, `\r`, `\t`) now allowed by default
+    - Security risk: minimal (string literals only)
+    - Use case: formatted output with `echo -e 'line1\nline2'`
+  - Comprehensive security tests for subshell control
+  - Documentation updates in CONFIGURATION.md and SECURITY.md
 
 - **Core Functionality**
   - TOML-based configuration with `commands.toml`

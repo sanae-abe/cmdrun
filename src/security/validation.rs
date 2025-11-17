@@ -74,9 +74,9 @@ impl CommandValidator {
     pub const DEFAULT_MAX_LENGTH: usize = 4096;
 
     /// 危険なシェルメタ文字（厳格モード）
+    /// 注意: \n, \r, \t はセキュリティリスクがほぼゼロのため除外（フォーマット出力に使用）
     const DANGEROUS_METACHARACTERS: &'static [char] = &[
-        ';', '&', '|', '>', '<', '`', '$', '(', ')', '{', '}', '[', ']', '\\', '"', '\'', '\n',
-        '\r', '\t',
+        ';', '&', '|', '>', '<', '`', '$', '(', ')', '{', '}', '[', ']', '\\', '"', '\'',
     ];
 
     /// 基本的に許可されるメタ文字（非厳格モード）
@@ -263,6 +263,26 @@ impl CommandValidator {
     pub fn allow_redirect(mut self) -> Self {
         self.allowed_metacharacters.insert('>');
         self.allowed_metacharacters.insert('<');
+        self
+    }
+
+    /// コマンド連結（&&, ||, ;）を許可
+    /// セキュリティリスク: コマンドインジェクション攻撃の可能性
+    /// 使用時は信頼できる入力のみに制限すること
+    pub fn allow_chaining(mut self) -> Self {
+        self.allowed_metacharacters.insert('&');
+        self.allowed_metacharacters.insert('|');
+        self.allowed_metacharacters.insert(';');
+        self
+    }
+
+    /// サブシェル（()）を許可
+    /// 用途: grep -E '(pattern)', (cd /tmp && make)
+    /// セキュリティリスク: サブシェルでのコマンド実行
+    /// 使用時は信頼できる入力のみに制限すること
+    pub fn allow_subshells(mut self) -> Self {
+        self.allowed_metacharacters.insert('(');
+        self.allowed_metacharacters.insert(')');
         self
     }
 }

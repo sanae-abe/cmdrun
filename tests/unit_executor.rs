@@ -16,6 +16,8 @@ async fn test_executor_creation() {
         echo: true,
         color: true,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let _executor = CommandExecutor::new(ctx);
@@ -39,6 +41,8 @@ async fn test_execute_simple_command() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -53,6 +57,8 @@ async fn test_execute_simple_command() {
         tags: vec![],
         platform: vec![],
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&cmd).await;
@@ -76,6 +82,8 @@ async fn test_execute_parallel() {
         echo: false,
         color: false,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -90,6 +98,8 @@ async fn test_execute_parallel() {
         tags: vec![],
         platform: vec![],
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
     let cmd2 = Command {
         description: "Test 2".to_string(),
@@ -102,6 +112,8 @@ async fn test_execute_parallel() {
         tags: vec![],
         platform: vec![],
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let commands = vec![&cmd1, &cmd2];

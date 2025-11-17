@@ -435,6 +435,8 @@ cmd = "cargo test"
                         timeout: None,
                         parallel: false,
                         confirm: false,
+                        allow_chaining: None,
+                        allow_subshells: None,
                     },
                 );
                 map
@@ -465,6 +467,8 @@ cmd = "cargo test"
                         timeout: None,
                         parallel: false,
                         confirm: false,
+                        allow_chaining: None,
+                        allow_subshells: None,
                     },
                 );
                 map

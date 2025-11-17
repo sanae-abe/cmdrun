@@ -19,6 +19,8 @@ fn create_test_config() -> CommandsConfig {
             tags: vec![],
             platform: vec![],
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         },
     );
     commands.insert(
@@ -34,6 +36,8 @@ fn create_test_config() -> CommandsConfig {
             tags: vec![],
             platform: vec![],
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         },
     );
 
@@ -85,6 +89,8 @@ fn test_circular_dependency_detection() {
             tags: vec![],
             platform: vec![],
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         },
     );
     commands.insert(
@@ -100,6 +106,8 @@ fn test_circular_dependency_detection() {
             tags: vec![],
             platform: vec![],
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         },
     );
 
@@ -132,6 +140,8 @@ fn test_missing_dependency() {
             tags: vec![],
             platform: vec![],
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         },
     );
 

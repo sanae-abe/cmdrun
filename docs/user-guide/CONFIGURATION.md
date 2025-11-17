@@ -166,6 +166,82 @@ language = "japanese"
 strict_mode = false  # 未定義変数を許可
 ```
 
+#### `allow_command_chaining`
+
+**型**: 真偽値
+**デフォルト**: `false`
+
+**説明**: コマンド連結（`&&`, `||`, `;`）をグローバルで許可するかどうか
+
+- `false`（デフォルト）: セキュリティのため、コマンド連結を禁止
+- `true`: コマンド連結を許可（**セキュリティリスクあり**）
+
+個別のコマンドで`allow_chaining`を指定すると、そちらが優先されます。
+
+**セキュリティリスク**:
+- コマンド連結はシェルインジェクション攻撃のベクトルになり得ます
+- 信頼できる入力のみを使用する場合に限り有効化してください
+- 代わりに**コマンド配列**（`cmd = ["cmd1", "cmd2"]`）の使用を推奨します
+
+**例**:
+```toml
+[config]
+allow_command_chaining = false  # デフォルト（セキュア）
+```
+
+**代替方法（推奨）**:
+```toml
+# ❌ コマンド連結（非推奨）
+[commands.build-and-deploy]
+cmd = "npm run build && npm run deploy"
+allow_chaining = true  # 明示的に許可が必要
+
+# ✅ コマンド配列（推奨）
+[commands.build-and-deploy]
+cmd = ["npm run build", "npm run deploy"]
+```
+
+#### `allow_subshells`
+
+**型**: 真偽値
+**デフォルト**: `false`
+
+**説明**: サブシェル（`()`）をグローバルで許可するかどうか
+
+- `false`（デフォルト）: セキュリティのため、サブシェルを禁止
+- `true`: サブシェルを許可（**正規表現パターンや特定のユースケースで必要**）
+
+個別のコマンドで`allow_subshells`を指定すると、そちらが優先されます。
+
+**セキュリティリスク**:
+- サブシェルは任意のコマンドをグループ化して実行できるため、セキュリティリスクがあります
+- 信頼できる入力のみを使用する場合に限り有効化してください
+- grep正規表現パターン（`grep -E '(pattern1|pattern2)'`）などの正当な用途のみで使用を推奨
+
+**正当な使用例**:
+```toml
+# grep正規表現パターン
+[commands.search-logs]
+cmd = "grep -E '(ERROR|WARN)' app.log"
+allow_subshells = true  # 正規表現パターンに括弧が必要
+```
+
+**グローバル設定例**:
+```toml
+[config]
+allow_subshells = false  # デフォルト（セキュア）
+```
+
+**コマンド個別設定（推奨）**:
+```toml
+[config]
+allow_subshells = false  # グローバルは禁止
+
+[commands.search-pattern]
+cmd = "grep -E '(http|https)://[^/]+' access.log"
+allow_subshells = true  # このコマンドのみ許可
+```
+
 #### `timeout`
 
 **型**: 整数
@@ -200,9 +276,9 @@ cmd = "実行するコマンド"
 description = "開発サーバーを起動"
 cmd = "npm run dev"
 
-[commands.push]
-description = "変更をコミット＆プッシュ"
-cmd = "git add . && git commit && git push"
+[commands.list]
+description = "ファイル一覧を表示"
+cmd = "ls -la"
 ```
 
 ### 複数のコマンド
@@ -281,6 +357,167 @@ description = "長時間かかるタスク"
 cmd = "npm run heavy-process"
 timeout = 600  # 10分でタイムアウト
 ```
+
+### コマンド連結
+
+コマンド連結（`&&`, `||`, `;`）を使用する場合は、セキュリティリスクを理解した上で明示的に許可する必要があります。
+
+#### デフォルトの動作（推奨）
+
+コマンド連結はセキュリティのため**デフォルトで禁止**されています：
+
+```toml
+[commands.build-and-deploy]
+description = "ビルドしてデプロイ"
+cmd = "npm run build && npm run deploy"
+# ❌ このままでは実行時にエラーになります
+```
+
+#### 方法1: コマンド配列を使用（推奨）
+
+最も安全な方法は、コマンド配列を使用することです：
+
+```toml
+[commands.build-and-deploy]
+description = "ビルドしてデプロイ"
+cmd = [
+    "npm run build",
+    "npm run deploy"
+]
+# ✅ 推奨：コマンド配列は安全で、先行コマンドが失敗すると停止します
+```
+
+#### 方法2: 個別コマンドで許可（条件付き推奨）
+
+信頼できるコマンドのみ、個別に連結を許可できます：
+
+```toml
+[commands.git-diff]
+description = "変更を確認"
+cmd = "cd /path/to/project && git diff"
+allow_chaining = true  # このコマンドのみ連結を許可
+```
+
+#### 方法3: グローバルで許可（非推奨）
+
+全コマンドで連結を許可することもできますが、**セキュリティリスクがあるため非推奨**です：
+
+```toml
+[config]
+allow_command_chaining = true  # ⚠️ 非推奨：セキュリティリスクあり
+
+[commands.deploy]
+cmd = "npm run build && npm run deploy"  # 全コマンドで連結が可能に
+```
+
+#### 階層的制御
+
+設定の優先順位：
+
+1. **個別コマンドの`allow_chaining`**（最優先）
+2. グローバル設定の`allow_command_chaining`
+3. デフォルト（`false`）
+
+```toml
+[config]
+allow_command_chaining = true  # グローバルで許可
+
+[commands.safe-command]
+cmd = "echo hello && echo world"
+# allow_chainingの指定なし → グローバル設定（true）が適用される
+
+[commands.critical-command]
+cmd = "rm -rf /tmp && ls"
+allow_chaining = false  # グローバル設定を上書きして禁止
+```
+
+#### セキュリティリスク
+
+コマンド連結を許可する際の注意点：
+
+- **シェルインジェクション攻撃**のリスクが高まります
+- 外部入力や変数を含むコマンドでは**絶対に使用しない**でください
+- 信頼できる静的なコマンドのみに限定してください
+
+### サブシェル制御（`allow_subshells`）
+
+サブシェル（`()`）を使用するコマンドを実行する必要がある場合、`allow_subshells`で制御できます。
+
+#### デフォルト動作
+
+デフォルトでは、サブシェルは**セキュリティのため禁止**されています：
+
+```toml
+[commands.search-pattern]
+cmd = "grep -E '(ERROR|WARN)' app.log"
+# エラー: サブシェル（括弧）は禁止されています
+```
+
+#### 方法1: コマンド配列（括弧が不要な場合）
+
+正規表現パターンを文字列として扱う場合、引用符でエスケープできます：
+
+```toml
+[commands.search-pattern]
+cmd = ["grep", "-E", "(ERROR|WARN)", "app.log"]
+# 配列形式では括弧がシェルメタ文字として解釈されない
+```
+
+#### 方法2: コマンド個別で許可（推奨）
+
+特定のコマンドでのみサブシェルを許可できます：
+
+```toml
+[commands.search-logs]
+description = "ログからエラーを検索"
+cmd = "grep -E '(ERROR|WARN|FATAL)' /var/log/app.log"
+allow_subshells = true  # このコマンドのみサブシェルを許可
+```
+
+**正当な使用例**:
+- **正規表現パターン**: `grep -E '(pattern1|pattern2)'`
+- **グループ化**: `(cd /tmp && make) && echo Done`
+
+#### 方法3: グローバルで許可（非推奨）
+
+全コマンドでサブシェルを許可することもできますが、**セキュリティリスクがあるため非推奨**です：
+
+```toml
+[config]
+allow_subshells = true  # ⚠️ 非推奨：セキュリティリスクあり
+
+[commands.search]
+cmd = "grep -E '(http|https)://[^/]+' access.log"  # 全コマンドでサブシェルが可能に
+```
+
+#### 階層的制御
+
+設定の優先順位：
+
+1. **個別コマンドの`allow_subshells`**（最優先）
+2. グローバル設定の`allow_subshells`
+3. デフォルト（`false`）
+
+```toml
+[config]
+allow_subshells = true  # グローバルで許可
+
+[commands.grep-pattern]
+cmd = "grep -E '(error|warning)' app.log"
+# allow_subshellsの指定なし → グローバル設定（true）が適用される
+
+[commands.critical-search]
+cmd = "grep -E '(password|secret)' sensitive.log"
+allow_subshells = false  # グローバル設定を上書きして禁止
+```
+
+#### セキュリティリスク
+
+サブシェルを許可する際の注意点：
+
+- サブシェルは任意のコマンドをグループ化して実行できるため、**セキュリティリスク**があります
+- 外部入力や変数を含むコマンドでは**絶対に使用しない**でください
+- **正規表現パターン**など、正当な用途のみに限定してください
 
 ---
 

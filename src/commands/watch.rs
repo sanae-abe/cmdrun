@@ -89,6 +89,8 @@ pub async fn handle_watch(
         echo: false, // Don't echo in watch mode to reduce noise
         color: true,
         language: lang,
+        allow_command_chaining: cmdrun_config.config.allow_command_chaining,
+        allow_subshells: cmdrun_config.config.allow_subshells,
     };
 
     // Create and run the watch runner with cmdrun integration

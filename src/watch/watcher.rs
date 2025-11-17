@@ -294,6 +294,8 @@ mod tests {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let exec_ctx = ExecutionContext {
@@ -305,6 +307,8 @@ mod tests {
             echo: false,
             color: false,
             language: crate::config::Language::English,
+            allow_command_chaining: false,
+            allow_subshells: false,
         };
 
         let runner = WatchRunner::new_with_cmdrun(
@@ -339,6 +343,8 @@ mod tests {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let exec_ctx = ExecutionContext {
@@ -350,6 +356,8 @@ mod tests {
             echo: false,
             color: false,
             language: crate::config::Language::English,
+            allow_command_chaining: false,
+            allow_subshells: false,
         };
 
         let runner = WatchRunner::new_with_cmdrun(
@@ -390,6 +398,8 @@ mod tests {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let exec_ctx = ExecutionContext {
@@ -401,6 +411,8 @@ mod tests {
             echo: false,
             color: false,
             language: crate::config::Language::English,
+            allow_command_chaining: false,
+            allow_subshells: false,
         };
 
         let cmdrun_runner = WatchRunner::new_with_cmdrun(

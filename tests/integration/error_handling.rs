@@ -24,7 +24,7 @@ async fn test_timeout_handling() {
         strict: false,
         echo: false,
         color: false,
-        language: Language::default(),
+        language: Language::default(), allow_command_chaining: false, allow_subshells: false,
     };
     let executor = CommandExecutor::new(ctx);
 
@@ -44,7 +44,7 @@ async fn test_timeout_handling() {
         parallel: false,
         tags: vec![],
         platform: vec![],
-        confirm: false,
+        confirm: false, allow_chaining: None, allow_subshells: None,
     };
 
     let result = executor.execute(&cmd).await;
@@ -109,7 +109,7 @@ async fn test_command_not_found_error() {
         strict: false,
         echo: false,
         color: false,
-        language: Language::default(),
+        language: Language::default(), allow_command_chaining: false, allow_subshells: false,
     };
     let executor = CommandExecutor::new(ctx);
 
@@ -123,7 +123,7 @@ async fn test_command_not_found_error() {
         parallel: false,
         tags: vec![],
         platform: vec![],
-        confirm: false,
+        confirm: false, allow_chaining: None, allow_subshells: None,
     };
 
     let result = executor.execute(&cmd).await;
@@ -188,7 +188,7 @@ async fn test_invalid_working_directory() {
         strict: false,
         echo: false,
         color: false,
-        language: Language::default(),
+        language: Language::default(), allow_command_chaining: false, allow_subshells: false,
     };
     let executor = CommandExecutor::new(ctx);
 
@@ -202,7 +202,7 @@ async fn test_invalid_working_directory() {
         parallel: false,
         tags: vec![],
         platform: vec![],
-        confirm: false,
+        confirm: false, allow_chaining: None, allow_subshells: None,
     };
 
     let result = executor.execute(&cmd).await;
@@ -229,7 +229,7 @@ fn test_empty_command_id() {
         parallel: false,
         tags: vec![],
         platform: vec![],
-        confirm: false,
+        confirm: false, allow_chaining: None, allow_subshells: None,
     };
 
     // コマンド自体は作成できるが、IDが空の場合の処理を確認
@@ -288,7 +288,7 @@ fn test_duplicate_command_definition() {
         parallel: false,
         tags: vec![],
         platform: vec![],
-        confirm: false,
+        confirm: false, allow_chaining: None, allow_subshells: None,
     };
 
     // 同じIDで2回追加
@@ -315,7 +315,7 @@ async fn test_platform_specific_command_execution() {
         strict: false,
         echo: false,
         color: false,
-        language: Language::default(),
+        language: Language::default(), allow_command_chaining: false, allow_subshells: false,
     };
     let executor = CommandExecutor::new(ctx);
 
@@ -335,7 +335,7 @@ async fn test_platform_specific_command_execution() {
         parallel: false,
         tags: vec![],
         platform: vec![],
-        confirm: false,
+        confirm: false, allow_chaining: None, allow_subshells: None,
     };
 
     let result = executor.execute(&cmd).await;

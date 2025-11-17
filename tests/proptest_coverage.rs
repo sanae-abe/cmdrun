@@ -313,7 +313,7 @@ proptest! {
             platform: vec![],
             tags: vec![],
             parallel: false,
-            confirm: false,
+            confirm: false, allow_chaining: None, allow_subshells: None,
         });
 
         let config = CommandsConfig {

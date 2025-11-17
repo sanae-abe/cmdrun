@@ -220,6 +220,8 @@ pub async fn handle_retry(id: Option<i64>) -> Result<()> {
         echo: true,
         color: true,
         language: config.config.language,
+        allow_command_chaining: config.config.allow_command_chaining,
+        allow_subshells: config.config.allow_subshells,
     };
 
     let executor = CommandExecutor::new(ctx);

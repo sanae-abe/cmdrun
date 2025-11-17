@@ -33,6 +33,10 @@
 ### 🔒 Security
 - **Zero Rust `eval()`** - No dynamic code generation in application code
 - **Safe variable expansion** - No shell injection vulnerabilities
+- **Fine-grained control** - Hierarchical permission system for command chaining and subshells
+  - `allow_command_chaining` - Control `&&`, `||`, `;` operators (default: disabled)
+  - `allow_subshells` - Control `()` parentheses for regex patterns (default: disabled)
+- **Escape sequences** - Support for `\n`, `\r`, `\t` with minimal security risk
 - **Dependency audit** - Built-in security scanning
 
 > **🔐 Security Report**: See [Security Documentation](docs/technical/SECURITY.md) for threat model and audit results.

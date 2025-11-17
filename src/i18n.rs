@@ -76,6 +76,12 @@ pub enum MessageKey {
     HintShellFunction,
     HintCdCommand,
 
+    // ====== コマンド連結ヒント ======
+    HintCommandChainingAlternatives,
+    HintCommandArrayRecommended,
+    HintEnableChainingForCommand,
+    HintEnableChainingGlobally,
+
     // ====== エラーメッセージ ======
     ErrorEmptyCommandId,
     ErrorEmptyCommand,
@@ -362,6 +368,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             HintShellFunction => "💡 Hint: Use shell functions for directory navigation",
             HintCdCommand => "   Add to ~/.cmdrun/shell-functions.sh:",
 
+            // ====== コマンド連結ヒント ======
+            HintCommandChainingAlternatives => "💡 Hint: Use one of these alternatives:",
+            HintCommandArrayRecommended => "   1. Use command array (recommended for security):\n      cmd = [\"cd /path\", \"git diff\"]",
+            HintEnableChainingForCommand => "   2. Enable chaining for this command (use with caution):\n      allow_chaining = true",
+            HintEnableChainingGlobally => "   3. Enable chaining globally (not recommended):\n      [config]\n      allow_command_chaining = true",
+
             // ====== エラーメッセージ ======
             ErrorEmptyCommandId => "Command ID cannot be empty",
             ErrorEmptyCommand => "Command cannot be empty",
@@ -641,6 +653,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             WarningShellBuiltinNoEffect => "⚠ このシェルビルトインコマンドはサブプロセスで実行されるため、現在のシェルには影響しません",
             HintShellFunction => "💡 ヒント: ディレクトリ移動にはシェル関数を使ってください",
             HintCdCommand => "   ~/.cmdrun/shell-functions.sh に追加:",
+
+            // ====== コマンド連結ヒント ======
+            HintCommandChainingAlternatives => "💡 ヒント: 次のいずれかの代替方法を使用してください：",
+            HintCommandArrayRecommended => "   1. コマンド配列を使用（セキュリティ上推奨）:\n      cmd = [\"cd /path\", \"git diff\"]",
+            HintEnableChainingForCommand => "   2. このコマンドのみ連結を許可（注意して使用）:\n      allow_chaining = true",
+            HintEnableChainingGlobally => "   3. グローバルで連結を許可（非推奨）:\n      [config]\n      allow_command_chaining = true",
 
             // ====== エラーメッセージ ======
             ErrorEmptyCommandId => "コマンドIDは空にできません",
@@ -922,6 +940,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             HintShellFunction => "💡 提示：使用shell函数进行目录导航",
             HintCdCommand => "   添加到 ~/.cmdrun/shell-functions.sh：",
 
+            // ====== 命令链接提示 ======
+            HintCommandChainingAlternatives => "💡 提示：使用以下替代方法之一：",
+            HintCommandArrayRecommended => "   1. 使用命令数组（推荐安全）:\n      cmd = [\"cd /path\", \"git diff\"]",
+            HintEnableChainingForCommand => "   2. 仅为此命令启用链接（谨慎使用）:\n      allow_chaining = true",
+            HintEnableChainingGlobally => "   3. 全局启用链接（不推荐）:\n      [config]\n      allow_command_chaining = true",
+
             // ====== 错误消息 ======
             ErrorEmptyCommandId => "命令ID不能为空",
             ErrorEmptyCommand => "命令不能为空",
@@ -1201,6 +1225,12 @@ pub fn get_message(key: MessageKey, language: Language) -> &'static str {
             WarningShellBuiltinNoEffect => "⚠ 此shell內建命令在子處理序中執行，不會影響目前shell",
             HintShellFunction => "💡 提示：使用shell函式進行目錄導覽",
             HintCdCommand => "   新增至 ~/.cmdrun/shell-functions.sh：",
+
+            // ====== 命令鏈接提示 ======
+            HintCommandChainingAlternatives => "💡 提示：使用以下替代方法之一：",
+            HintCommandArrayRecommended => "   1. 使用命令陣列（建議安全）:\n      cmd = [\"cd /path\", \"git diff\"]",
+            HintEnableChainingForCommand => "   2. 僅為此命令啟用鏈接（謹慎使用）:\n      allow_chaining = true",
+            HintEnableChainingGlobally => "   3. 全域啟用鏈接（不建議）:\n      [config]\n      allow_command_chaining = true",
 
             // ====== 錯誤訊息 ======
             ErrorEmptyCommandId => "命令ID不能為空",

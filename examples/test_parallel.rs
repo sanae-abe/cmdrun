@@ -56,6 +56,8 @@ async fn main() -> anyhow::Result<()> {
         echo: true,
         color: true,
         language: cmdrun::config::Language::default(),
+        allow_command_chaining: false,
+        allow_subshells: false,
     };
 
     let executor = CommandExecutor::new(ctx);
@@ -123,6 +125,7 @@ fn create_test_config() -> CommandsConfig {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
         },
     );
 
@@ -140,6 +143,7 @@ fn create_test_config() -> CommandsConfig {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
         },
     );
 
@@ -157,6 +161,7 @@ fn create_test_config() -> CommandsConfig {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
         },
     );
 
@@ -174,6 +179,7 @@ fn create_test_config() -> CommandsConfig {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
         },
     );
 

@@ -28,6 +28,8 @@ fn create_command_with_platform(description: &str, platforms: Vec<Platform>) -> 
         tags: vec![],
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     }
 }
 
@@ -261,6 +263,8 @@ async fn test_platform_validation_before_execution() {
         tags: vec![],
         parallel: false,
         confirm: false,
+        allow_chaining: None,
+        allow_subshells: None,
     };
 
     let result = executor.execute(&incompatible_cmd).await;

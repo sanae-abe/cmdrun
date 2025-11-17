@@ -37,6 +37,10 @@ pub struct ExecutionContext {
     pub color: bool,
     /// 言語設定
     pub language: crate::config::Language,
+    /// コマンド連結をグローバルで許可（デフォルト: false）
+    pub allow_command_chaining: bool,
+    /// サブシェルをグローバルで許可（デフォルト: false）
+    pub allow_subshells: bool,
 }
 
 impl Default for ExecutionContext {
@@ -50,6 +54,8 @@ impl Default for ExecutionContext {
             echo: true,
             color: true,
             language: crate::config::Language::default(),
+            allow_command_chaining: false,
+            allow_subshells: false,
         }
     }
 }
@@ -72,28 +78,14 @@ pub struct ExecutionResult {
 /// コマンドエグゼキューター
 pub struct CommandExecutor {
     context: ExecutionContext,
-    validator: CommandValidator,
     sensitive_env: SensitiveEnv,
 }
 
 impl CommandExecutor {
     /// 新規エグゼキューター作成
     pub fn new(context: ExecutionContext) -> Self {
-        // バリデーターを設定（strictモードに応じて）
-        let validator = if context.strict {
-            // strictモードでも変数展開は許可する（安全な展開のみ）
-            CommandValidator::new().allow_variable_expansion()
-        } else {
-            CommandValidator::new()
-                .with_strict_mode(false)
-                .allow_variable_expansion()
-                .allow_pipe()
-                .allow_redirect()
-        };
-
         Self {
             context,
-            validator,
             sensitive_env: SensitiveEnv::new(),
         }
     }
@@ -126,10 +118,15 @@ impl CommandExecutor {
         // 変数展開
         let interpolated_commands = self.interpolate_commands(&commands, command)?;
 
+        // コマンド固有のvalidatorを構築（階層的制御）
+        let command_validator = self.build_validator_for_command(command);
+
         // 実行
         let mut last_result = None;
         for cmd in interpolated_commands {
-            let result = self.execute_single(&cmd, &merged_env).await?;
+            let result = self
+                .execute_single_with_validator(&cmd, &merged_env, &command_validator)
+                .await?;
             if !result.success {
                 return Err(ExecutionError::CommandFailed {
                     command: cmd,
@@ -198,19 +195,111 @@ impl CommandExecutor {
             .collect::<Result<Vec<_>>>()
     }
 
-    /// 単一コマンド実行
-    async fn execute_single(
+    /// コマンド固有のvalidatorを構築（階層的制御）
+    fn build_validator_for_command(&self, command: &Command) -> CommandValidator {
+        // 1. コマンド個別設定（最優先）
+        let allow_chaining = if let Some(allow) = command.allow_chaining {
+            allow
+        } else {
+            // 2. グローバル設定
+            self.context.allow_command_chaining
+        };
+
+        // サブシェル許可の階層制御
+        let allow_subshells = if let Some(allow) = command.allow_subshells {
+            allow
+        } else {
+            // 2. グローバル設定
+            self.context.allow_subshells
+        };
+
+        // コマンド連結を許可する場合、strictモードは無効化する必要がある
+        // （[;&|]パターンが危険パターンとして検出されるため）
+        let effective_strict = if allow_chaining || allow_subshells {
+            false
+        } else {
+            self.context.strict
+        };
+
+        // validatorを構築
+        let mut validator = if effective_strict {
+            CommandValidator::new().allow_variable_expansion()
+        } else {
+            CommandValidator::new()
+                .with_strict_mode(false)
+                .allow_variable_expansion()
+                .allow_pipe()
+                .allow_redirect()
+        };
+
+        // コマンド連結を許可する場合
+        if allow_chaining {
+            validator = validator.allow_chaining();
+        }
+
+        // サブシェルを許可する場合
+        if allow_subshells {
+            validator = validator.allow_subshells();
+        }
+
+        validator
+    }
+
+    /// 単一コマンド実行（validator指定版）
+    async fn execute_single_with_validator(
         &self,
         command: &str,
         env: &AHashMap<String, String>,
+        validator: &CommandValidator,
     ) -> Result<ExecutionResult> {
         let start = Instant::now();
 
         // セキュリティ検証
-        let validation_result = self.validator.validate(command);
+        let validation_result = validator.validate(command);
         if !validation_result.is_safe() {
             if let Some(err) = validation_result.error() {
                 warn!("Command validation failed: {}", err);
+
+                // コマンド連結が拒否された場合、代替方法を提示
+                use crate::security::validation::ValidationError;
+                if let ValidationError::DangerousMetacharacters(chars) = err {
+                    if chars.contains("'&'") || chars.contains("'|'") || chars.contains("';'") {
+                        use crate::i18n::{get_message, MessageKey};
+                        eprintln!();
+                        eprintln!(
+                            "{}",
+                            get_message(
+                                MessageKey::HintCommandChainingAlternatives,
+                                self.context.language
+                            )
+                        );
+                        eprintln!(
+                            "{}",
+                            get_message(
+                                MessageKey::HintCommandArrayRecommended,
+                                self.context.language
+                            )
+                        );
+                        eprintln!();
+                        eprintln!(
+                            "{}",
+                            get_message(
+                                MessageKey::HintEnableChainingForCommand,
+                                self.context.language
+                            )
+                        );
+                        eprintln!();
+                        eprintln!(
+                            "{}",
+                            get_message(
+                                MessageKey::HintEnableChainingGlobally,
+                                self.context.language
+                            )
+                        );
+                        eprintln!();
+                    }
+                }
+
                 return Err(ExecutionError::CommandFailed {
                     command: command.to_string(),
                     code: 1,
@@ -396,7 +485,6 @@ impl CommandExecutor {
     fn clone_for_task(&self) -> Self {
         Self {
             context: self.context.clone(),
-            validator: CommandValidator::new(),
             sensitive_env: SensitiveEnv::new(),
         }
     }
@@ -567,6 +655,8 @@ mod tests {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let result = executor.execute(&command).await;
@@ -594,6 +684,8 @@ mod tests {
             timeout: None,
             parallel: false,
             confirm: false,
+            allow_chaining: None,
+            allow_subshells: None,
         };
 
         let result = executor.execute(&command).await.unwrap();
