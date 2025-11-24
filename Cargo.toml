@@ -93,7 +93,7 @@ smallvec = "1.13"  # スタック最適化ベクター
 strsim = "0.11"  # Levenshtein distance, Jaro-Winkler等
 
 # 履歴管理（SQLite）
-rusqlite = { version = "0.31", features = ["bundled"] }  # SQLite データベース
+rusqlite = { version = "0.37", features = ["bundled"] }  # SQLite データベース
 
 # プラグインシステム
 libloading = { version = "0.9", optional = true }  # 動的ライブラリロード
