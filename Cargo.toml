@@ -41,7 +41,7 @@ tokio = { version = "1.39", features = [
 
 # エラーハンドリング（詳細なエラー情報）
 anyhow = "1.0"
-thiserror = "1.0"
+thiserror = "2.0"
 
 # 対話的入力（readline機能付き）
 dialoguer = "0.12"
