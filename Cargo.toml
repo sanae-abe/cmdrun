@@ -24,7 +24,7 @@ clap = { version = "4.5", features = ["derive", "cargo", "env", "wrap_help"] }
 clap_complete = "4.5"
 
 # TOML パース（高速・エラー詳細）
-toml = { version = "0.8", features = ["preserve_order"] }
+toml = { version = "0.9", features = ["preserve_order"] }
 toml_edit = "0.23"  # TOML編集（フォーマット保持）
 
 # 非同期ランタイム（最適化済み・必要機能のみ）
