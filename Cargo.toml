@@ -113,7 +113,7 @@ criterion = { version = "0.7", features = ["html_reports"] }
 
 [build-dependencies]
 # ビルド時コード生成
-vergen = { version = "8.3", features = ["build", "cargo", "git", "gitcl"] }
+vergen = { version = "9.0", features = ["build", "cargo", "git", "gitcl"] }
 
 [profile.release]
 # 本番最適化
