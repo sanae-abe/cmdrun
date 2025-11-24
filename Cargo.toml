@@ -104,7 +104,7 @@ uuid = { version = "1.10", features = ["v4", "serde"], optional = true }  # プ�
 # テスト
 proptest = "1.5"  # プロパティベーステスト
 quickcheck = "1.0"
-mockall = "0.13"  # モック
+mockall = "0.14"  # モック
 pretty_assertions = "1.4"  # アサーション表示改善
 tempfile = "3.12"  # 一時ファイル
 
