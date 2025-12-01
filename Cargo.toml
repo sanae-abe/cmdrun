@@ -109,7 +109,7 @@ pretty_assertions = "1.4"  # アサーション表示改善
 tempfile = "3.12"  # 一時ファイル
 
 # ベンチマーク
-criterion = { version = "0.7", features = ["html_reports"] }
+criterion = { version = "0.8", features = ["html_reports"] }
 
 [build-dependencies]
 # ビルド時コード生成
