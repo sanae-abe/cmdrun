@@ -15,7 +15,7 @@ jobs:
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -52,7 +52,7 @@ jobs:
             asset_name: cmdrun-windows-x86_64.zip
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -95,7 +95,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: dtolnay/rust-toolchain@stable
       - name: Publish
         run: cargo publish --token ${{ secrets.CARGO_TOKEN }}
