@@ -36,7 +36,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache cargo dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry/index/
@@ -59,7 +59,7 @@ jobs:
 
       - name: Cache cli-testing-specialist
         id: cache-cli-testing-specialist
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cargo/bin/cli-testing-specialist
           key: ${{ runner.os }}-cli-testing-specialist-v1.0.2
@@ -217,7 +217,7 @@ jobs:
 
       - name: Cache cli-testing-specialist
         id: cache-cli-testing-specialist-security
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cargo/bin/cli-testing-specialist
           key: ${{ runner.os }}-cli-testing-specialist-v1.0.2
